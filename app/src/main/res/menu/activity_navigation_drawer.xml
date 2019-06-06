@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+                android:id="@+id/nav_dashboard"
+                android:icon="@drawable/ic_dashboard_black_24dp"
+                android:title="@string/menu_dashboard"/>
+        <item
+                android:id="@+id/nav_view_circular"
+                android:icon="@drawable/ic_description_black_24dp"
+                android:title="@string/menu_view_circular"/>
+        <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_person_black_24dp"
+                android:title="@string/menu_profile"/>
+        <item
+                android:id="@+id/nav_view_assignment_jpeg"
+                android:icon="@drawable/ic_description_black_24dp"
+                android:title="@string/menu_view_assignment_jpeg"/>
+
+        <item
+                android:id="@+id/nav_view_assignment_pdf"
+                android:icon="@drawable/ic_picture_as_pdf_black_24dp"
+                android:title="@string/menu_view_assignment_pdf"/>
+        <item
+                android:id="@+id/nav_view_report"
+                android:icon="@drawable/ic_description_black_24dp"
+                android:title="@string/menu_view_report"/>
+
+        <item
+                android:id="@+id/nav_report_pdf"
+                android:icon="@drawable/ic_picture_as_pdf_black_24dp"
+                android:title="@string/menu_reports_pdf"/>
+
+        <item
+                android:id="@+id/nav_announcement"
+                android:icon="@drawable/ic_radio_black_24dp"
+                android:title="@string/menu_announcement"/>
+
+        <item
+                android:id="@+id/nav_send_message"
+                android:icon="@drawable/ic_message_black_24dp"
+                android:title="@string/menu_send_message"/>
+        <item
+                android:id="@+id/nav_change_password"
+                android:icon="@drawable/ic_lock_black_24dp"
+                android:title="@string/menu_change_password"/>
+
+    </group>
+
+
+
+</menu>

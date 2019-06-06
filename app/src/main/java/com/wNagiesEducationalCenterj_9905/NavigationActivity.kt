@@ -12,12 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class NavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_navigation)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.menu_navigation, menu)
         return true
     }
 
@@ -65,22 +65,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_home -> {
+            R.id.nav_dashboard -> {
                 // Handle the camera action
             }
-            R.id.nav_gallery -> {
+            R.id.nav_view_circular -> {
 
             }
-            R.id.nav_slideshow -> {
+            R.id.nav_profile -> {
 
             }
-            R.id.nav_tools -> {
+            R.id.nav_view_assignment_jpeg -> {
 
             }
-            R.id.nav_share -> {
+            R.id.nav_view_assignment_pdf -> {
 
             }
-            R.id.nav_send -> {
+            R.id.nav_view_report -> {
+
+            }
+            R.id.nav_report_pdf -> {
+
+            }
+            R.id.nav_announcement -> {
+
+            }
+            R.id.nav_send_message -> {
+
+            }
+
+            R.id.nav_change_password -> {
 
             }
         }

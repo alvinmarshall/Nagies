@@ -24,4 +24,5 @@
     <string name="hint_input_password">password</string>
     <string name="label_terms_and_conditions">terms and conditions</string>
     <string name="label_button_login">login</string>
+    <string name="label_msg_available_files">Available files</string>
 </resources>

@@ -29,4 +29,7 @@
     <string name="hint_input_new_password">New Password</string>
     <string name="hint_input_old_password">Old Password</string>
     <string name="label_button_reset_password">Reset Password</string>
+    <string name="hint_input_start_a_conversation">Start a conversation</string>
+    <string name="action_send">Send</string>
+    <string name="action_close">Close</string>
 </resources>

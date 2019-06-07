@@ -6,8 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
-        tools:showIn="@layout/activity_login"
-        tools:context=".auth.LoginActivity">
+        tools:showIn="@layout/activity_auth"
+        tools:context=".auth.AuthActivity">
 
     <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

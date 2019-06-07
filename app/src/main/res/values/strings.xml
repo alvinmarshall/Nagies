@@ -32,4 +32,6 @@
     <string name="hint_input_start_a_conversation">Start a conversation</string>
     <string name="action_send">Send</string>
     <string name="action_close">Close</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

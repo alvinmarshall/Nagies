@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/app_navigation"
+            app:startDestination="@id/dashboardFragment">
+
+    <fragment android:id="@+id/dashboardFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.DashboardFragment"
+              android:label="Dashboard" tools:layout="@layout/fragment_dashboard"/>
+    <fragment android:id="@+id/assignmentJpegFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.AssignmentJpegFragment"
+              android:label="Assignment jpeg" tools:layout="@layout/fragment_assignment_jpeg"/>
+    <fragment android:id="@+id/assignmentPdfFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.AssignmentPdfFragment"
+              android:label="Assignment pdf" tools:layout="@layout/fragment_assignment_pdf"/>
+    <fragment android:id="@+id/changePasswordFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment"
+              android:label="Change Password" tools:layout="@layout/fragment_change_password"/>
+    <fragment android:id="@+id/profileFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ProfileFragment"
+              android:label="Profile" tools:layout="@layout/fragment_profile"/>
+    <fragment android:id="@+id/sendMessageFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.SendMessageFragment"
+              android:label="Send Message" tools:layout="@layout/fragment_send_message"/>
+    <fragment android:id="@+id/messageDetailFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.MessageDetailFragment"
+              android:label="fragment_message_detail" tools:layout="@layout/fragment_message_detail"/>
+    <fragment android:id="@+id/announcementFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.AnnouncementFragment"
+              android:label="Announcement" tools:layout="@layout/fragment_announcement"/>
+    <fragment android:id="@+id/circularFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.CircularFragment"
+              android:label="Circular" tools:layout="@layout/fragment_circular"/>
+    <fragment android:id="@+id/reportFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ReportFragment"
+              android:label="Reports" tools:layout="@layout/fragment_report"/>
+    <fragment android:id="@+id/reportPdfFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ReportPdfFragment"
+              android:label="Report pdf" tools:layout="@layout/fragment_report_pdf"/>
+</navigation>

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
                 xmlns:tools="http://schemas.android.com/tools"
-                tools:context=".ui.fragment.AssignmentJpegFragment"
-                android:layout_height="match_parent">
-
-
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".ui.fragment.AnnouncementFragment">
     <TextView
-            android:text="@string/label_msg_available_files"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            tools:text="Messages From teacher"
             android:layout_width="match_parent"
             android:gravity="center"
+            android:padding="5dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_height="wrap_content" android:id="@+id/label_msg_title"/>
+
     <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
             android:layout_marginTop="5dp"
-            tools:listitem="@layout/list_assignment"
             android:id="@+id/recycler_view"
             android:layout_below="@id/label_msg_title"
+            android:layout_width="match_parent"
+            tools:listitem="@layout/list_messages"
             android:layout_height="match_parent"/>
 </RelativeLayout>

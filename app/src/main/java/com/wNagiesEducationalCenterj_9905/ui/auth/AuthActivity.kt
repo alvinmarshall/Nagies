@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.auth
+package com.wNagiesEducationalCenterj_9905.ui.auth
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

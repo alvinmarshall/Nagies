@@ -9,7 +9,7 @@
     <EditText
             android:layout_width="match_parent"
             android:id="@+id/et_message_content"
-            android:inputType="textLongMessage"
+            android:inputType="textMultiLine"
             android:padding="16dp"
             android:background="@drawable/square_edit_text"
             android:hint="@string/hint_input_start_a_conversation"

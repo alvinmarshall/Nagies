@@ -6,14 +6,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/app_bar_navigation"
-        tools:context=".ui.NavigationActivity">
-
+        tools:showIn="@layout/app_bar_teacher_navigation"
+        tools:context=".ui.teacher.TeacherNavigationActivity">
     <fragment
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navGraph="@navigation/app_navigation" app:defaultNavHost="true"
+            android:layout_height="match_parent"
+            app:navGraph="@navigation/teacher_navigation" app:defaultNavHost="true"
             android:id="@+id/fragment_socket"/>
-
 </FrameLayout>

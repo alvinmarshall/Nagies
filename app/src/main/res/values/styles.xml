@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:spinnerItemStyle">@style/SpinnerTheme</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -15,6 +16,10 @@
 
     <style name="SplashTheme" parent="Theme.MaterialComponents">
         <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
+    <style name="SpinnerTheme" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
 </resources>

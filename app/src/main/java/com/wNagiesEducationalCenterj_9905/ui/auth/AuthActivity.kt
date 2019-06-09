@@ -21,7 +21,7 @@ class AuthActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var loginOptions: ArrayList<String>
     private lateinit var arrayAdapter: ArrayAdapter<String>
-    private var snackbar:Snackbar? = null
+    private var snackbar: Snackbar? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +46,7 @@ class AuthActivity : AppCompatActivity() {
     private fun setLoginRoleNavigation() {
         when (spinner.selectedItemPosition) {
             0 -> {
-                snackbar = Snackbar.make(root,"Select a role",Snackbar.LENGTH_SHORT)
+                snackbar = Snackbar.make(root, getString(R.string.error_role_select_message), Snackbar.LENGTH_SHORT)
                 snackbar?.show()
             }
             1 -> startActivity<ParentNavigationActivity>()

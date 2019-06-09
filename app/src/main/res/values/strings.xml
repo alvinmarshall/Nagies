@@ -17,6 +17,7 @@
     <string name="menu_reports_pdf">Reports PDF</string>
     <string name="menu_announcement">Announcement</string>
     <string name="menu_send_message">Send Message</string>
+    <string name="error_role_select_message">Please select a role</string>
     <string name="action_search">Search</string>
     <string name="action_logout">Logout</string>
     <string name="label_login_msg">Login Page</string>

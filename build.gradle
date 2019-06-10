@@ -24,15 +24,20 @@ buildscript {
     ext.mockito_version = '2.1.0'
     ext.mockito_org_version = '2.+'
     ext.expresso_version = '3.2.0'
+    ext.firebase_version = '16.0.9'
     repositories {
         google()
         jcenter()
-        
+        maven {
+            url 'https://maven.fabric.io/public'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
+        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'io.fabric.tools:gradle:1.29.0'
         // in the individual module build.gradle files
     }
 }

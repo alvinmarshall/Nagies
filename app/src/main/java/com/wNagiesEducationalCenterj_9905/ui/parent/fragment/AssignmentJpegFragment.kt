@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.ui.fragment
+package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.os.Bundle
@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.TextView
 import com.wNagiesEducationalCenterj_9905.R
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -17,14 +17,15 @@ private const val ARG_PARAM2 = "param2"
  * A simple [Fragment] subclass.
  *
  */
-class ReportFragment : Fragment() {
+class AssignmentJpegFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_report, container, false)
+        return TextView(activity).apply {
+            setText(R.string.hello_blank_fragment)
+        }
     }
 
 

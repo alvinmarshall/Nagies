@@ -1,93 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
+        android:scrollbarStyle="outsideOverlay"
         android:layout_height="match_parent"
-        android:padding="8dp"
         tools:showIn="@layout/activity_auth"
         tools:context=".ui.auth.AuthActivity">
 
-    <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_centerInParent="true"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardUseCompatPadding="true"
-            android:layout_height="wrap_content">
-
-        <RelativeLayout
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+        <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:padding="8dp"
+                android:layout_marginStart="24dp"
+                android:id="@+id/mv"
+                android:layout_marginEnd="24dp"
+                android:layout_centerInParent="true"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardUseCompatPadding="true"
                 android:layout_height="wrap_content">
 
-            <TextView
+            <RelativeLayout
                     android:layout_width="match_parent"
-                    android:text="@string/label_login_msg"
-                    android:gravity="center_horizontal"
-                    android:textStyle="bold"
-                    android:id="@+id/label_msg_title"
-                    android:textColor="@color/colorAccent"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-                    android:layout_height="wrap_content"/>
+                    android:padding="8dp"
+                    android:focusableInTouchMode="true"
+                    android:layout_height="wrap_content">
 
-            <EditText
-                    android:layout_marginTop="100dp"
-                    android:layout_width="match_parent"
-                    android:inputType="textPersonName"
-                    android:hint="@string/hint_input_username"
-                    android:background="@drawable/square_edit_text"
-                    android:layout_below="@id/label_msg_title"
-                    android:padding="16dp"
-                    android:textColorHint="@color/colorAccent"
-                    android:id="@+id/et_username"
-                    android:layout_height="wrap_content" tools:ignore="Autofill"/>
+                <TextView
+                        android:layout_width="match_parent"
+                        android:text="@string/label_login_msg"
+                        android:gravity="center_horizontal"
+                        android:textStyle="bold"
+                        android:id="@+id/label_msg_title"
+                        android:textColor="?attr/primaryTextColor"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                        android:layout_height="wrap_content"/>
 
-            <EditText
-                    android:layout_width="match_parent"
-                    android:hint="@string/hint_input_password"
-                    android:layout_marginTop="16dp"
-                    android:inputType="textPassword"
-                    android:textColorHint="@color/colorAccent"
-                    android:background="@drawable/square_edit_text"
-                    android:layout_below="@id/et_username"
-                    android:padding="16dp"
-                    android:id="@+id/et_password"
-                    android:layout_height="wrap_content" tools:ignore="Autofill"/>
+                <EditText
+                        android:layout_marginTop="100dp"
+                        android:layout_width="match_parent"
+                        android:inputType="textPersonName"
+                        android:hint="@string/hint_input_username"
+                        android:background="@drawable/square_edit_text"
+                        android:layout_below="@id/label_msg_title"
+                        android:padding="16dp"
+                        android:textColorHint="?attr/primaryTextColor"
+                        android:id="@+id/et_username"
+                        android:layout_height="wrap_content" tools:ignore="Autofill"/>
 
-            <Spinner android:layout_width="match_parent"
-                     android:padding="16dp"
-                     android:layout_marginTop="16dp"
-                     android:hapticFeedbackEnabled="true"
-                     android:foregroundTint="@color/colorPrimary"
-                     android:background="@drawable/square_edit_text"
-                     android:layout_below="@+id/et_password"
-                     android:id="@+id/sp_login_option"
-                     android:spinnerMode="dropdown"
-                     android:layout_height="wrap_content"/>
-
-            <com.google.android.material.button.MaterialButton
-                    android:layout_width="match_parent"
-                    android:text="@string/label_button_login"
-                    android:padding="16dp"
-                    android:layout_marginTop="16dp"
-                    android:id="@+id/btn_login"
-                    android:layout_below="@id/sp_login_option"
-                    android:layout_height="wrap_content"/>
-
-            <TextView android:layout_width="match_parent"
-                      android:text="@string/label_terms_and_conditions"
-                      android:padding="5dp"
-                      android:layout_marginTop="8dp"
-                      android:textColor="@color/colorAccent"
-                      android:gravity="center_horizontal"
-                      android:layout_below="@id/btn_login"
-                      android:layout_height="wrap_content"/>
-
-        </RelativeLayout>
+                <EditText
+                        android:layout_width="match_parent"
+                        android:hint="@string/hint_input_password"
+                        android:layout_marginTop="16dp"
+                        android:inputType="textPassword"
+                        android:textColorHint="?attr/primaryTextColor"
+                        android:background="@drawable/square_edit_text"
+                        android:layout_below="@id/et_username"
+                        android:padding="16dp"
+                        android:id="@+id/et_password"
+                        android:layout_height="wrap_content" tools:ignore="Autofill"/>
 
 
-    </com.google.android.material.card.MaterialCardView>
-</RelativeLayout>
+                <com.google.android.material.button.MaterialButton
+                        android:layout_width="match_parent"
+                        android:text="@string/label_button_login"
+                        android:padding="16dp"
+                        android:layout_marginTop="16dp"
+                        android:id="@+id/btn_login"
+                        android:layout_below="@id/et_password"
+                        android:layout_height="wrap_content"/>
+
+                <TextView android:layout_width="match_parent"
+                          android:text="@string/label_terms_and_conditions"
+                          android:padding="5dp"
+                          android:layout_marginTop="8dp"
+                          android:textColor="?attr/primaryTextColor"
+                          android:gravity="center_horizontal"
+                          android:layout_below="@id/btn_login"
+                          android:layout_height="wrap_content"/>
+
+            </RelativeLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView android:layout_width="match_parent"
+                  android:text="@string/label_corp_name"
+                  android:gravity="center_horizontal"
+                  android:layout_below="@+id/mv"
+                  android:layout_marginTop="16dp"
+                  android:layout_alignParentBottom="true"
+                  android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</ScrollView>

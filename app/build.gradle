@@ -5,6 +5,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -39,9 +41,19 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation "androidx.test.espresso:espresso-core:$expresso_version"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$expresso_version"
     androidTestImplementation 'androidx.arch.core:core-testing:2.0.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+//    androidTestImplementation 'androidx.test.ext:truth:1.2.0'
+    androidTestImplementation 'com.agoda.kakao:kakao:2.0.0'
+
+    //firebase analytics
+    implementation "com.google.firebase:firebase-core:$firebase_version"
+
+    //crash analytics
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     // CORE TESTING
     testImplementation "android.arch.core:core-testing:$coreTesting_version"
     // Robolectric
@@ -98,6 +110,4 @@ dependencies {
     implementation "org.jetbrains.anko:anko:$anko_version"
     //reactive streams observable to live data
     implementation "android.arch.lifecycle:reactivestreams:$reactivestreams_version"
-
-
 }

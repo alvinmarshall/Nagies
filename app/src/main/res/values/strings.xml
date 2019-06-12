@@ -17,9 +17,10 @@
     <string name="menu_reports_pdf">Reports PDF</string>
     <string name="menu_announcement">Announcement</string>
     <string name="menu_send_message">Send Message</string>
+    <string name="error_role_select_message">Please select a role</string>
     <string name="action_search">Search</string>
     <string name="action_logout">Logout</string>
-    <string name="label_parent_login">Parent Login</string>
+    <string name="label_login_msg">Welcome to Nagies\'s Educational Center</string>
     <string name="hint_input_username">username</string>
     <string name="hint_input_password">password</string>
     <string name="label_terms_and_conditions">terms and conditions</string>
@@ -34,4 +35,20 @@
     <string name="action_close">Close</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_attachment">Attachment</string>
+    <string name="menu_file_management">File Management</string>
+    <string name="menu_parent_complaints">Parent Complaints</string>
+
+    <string name="label_parent_login">Parent\'s Login</string>
+    <string name="label_teacher_login">Teacher\'s Login</string>
+    <string name="title_activity_teacher_navigation">TeacherNavigationActivity</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="label_login_page">Login Page</string>
+    <string name="label_corp_name">Powered by Infodas Ghana Limited</string>
 </resources>

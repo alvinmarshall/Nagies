@@ -1,10 +1,9 @@
-package com.wNagiesEducationalCenterj_9905.ui.fragment
+package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.TextView
 import com.wNagiesEducationalCenterj_9905.R
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

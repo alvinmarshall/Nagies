@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/teacher_navigation"
+            app:startDestination="@id/sendMessageTeacherFragment">
+    <fragment android:id="@+id/sendMessageTeacherFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.SendMessageTeacherFragment"
+              android:label="Send Message" tools:layout="@layout/fragment_send_message_teacher"/>
+    <fragment android:id="@+id/fileManagementFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileManagementFragment"
+              android:label="File Management" tools:layout="@layout/fragment_file_management"/>
+    <fragment android:id="@+id/parentComplaintFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.ParentComplaintFragment"
+              android:label="Parent Complaint" tools:layout="@layout/fragment_parent_complaint"/>
+    <fragment android:id="@+id/attachmentFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.AttachmentFragment"
+              android:label="Attachment" tools:layout="@layout/fragment_attachment"/>
+    <fragment android:id="@+id/changePasswordFragmentTeacher"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment"
+              android:label="Change Password" tools:layout="@layout/fragment_change_password"/>
+</navigation>

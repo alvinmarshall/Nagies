@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.ui.fragment
+package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.os.Bundle

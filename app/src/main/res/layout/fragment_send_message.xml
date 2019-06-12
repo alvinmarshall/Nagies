@@ -3,7 +3,7 @@
               xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
               android:layout_width="match_parent"
               android:padding="16dp"
-              tools:context=".ui.fragment.SendMessageFragment"
+              tools:context=".ui.parent.fragment.SendMessageFragment"
               android:layout_height="match_parent">
 
     <EditText

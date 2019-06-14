@@ -8,5 +8,7 @@ data class AuthResponse(
     @SerializedName("username")
     val Username:String,
     @SerializedName("password")
-    val Password:String
+    val Password:String,
+    @SerializedName("id")
+    val UUID:String
 )

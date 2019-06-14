@@ -13,8 +13,13 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.wNagiesEducationalCenterj_9905.R
+import com.wNagiesEducationalCenterj_9905.base.BaseActivity
+import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import org.jetbrains.anko.clearTask
+import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.newTask
 
-class ParentNavigationActivity : AppCompatActivity() {
+class ParentNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
@@ -64,6 +69,12 @@ class ParentNavigationActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_logout -> {
+                preferenceProvider.setUserLogin(false,null)
+                startActivity(intentFor<RoleActivity>().newTask().clearTask())
+                finish()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

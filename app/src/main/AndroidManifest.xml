@@ -3,8 +3,8 @@
           xmlns:dist="http://schemas.android.com/apk/distribution"
           xmlns:tools="http://schemas.android.com/tools"
           package="com.wNagiesEducationalCenterj_9905">
-
     <dist:module dist:instant="true"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:name=".App"

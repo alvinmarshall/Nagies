@@ -2,6 +2,7 @@ package com.wNagiesEducationalCenterj_9905.di.modules
 
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.common.INFODAS_BASE_URL
+import com.wNagiesEducationalCenterj_9905.common.utils.LiveDataCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -28,7 +29,7 @@ class NetworkModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(LiveDataCallAdapterFactory())
             .client(okHttpClient)
             .baseUrl(INFODAS_BASE_URL)
             .build()

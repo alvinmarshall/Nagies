@@ -86,7 +86,9 @@ class AuthActivity : BaseActivity() {
                         return@let
                     }
                     toast("welcome ${it.data.username}")
-                    setLoginRoleNavigation(authRole)
+                    val uuid = it.data.uuid
+                    setLoginRoleNavigation(authRole, uuid, true)
+
                     Timber.i("user authenticated with id: ${it.data.id}")
                 }
                 Status.ERROR -> {
@@ -105,7 +107,7 @@ class AuthActivity : BaseActivity() {
         snackbar = Snackbar.make(mv, "username or password incorrect", Snackbar.LENGTH_SHORT)
         if (show) {
             snackbar?.show()
-        }else{
+        } else {
             snackbar?.dismiss()
         }
     }
@@ -122,11 +124,12 @@ class AuthActivity : BaseActivity() {
         authViewModel = ViewModelProviders.of(this, viewModelFactory)[AuthViewModel::class.java]
     }
 
-    private fun setLoginRoleNavigation(login_role: String?) {
+    private fun setLoginRoleNavigation(login_role: String?, uuid: String, isLogin: Boolean = false) {
         login_role?.let {
             when (it) {
                 LOGIN_ROLE_OPTIONS[0] -> {
                     preferenceProvider.setUserLoginRole(LOGIN_ROLE_OPTIONS[0])
+                    preferenceProvider.setUserLogin(isLogin, uuid)
                     startActivity(
                         intentFor<ParentNavigationActivity>()
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

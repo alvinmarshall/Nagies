@@ -28,7 +28,6 @@ class AuthViewModel @Inject constructor(
                 if (it.isEmpty()) return@map AuthResource.error("user not found", null)
                 return@map AuthResource.authenticated(it[0])
             })
-
     }
 
     fun authenticateWithUUID(uuid: String) {

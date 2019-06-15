@@ -9,6 +9,7 @@ import com.wNagiesEducationalCenterj_9905.common.delegate.lazyDeferred
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.auth.viewmodel.AuthViewModel
 import com.wNagiesEducationalCenterj_9905.ui.parent.ParentNavigationActivity
+import com.wNagiesEducationalCenterj_9905.ui.teacher.TeacherNavigationActivity
 import com.wNagiesEducationalCenterj_9905.vo.AuthStatus
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
@@ -58,7 +59,6 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun subscribeObserver(role:String) {
-
         authViewModel.authCachedUserData().observe(this, Observer { it ->
             it?.let {
                 when(it.status){
@@ -80,7 +80,10 @@ class SplashActivity : BaseActivity() {
                 startActivity(intentFor<ParentNavigationActivity>())
                 finish()
             }
-            LOGIN_ROLE_OPTIONS[1] -> {}
+            LOGIN_ROLE_OPTIONS[1] -> {
+                startActivity(intentFor<TeacherNavigationActivity>())
+                finish()
+            }
         }
     }
 }

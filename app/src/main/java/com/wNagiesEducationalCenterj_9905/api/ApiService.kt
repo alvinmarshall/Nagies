@@ -12,4 +12,9 @@ interface ApiService {
     @POST("students/android_post_parent1.php")
     fun getAuthenticatedParent(@Field("usr") Username:String,@Field("pwd") Password:String )
             :LiveData<ApiResponse<AuthResponse>>
+
+    @FormUrlEncoded
+    @POST("teacher/android_post_teacher1.php")
+    fun getAuthenticatedTeacher(@Field("usr") Username:String,@Field("pwd") Password:String )
+            :LiveData<ApiResponse<AuthResponse>>
 }

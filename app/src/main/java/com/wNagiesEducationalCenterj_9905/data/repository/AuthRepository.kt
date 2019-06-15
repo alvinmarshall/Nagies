@@ -18,7 +18,7 @@ class AuthRepository @Inject constructor(
     private val userDao: UserDao,
     private val preferenceProvider: PreferenceProvider
 ) {
-    fun authenticateUser(username: String, password: String): LiveData<Resource<UserEntity>> {
+    fun authenticateParent(username: String, password: String): LiveData<Resource<UserEntity>> {
         return object : NetworkBoundResource<UserEntity, AuthResponse>(appExecutors) {
             override fun saveCallResult(item: AuthResponse) {
                 if (item.Status == 1) {
@@ -35,6 +35,27 @@ class AuthRepository @Inject constructor(
 
             override fun createCall(): LiveData<ApiResponse<AuthResponse>> {
                 return apiService.getAuthenticatedParent(username, password)
+            }
+        }.asLiveData()
+    }
+
+    fun authenticateTeacher(username: String, password: String): LiveData<Resource<UserEntity>> {
+        return object : NetworkBoundResource<UserEntity, AuthResponse>(appExecutors) {
+            override fun saveCallResult(item: AuthResponse) {
+                if (item.Status == 1) {
+                    userDao.insertUser(UserEntity(item.UUID,item.Username, item.Password))
+                    preferenceProvider.setUserLogin(true,item.UUID)
+                }
+            }
+
+            override fun shouldFetch(data: UserEntity?): Boolean = data == null
+
+            override fun loadFromDb(): LiveData<UserEntity> {
+                return userDao.getAuthenticatedUser(username, password)
+            }
+
+            override fun createCall(): LiveData<ApiResponse<AuthResponse>> {
+                return apiService.getAuthenticatedTeacher(username, password)
             }
         }.asLiveData()
     }

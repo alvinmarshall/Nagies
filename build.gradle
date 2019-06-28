@@ -6,7 +6,7 @@ buildscript {
     ext.room_version = '2.1.0'
     ext.glide_version = '4.9.0'
     ext.navigation_version = '2.1.0-alpha05'
-    ext.dagger_version = '2.20'
+    ext.dagger_version = '2.22'
     ext.kotlin_coroutine_version = '1.0.0'
     ext.kotlin_room_adapter = '0.9.2'
     ext.material_version = '1.0.0'

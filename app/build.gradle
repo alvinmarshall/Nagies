@@ -110,4 +110,12 @@ dependencies {
     implementation "org.jetbrains.anko:anko:$anko_version"
     //reactive streams observable to live data
     implementation "android.arch.lifecycle:reactivestreams:$reactivestreams_version"
+
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rx_adapter"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    //Gson
+    implementation "com.google.code.gson:gson:$gson_version"
 }

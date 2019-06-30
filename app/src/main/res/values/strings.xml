@@ -51,4 +51,6 @@
     <string name="menu_send">Send</string>
     <string name="label_login_page">Login Page</string>
     <string name="label_corp_name">Powered by Infodas Ghana Limited</string>
+    <string name="prompt_empty_field">invalid field</string>
+    <string name="prompt_password_mismatch">password mismatch</string>
 </resources>

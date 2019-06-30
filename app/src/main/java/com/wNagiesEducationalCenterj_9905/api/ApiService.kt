@@ -1,20 +1,19 @@
 package com.wNagiesEducationalCenterj_9905.api
 
 import androidx.lifecycle.LiveData
-import com.wNagiesEducationalCenterj_9905.vo.AuthResource
-import io.reactivex.Single
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
+import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ApiService {
-    @FormUrlEncoded
-    @POST("students/android_post_parent1.php")
-    fun getAuthenticatedParent(@Field("usr") Username:String,@Field("pwd") Password:String )
-            :LiveData<ApiResponse<AuthResponse>>
+    @POST("users/parent")
+    fun getAuthenticatedParent(@Body userEntity: UserEntity)
+            : LiveData<ApiResponse<AuthResponse>>
 
-    @FormUrlEncoded
-    @POST("teacher/android_post_teacher1.php")
-    fun getAuthenticatedTeacher(@Field("usr") Username:String,@Field("pwd") Password:String )
-            :LiveData<ApiResponse<AuthResponse>>
+    @POST("users/teacher")
+    fun getAuthenticatedTeacher(@Body userEntity: UserEntity)
+            : LiveData<ApiResponse<AuthResponse>>
+
+//    @GET("students/messages")
+//    fun getStudentMessages(@Header("Authorization") token:String):<MessageResponse>
 }

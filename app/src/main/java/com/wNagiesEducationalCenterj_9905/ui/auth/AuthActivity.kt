@@ -86,8 +86,8 @@ class AuthActivity : BaseActivity() {
                         return@let
                     }
                     toast("welcome ${it.data.username}")
-                    val uuid = it.data.uuid
-                    setLoginRoleNavigation(authRole, uuid, true)
+                    val token = it.data.token
+                    setLoginRoleNavigation(authRole, token, true)
 
                     Timber.i("user authenticated with id: ${it.data.id}")
                 }
@@ -138,6 +138,7 @@ class AuthActivity : BaseActivity() {
                 }
                 LOGIN_ROLE_OPTIONS[1] -> {
                     preferenceProvider.setUserLoginRole(LOGIN_ROLE_OPTIONS[1])
+                    preferenceProvider.setUserLogin(isLogin, uuid)
                     startActivity(
                         intentFor<TeacherNavigationActivity>()
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

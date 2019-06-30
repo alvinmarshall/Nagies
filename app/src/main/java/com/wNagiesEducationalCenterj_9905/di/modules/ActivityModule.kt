@@ -7,7 +7,7 @@ import com.wNagiesEducationalCenterj_9905.ui.teacher.TeacherNavigationActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-@Module
+@Module(includes = [FragmentModule::class])
 abstract class ActivityModule {
     @ContributesAndroidInjector
     abstract fun contributeAuthActivity():AuthActivity

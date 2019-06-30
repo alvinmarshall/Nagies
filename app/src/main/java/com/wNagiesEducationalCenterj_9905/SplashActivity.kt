@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.LOGIN_ROLE_OPTIONS
+import com.wNagiesEducationalCenterj_9905.common.USER_INFO
 import com.wNagiesEducationalCenterj_9905.common.delegate.lazyDeferred
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.auth.viewmodel.AuthViewModel
@@ -12,10 +13,7 @@ import com.wNagiesEducationalCenterj_9905.ui.parent.ParentNavigationActivity
 import com.wNagiesEducationalCenterj_9905.ui.teacher.TeacherNavigationActivity
 import com.wNagiesEducationalCenterj_9905.vo.AuthStatus
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.newTask
-import org.jetbrains.anko.startActivity
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,8 +36,8 @@ class SplashActivity : BaseActivity() {
         val getLoginStatus by lazyDeferred {
             preferenceProvider.getUserLoginStatus()
         }
-        val getLoginUUID by lazyDeferred {
-            preferenceProvider.getUserUUID()
+        val getLoginToken by lazyDeferred {
+            preferenceProvider.getUserToken()
         }
         val getLoginRole by lazyDeferred{
             preferenceProvider.getUserLoginRole()
@@ -47,7 +45,7 @@ class SplashActivity : BaseActivity() {
         when (getLoginStatus.await()) {
             true -> {
                 Timber.i("login status is true")
-                getLoginUUID.await()?.let { authViewModel.authenticateWithUUID(it) }
+                getLoginToken.await()?.let { authViewModel.authenticateWithToken(it) }
                 getLoginRole.await()?.let { subscribeObserver(it) }
             }
             false -> {
@@ -65,7 +63,10 @@ class SplashActivity : BaseActivity() {
                     AuthStatus.LOADING -> {}
                     AuthStatus.AUTHENTICATED -> {
                         Timber.i("welcome back ")
-                        startDashboard(role)
+                        val userInfo = arrayListOf<String?>()
+                        userInfo.add(it.data?.username)
+                        userInfo.add(it.data?.photo)
+                        startDashboard(role,userInfo)
                     }
                     AuthStatus.ERROR -> {}
                     AuthStatus.LOG_OUT ->{}
@@ -74,14 +75,14 @@ class SplashActivity : BaseActivity() {
         })
     }
 
-    private fun startDashboard(role: String) {
+    private fun startDashboard(role: String, userInfo: ArrayList<String?>) {
         when(role){
             LOGIN_ROLE_OPTIONS[0] -> {
-                startActivity(intentFor<ParentNavigationActivity>())
+                startActivity(intentFor<ParentNavigationActivity>(USER_INFO to userInfo))
                 finish()
             }
             LOGIN_ROLE_OPTIONS[1] -> {
-                startActivity(intentFor<TeacherNavigationActivity>())
+                startActivity(intentFor<TeacherNavigationActivity>(USER_INFO to userInfo))
                 finish()
             }
         }

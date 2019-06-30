@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.wNagiesEducationalCenterj_9905.viewmodel.ViewModelFactory
 import com.wNagiesEducationalCenterj_9905.di.key.ViewModelKey
 import com.wNagiesEducationalCenterj_9905.ui.auth.viewmodel.AuthViewModel
+import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -15,9 +16,14 @@ abstract class ViewModelModule {
     @Binds
     @ViewModelKey(AuthViewModel::class)
     @IntoMap
-    abstract fun bindAuthViewModel(authViewModel: AuthViewModel):ViewModel
+    abstract fun bindAuthViewModel(authViewModel: AuthViewModel): ViewModel
 
     @Binds
-    abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory):ViewModelProvider.Factory
+    @IntoMap
+    @ViewModelKey(StudentViewModel::class)
+    abstract fun bindStudentViewModel(studentViewModel: StudentViewModel): ViewModel
+
+    @Binds
+    abstract fun bindViewModelFactory(viewModelFactory: ViewModelFactory): ViewModelProvider.Factory
 
 }

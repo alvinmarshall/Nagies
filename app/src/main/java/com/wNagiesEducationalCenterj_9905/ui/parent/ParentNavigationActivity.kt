@@ -1,9 +1,9 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -11,10 +11,14 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
+import com.wNagiesEducationalCenterj_9905.common.GlideApp
+import com.wNagiesEducationalCenterj_9905.common.USER_INFO
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import kotlinx.android.synthetic.main.nav_header_parent_navigation.view.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
@@ -31,6 +35,22 @@ class ParentNavigationActivity : BaseActivity() {
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
         setupNavigation()
+        if (intent.hasExtra(USER_INFO)) {
+            setUserInfo(intent)
+        }
+    }
+
+    private fun setUserInfo(intent: Intent?) {
+        val bundle = intent?.extras?.getStringArrayList(USER_INFO)
+        val photo = bundle?.get(1)
+        val index = bundle?.get(0)
+        val title = "index: $index"
+        navView.getHeaderView(0).nav_header_title.text = title
+        GlideApp.with(this).load(photo)
+            .placeholder(R.drawable.parent)
+            .circleCrop()
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(navView.getHeaderView(0).img_sidebar)
     }
 
     private fun setupNavigation() {
@@ -70,7 +90,7 @@ class ParentNavigationActivity : BaseActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             R.id.action_logout -> {
-                preferenceProvider.setUserLogin(false,null)
+                preferenceProvider.setUserLogin(false, null)
                 startActivity(intentFor<RoleActivity>().newTask().clearTask())
                 finish()
                 return true

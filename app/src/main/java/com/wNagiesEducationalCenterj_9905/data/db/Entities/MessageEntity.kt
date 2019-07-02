@@ -9,8 +9,9 @@ data class MessageEntity(
     val level: String,
     val content: String,
     val read: String,
-    val token:String
+    var token:String?
     ){
     @PrimaryKey(autoGenerate = true)
     var id:Int= 0
+
 }

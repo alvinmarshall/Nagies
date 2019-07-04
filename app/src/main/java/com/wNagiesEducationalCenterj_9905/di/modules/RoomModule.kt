@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.wNagiesEducationalCenterj_9905.common.DATABASE_NAME
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
 import dagger.Module
 import dagger.Provides
@@ -29,4 +30,8 @@ class RoomModule {
     @Singleton
     @Provides
     fun provideMessageDao(database: AppDatabase): MessageDao = database.messageDao()
+
+    @Singleton
+    @Provides
+    fun provideStudentDao(database: AppDatabase):StudentDao = database.studentDao()
 }

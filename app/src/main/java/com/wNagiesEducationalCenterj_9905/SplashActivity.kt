@@ -44,17 +44,18 @@ class SplashActivity : BaseActivity() {
         }
         when (getLoginStatus.await()) {
             true -> {
-                Timber.i("login status is true")
+                Timber.i("user login status $getLoginStatus ")
                 getLoginToken.await()?.let { authViewModel.authenticateWithToken(it) }
                 getLoginRole.await()?.let { subscribeObserver(it) }
             }
             false -> {
-                Timber.i("login status is false")
+                Timber.i("user login status $getLoginStatus ")
                 startActivity(intentFor<RoleActivity>())
                 finish()
             }
         }
     }
+
 
     private fun subscribeObserver(role:String) {
         authViewModel.authCachedUserData().observe(this, Observer { it ->
@@ -62,13 +63,13 @@ class SplashActivity : BaseActivity() {
                 when(it.status){
                     AuthStatus.LOADING -> {}
                     AuthStatus.AUTHENTICATED -> {
-                        Timber.i("welcome back ")
+                        Timber.i("welcome back ${it.data?.username}")
                         val userInfo = arrayListOf<String?>()
                         userInfo.add(it.data?.username)
                         userInfo.add(it.data?.photo)
                         startDashboard(role,userInfo)
                     }
-                    AuthStatus.ERROR -> {}
+                    AuthStatus.ERROR -> {Timber.i(it.message) }
                     AuthStatus.LOG_OUT ->{}
                 }
             }
@@ -78,10 +79,12 @@ class SplashActivity : BaseActivity() {
     private fun startDashboard(role: String, userInfo: ArrayList<String?>) {
         when(role){
             LOGIN_ROLE_OPTIONS[0] -> {
+                Timber.i("starting parent dashboard")
                 startActivity(intentFor<ParentNavigationActivity>(USER_INFO to userInfo))
                 finish()
             }
             LOGIN_ROLE_OPTIONS[1] -> {
+                Timber.i("starting teachers dashboard")
                 startActivity(intentFor<TeacherNavigationActivity>(USER_INFO to userInfo))
                 finish()
             }

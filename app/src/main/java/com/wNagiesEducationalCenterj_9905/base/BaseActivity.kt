@@ -27,7 +27,7 @@ abstract class BaseActivity:DaggerAppCompatActivity(),CoroutineScope{
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        observeAuthState()
+//        observeAuthState()
     }
 
     private fun observeAuthState() {

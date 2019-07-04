@@ -77,10 +77,12 @@ class DashboardFragment : BaseFragment() {
             }
 
             override fun onClick(data: Int?) {
-                val action = data?.let { DashboardFragmentDirections.actionDashboardFragmentToMessageDetailFragment(it) }
-                activity?.let { Navigation.findNavController(it,R.id.fragment_socket).navigate(action!!) }
+                val action =
+                    data?.let { DashboardFragmentDirections.actionDashboardFragmentToMessageDetailFragment(it) }
+                activity?.let { Navigation.findNavController(it, R.id.fragment_socket).navigate(action!!) }
             }
         })
+        recyclerView?.adapter = messageAdapter
     }
 
     private fun subscribeObserver(token: String?) {
@@ -90,15 +92,14 @@ class DashboardFragment : BaseFragment() {
                     Status.SUCCESS -> {
                         showLoadingDialog(false)
                         messageAdapter?.submitList(r.data)
-                        recyclerView?.adapter = messageAdapter
-                        Timber.i("data size:  ${r.data?.size}")
+                        Timber.i("message data size: ${r.data?.size}")
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
+                        Timber.i(r.message)
                     }
                     Status.LOADING -> {
                         showLoadingDialog()
-                        Timber.i("loading please wait...")
                     }
                 }
             })

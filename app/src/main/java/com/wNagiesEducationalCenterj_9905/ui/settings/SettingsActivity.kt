@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.ui.Settings
+package com.wNagiesEducationalCenterj_9905.ui.settings
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

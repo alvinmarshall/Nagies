@@ -85,10 +85,8 @@ class AuthActivity : BaseActivity() {
                         showFailedMessage()
                         return@let
                     }
-                    toast("welcome ${it.data.username}")
                     val token = it.data.token
                     setLoginRoleNavigation(authRole, token, true)
-
                     Timber.i("user authenticated with id: ${it.data.id}")
                 }
                 Status.ERROR -> {

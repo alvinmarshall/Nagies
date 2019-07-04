@@ -13,12 +13,15 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
 import com.wNagiesEducationalCenterj_9905.common.USER_INFO
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import kotlinx.android.synthetic.main.content_parent_navigation.*
 import kotlinx.android.synthetic.main.nav_header_parent_navigation.view.*
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
@@ -27,6 +30,7 @@ class ParentNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
+    private var snackBar:Snackbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
@@ -40,17 +44,20 @@ class ParentNavigationActivity : BaseActivity() {
         }
     }
 
-    private fun setUserInfo(intent: Intent?) {
+    private fun setUserInfo(intent: Intent?) = launch {
         val bundle = intent?.extras?.getStringArrayList(USER_INFO)
         val photo = bundle?.get(1)
         val index = bundle?.get(0)
         val title = "index: $index"
+        snackBar = Snackbar.make(root,"welcome back $index",Snackbar.LENGTH_LONG)
+        snackBar?.show()
         navView.getHeaderView(0).nav_header_title.text = title
-        GlideApp.with(this).load(photo)
-            .placeholder(R.drawable.parent)
+        GlideApp.with(applicationContext).load(photo)
+            .placeholder(R.drawable.default_user_avatar)
             .circleCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(navView.getHeaderView(0).img_sidebar)
+
     }
 
     private fun setupNavigation() {
@@ -98,4 +105,5 @@ class ParentNavigationActivity : BaseActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
 }

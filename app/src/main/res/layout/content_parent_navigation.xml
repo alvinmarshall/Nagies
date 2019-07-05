@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/root"
+        android:background="@drawable/gradient_list_bg"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/app_bar_navigation"
         tools:context=".ui.parent.ParentNavigationActivity">

@@ -1,8 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.di.modules
 
 import com.wNagiesEducationalCenterj_9905.ui.fragment.MessageDetailFragment
-import com.wNagiesEducationalCenterj_9905.ui.parent.fragment.DashboardFragment
-import com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ProfileFragment
+import com.wNagiesEducationalCenterj_9905.ui.parent.fragment.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -16,5 +15,14 @@ abstract class FragmentModule {
     abstract fun contributeMessageDetailFragement(): MessageDetailFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeStudentProfile():ProfileFragment
+    abstract fun contributeStudentProfile(): ProfileFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeCreateMessageFragment(): CreateMessageFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeSendMessageFragment():SendMessageFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeComplaintDetailFragment():ComplaintDetailFragment
 }

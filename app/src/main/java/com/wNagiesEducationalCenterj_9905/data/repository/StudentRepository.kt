@@ -6,16 +6,22 @@ import androidx.lifecycle.Transformations
 import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
+import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.api.response.MessageResponse
+import com.wNagiesEducationalCenterj_9905.api.response.ParentComplaintResponse
 import com.wNagiesEducationalCenterj_9905.api.response.StudentProfileResponse
 import com.wNagiesEducationalCenterj_9905.common.utils.ImagePathUtil
 import com.wNagiesEducationalCenterj_9905.common.utils.RateLimiter
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
 import com.wNagiesEducationalCenterj_9905.vo.Resource
+import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -26,7 +32,8 @@ class StudentRepository @Inject constructor(
     private val apiService: ApiService,
     private val messageDao: MessageDao,
     private val db: AppDatabase,
-    private val studentDao: StudentDao
+    private val studentDao: StudentDao,
+    private val complaintDao: ComplaintDao
 ) {
     private val studentRateLimiter = RateLimiter<String>(10, TimeUnit.MINUTES)
     fun fetchStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
@@ -106,5 +113,24 @@ class StudentRepository @Inject constructor(
                 apiService.getStudentProfile(token)
         }.asLiveData()
 
+    }
+
+    fun sendParentComplaint(
+        token: String,
+        parentComplaintRequest: ParentComplaintRequest
+    ): Single<ParentComplaintResponse> {
+        return apiService.sendParentComplaint(token, parentComplaintRequest)
+    }
+
+    fun saveComplaintMessage(complaintEntity: ComplaintEntity): Single<Long> {
+        return complaintDao.insertParentComplaint(complaintEntity)
+    }
+
+    fun getSavedParentComplaints(token: String): Flowable<List<ComplaintEntity>> {
+        return complaintDao.getSavedComplaintMessage(token)
+    }
+
+    fun getSavedParentComplaintsById(id: Int): Single<ComplaintEntity> {
+        return complaintDao.getSavedComplaintMessageById(id)
     }
 }

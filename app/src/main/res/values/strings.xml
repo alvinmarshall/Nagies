@@ -55,4 +55,5 @@
     <string name="prompt_password_mismatch">password mismatch</string>
     <string name="label_admin_message">Message from administrator</string>
     <string name="des_profile_image">profile image</string>
+    <string name="errorConnection">Connection failed. Please try again later</string>
 </resources>

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.wNagiesEducationalCenterj_9905.common.DATABASE_NAME
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
@@ -18,6 +19,7 @@ class RoomModule {
     fun provideRoomDb(application: Application): AppDatabase {
         return Room
             .databaseBuilder(application.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -34,4 +36,8 @@ class RoomModule {
     @Singleton
     @Provides
     fun provideStudentDao(database: AppDatabase):StudentDao = database.studentDao()
+
+    @Singleton
+    @Provides
+    fun provideComplaintDao(database: AppDatabase):ComplaintDao = database.complaintDao()
 }

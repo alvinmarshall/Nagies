@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.wNagiesEducationalCenterj_9905.common.DATABASE_NAME
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -35,9 +32,13 @@ class RoomModule {
 
     @Singleton
     @Provides
-    fun provideStudentDao(database: AppDatabase):StudentDao = database.studentDao()
+    fun provideStudentDao(database: AppDatabase): StudentDao = database.studentDao()
 
     @Singleton
     @Provides
-    fun provideComplaintDao(database: AppDatabase):ComplaintDao = database.complaintDao()
+    fun provideComplaintDao(database: AppDatabase): ComplaintDao = database.complaintDao()
+
+    @Singleton
+    @Provides
+    fun provideAssignmentDao(database: AppDatabase): AssignmentDao = database.assignmentDao()
 }

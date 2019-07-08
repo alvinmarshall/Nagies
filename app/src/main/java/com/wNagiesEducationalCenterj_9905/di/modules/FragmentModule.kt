@@ -21,8 +21,14 @@ abstract class FragmentModule {
     abstract fun contributeCreateMessageFragment(): CreateMessageFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeSendMessageFragment():SendMessageFragment
+    abstract fun contributeSendMessageFragment(): SendMessageFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeComplaintDetailFragment():ComplaintDetailFragment
+    abstract fun contributeComplaintDetailFragment(): ComplaintDetailFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeAssignmentPdfFragment(): AssignmentPdfFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeAssignmentJpegFragment(): AssignmentJpegFragment
 }

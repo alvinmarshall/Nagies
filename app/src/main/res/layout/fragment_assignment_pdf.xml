@@ -16,6 +16,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
             android:layout_marginTop="5dp"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_below="@id/label_msg_title"
             tools:listitem="@layout/list_assignment"

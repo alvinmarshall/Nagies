@@ -98,7 +98,7 @@ class StudentViewModel @Inject constructor(
                 it.onComplete()
 
             }
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedLabels.value = it
@@ -279,9 +279,11 @@ class StudentViewModel @Inject constructor(
         disposable.addAll(
             Observable.create<String> {
                 id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }
-                val file = File(path!!)
-                if (file.exists()) {
-                    file.delete()
+                path?.let {p ->
+                    val file = File(p)
+                    if (file.exists()) {
+                        file.delete()
+                    }
                 }
                 it.onNext("finish")
                 it.onComplete()

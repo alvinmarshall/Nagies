@@ -56,4 +56,10 @@
     <string name="label_admin_message">Message from administrator</string>
     <string name="des_profile_image">profile image</string>
     <string name="errorConnection">Connection failed. Please try again later</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="permission_storage_message">Allow application to read &amp; write storage</string>
+    <string name="permission_storage_explained">Without this permission this app is unable to open files. Are you sure
+        you want to deny this permission.
+    </string>
+    <string name="chooser_title">choose an application to open file</string>
 </resources>

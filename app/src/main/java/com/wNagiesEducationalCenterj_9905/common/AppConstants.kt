@@ -8,3 +8,5 @@ const val LOGIN_PREF = "login_in_status"
 const val USER_TOKEN = "user_token"
 const val SERVER_URL = "http://192.168.8.101:81"//"http://192.168.8.100:81  --- http://nagiesportal.000webhostapp.com"
 const val USER_INFO = "user_info"
+const val PERMISSION_PREF = "permission_pref"
+const val REQUEST_EXTERNAL_STORAGE = 100

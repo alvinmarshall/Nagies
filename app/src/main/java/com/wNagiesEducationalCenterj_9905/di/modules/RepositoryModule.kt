@@ -4,10 +4,7 @@ import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
 import com.wNagiesEducationalCenterj_9905.data.repository.AuthRepository
 import com.wNagiesEducationalCenterj_9905.data.repository.StudentRepository
 import dagger.Module
@@ -35,9 +32,12 @@ class RepositoryModule {
         messageDao: MessageDao,
         database: AppDatabase,
         studentDao: StudentDao,
-        complaintDao: ComplaintDao
+        complaintDao: ComplaintDao,
+        assignmentDao: AssignmentDao
     ): StudentRepository {
-        return StudentRepository(appExecutors, apiService, messageDao, database, studentDao, complaintDao)
+        return StudentRepository(
+            appExecutors, apiService, messageDao, database, studentDao, complaintDao, assignmentDao
+        )
     }
 
 }

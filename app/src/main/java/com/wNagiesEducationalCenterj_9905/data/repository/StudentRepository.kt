@@ -7,22 +7,29 @@ import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
+import com.wNagiesEducationalCenterj_9905.api.response.AssignmentResponse
 import com.wNagiesEducationalCenterj_9905.api.response.MessageResponse
 import com.wNagiesEducationalCenterj_9905.api.response.ParentComplaintResponse
 import com.wNagiesEducationalCenterj_9905.api.response.StudentProfileResponse
 import com.wNagiesEducationalCenterj_9905.common.utils.ImagePathUtil
 import com.wNagiesEducationalCenterj_9905.common.utils.RateLimiter
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.AssignmentDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.AssignmentEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
+import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
+import okhttp3.ResponseBody
+import retrofit2.Response
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -33,7 +40,8 @@ class StudentRepository @Inject constructor(
     private val messageDao: MessageDao,
     private val db: AppDatabase,
     private val studentDao: StudentDao,
-    private val complaintDao: ComplaintDao
+    private val complaintDao: ComplaintDao,
+    private val assignmentDao: AssignmentDao
 ) {
     private val studentRateLimiter = RateLimiter<String>(10, TimeUnit.MINUTES)
     fun fetchStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
@@ -132,5 +140,101 @@ class StudentRepository @Inject constructor(
 
     fun getSavedParentComplaintsById(id: Int): Single<ComplaintEntity> {
         return complaintDao.getSavedComplaintMessageById(id)
+    }
+
+    fun fetchFileFromServer(token: String, url: DownloadRequest): Observable<Response<ResponseBody>> {
+        return apiService.getFilesFromServer(token, url)
+    }
+
+    fun fetchStudentAssignmentPDF(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+        return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
+            override fun saveCallResult(item: AssignmentResponse) {
+                if (item.status == 200) {
+                    item.assignment.forEach { pdf ->
+                        pdf.type = "pdf"
+                        pdf.token = token
+                    }
+                    db.runInTransaction {
+                        assignmentDao.deleteAssignmentPDF(token)
+                        assignmentDao.insertAssignmentPDF(item.assignment)
+                    }
+                }
+            }
+
+            override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
+                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                Timber.i("should fetch data? $fetch")
+                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+            }
+
+            override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
+                return Transformations.switchMap(assignmentDao.getStudentAssignmentPDF(token)) { pdf ->
+                    if (pdf.isEmpty()) {
+                        val data = MutableLiveData<List<AssignmentEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap assignmentDao.getStudentAssignmentPDF(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
+                return apiService.getStudentAssignmentPDF(token)
+            }
+
+            override fun onFetchFailed() {
+                studentRateLimiter.reset(token)
+            }
+        }.asLiveData()
+    }
+
+    fun fetchStudentAssignmentImage(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+        return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
+            override fun saveCallResult(item: AssignmentResponse) {
+                if (item.status == 200) {
+                    item.assignment.forEach { image ->
+                        image.token = token
+                        image.type = "image"
+                    }
+                    db.runInTransaction {
+                        assignmentDao.deleteAssignmentImage()
+                        assignmentDao.insertAssignmentImage(item.assignment)
+                    }
+                }
+            }
+
+            override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
+                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                Timber.i("should fetch data? $fetch")
+                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+            }
+
+            override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
+                return Transformations.switchMap(assignmentDao.getAssignmentImage(token)) { image ->
+                    if (image.isEmpty()) {
+                        val data = MutableLiveData<List<AssignmentEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap assignmentDao.getAssignmentImage(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
+                return apiService.getStudentAssignmentImage(token)
+            }
+
+            override fun onFetchFailed() {
+                studentRateLimiter.reset(token)
+            }
+        }.asLiveData()
+    }
+
+    fun updateStudentAssignmentFilePath(id: Int,path:String):Int{
+        return assignmentDao.updateAssignmentPath(path,id)
+    }
+
+    fun deleteAssignmentById(id: Int){
+        return assignmentDao.deleteAssignmentById(id)
     }
 }

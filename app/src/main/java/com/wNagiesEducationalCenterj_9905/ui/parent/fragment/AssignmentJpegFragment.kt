@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -116,7 +117,9 @@ class AssignmentJpegFragment : BaseFragment() {
             val file = File(itemData?.second!!)
             if (file.exists()) {
                 val openIntent = Intent(Intent.ACTION_VIEW)
-                openIntent.setDataAndType(Uri.fromFile(file), FileTypeUtils.getType(file.absolutePath))
+                val url = FileProvider.getUriForFile(context!!,getString(R.string.file_provider_authority),file)
+                openIntent.setDataAndType(url, FileTypeUtils.getType(file.absolutePath))
+                openIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 val open = Intent.createChooser(openIntent, getString(R.string.chooser_title))
                 startActivity(open)
             }

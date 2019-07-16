@@ -62,4 +62,5 @@
         you want to deny this permission.
     </string>
     <string name="chooser_title">choose an application to open file</string>
+    <string name="file_provider_authority" translatable="false">com.wNagiesEducationalCenterj_9905.fileprovider</string>
 </resources>

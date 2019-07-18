@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -44,6 +45,8 @@ class ReportFragment : BaseFragment() {
     private var itemData: Pair<Int?, String?>? = null
     private var callbackType: String? = null
     private var alertDialog: AlertDialog.Builder? = null
+    private var loadingIndicator: ProgressBar? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,6 +58,8 @@ class ReportFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
+        loadingIndicator = progressBar
+        loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
     }
 
@@ -72,16 +77,18 @@ class ReportFragment : BaseFragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         Timber.i("report_image files data :${resource.data?.size}")
+                        showLoadingDialog(false)
                         reportAdapter?.submitList(resource?.data)
                     }
                     Status.ERROR -> {
                         Timber.i(resource.message)
+                        showLoadingDialog(false)
                     }
                     Status.LOADING -> {
                         Timber.i("loading...")
+                        showLoadingDialog()
                     }
                 }
-
             })
         })
 
@@ -145,6 +152,15 @@ class ReportFragment : BaseFragment() {
         alertDialog?.show()
     }
 
+    private fun showLoadingDialog(show: Boolean = true) {
+        showAnyView(progressBar,null,null,show){view,_,_,visible ->
+            if (visible){
+                (view as ProgressBar).visibility = View.VISIBLE
+            }else{
+                (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
     //region Permission
     private fun showStorageRational(title: String, message: String) {
         alertDialog?.setTitle(title)

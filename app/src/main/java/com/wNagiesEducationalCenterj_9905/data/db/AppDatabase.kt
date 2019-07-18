@@ -13,7 +13,8 @@ import com.wNagiesEducationalCenterj_9905.data.db.converter.DateTypeConverter
         MessageEntity::class,
         StudentProfileEntity::class,
         ComplaintEntity::class,
-        AssignmentEntity::class
+        AssignmentEntity::class,
+        ReportEntity::class
     ], version = 1, exportSchema = false
 )
 @TypeConverters(DateTypeConverter::class)
@@ -23,4 +24,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun studentDao(): StudentDao
     abstract fun complaintDao(): ComplaintDao
     abstract fun assignmentDao():AssignmentDao
+    abstract fun reportDao():ReportDao
 }

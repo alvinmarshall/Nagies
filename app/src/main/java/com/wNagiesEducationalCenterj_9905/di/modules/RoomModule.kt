@@ -16,7 +16,6 @@ class RoomModule {
     fun provideRoomDb(application: Application): AppDatabase {
         return Room
             .databaseBuilder(application.applicationContext, AppDatabase::class.java, DATABASE_NAME)
-            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -41,4 +40,8 @@ class RoomModule {
     @Singleton
     @Provides
     fun provideAssignmentDao(database: AppDatabase): AssignmentDao = database.assignmentDao()
+
+    @Singleton
+    @Provides
+    fun provideReportDao(database: AppDatabase): ReportDao = database.reportDao()
 }

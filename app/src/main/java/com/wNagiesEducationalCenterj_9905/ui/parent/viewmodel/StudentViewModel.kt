@@ -8,10 +8,7 @@ import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.AssignmentEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.data.repository.StudentRepository
 import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
@@ -201,7 +198,8 @@ class StudentViewModel @Inject constructor(
                 }
                 .flatMap {
                     when (entity) {
-                        "assignment" -> return@flatMap updateEntityPath(it, entityId)
+                        "assignment" -> return@flatMap updateAssignmentEntityPath(it, entityId)
+                        "report" -> return@flatMap updateReportEntityPath(it, entityId)
                         else -> return@flatMap null
                     }
                 }
@@ -214,7 +212,7 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    private fun updateEntityPath(file: File, id: Int?): Observable<Int> {
+    private fun updateAssignmentEntityPath(file: File, id: Int?): Observable<Int> {
         return Observable.create {
             id?.let { it1 ->
                 val row = studentRepository.updateStudentAssignmentFilePath(it1, file.absolutePath)
@@ -240,7 +238,7 @@ class StudentViewModel @Inject constructor(
                         File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename!!)
                     }
                     "application/pdf" -> {
-                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), filename!!)
+                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename!!)
                     }
                     else -> null
                 }
@@ -279,7 +277,7 @@ class StudentViewModel @Inject constructor(
         disposable.addAll(
             Observable.create<String> {
                 id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }
-                path?.let {p ->
+                path?.let { p ->
                     val file = File(p)
                     if (file.exists()) {
                         file.delete()
@@ -294,6 +292,24 @@ class StudentViewModel @Inject constructor(
                     Timber.i("delete $it")
                 }, { Timber.i(it) })
         )
+    }
+
+    fun getStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
+        return studentRepository.fetchStudentReportPDF(token)
+    }
+
+    fun getStudentReportImage(token: String): LiveData<Resource<List<ReportEntity>>> {
+        return studentRepository.fetchStudentReportImage(token)
+    }
+
+    private fun updateReportEntityPath(file: File, id: Int?): Observable<Int> {
+        return Observable.create {
+            id?.let { it1 ->
+                val row = studentRepository.updateStudentReportFilePath(it1, file.absolutePath)
+                it.onNext(row)
+            }
+            it.onComplete()
+        }
     }
 
 }

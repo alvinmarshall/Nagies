@@ -7,24 +7,14 @@ import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
-import com.wNagiesEducationalCenterj_9905.api.response.AssignmentResponse
-import com.wNagiesEducationalCenterj_9905.api.response.MessageResponse
-import com.wNagiesEducationalCenterj_9905.api.response.ParentComplaintResponse
-import com.wNagiesEducationalCenterj_9905.api.response.StudentProfileResponse
-import com.wNagiesEducationalCenterj_9905.common.utils.ImagePathUtil
+import com.wNagiesEducationalCenterj_9905.api.response.*
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.common.utils.RateLimiter
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.AssignmentDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
-import com.wNagiesEducationalCenterj_9905.data.db.DAO.StudentDao
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.AssignmentEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
+import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Resource
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -41,7 +31,8 @@ class StudentRepository @Inject constructor(
     private val db: AppDatabase,
     private val studentDao: StudentDao,
     private val complaintDao: ComplaintDao,
-    private val assignmentDao: AssignmentDao
+    private val assignmentDao: AssignmentDao,
+    private val reportDao: ReportDao
 ) {
     private val studentRateLimiter = RateLimiter<String>(10, TimeUnit.MINUTES)
     fun fetchStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
@@ -98,7 +89,7 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.studentProfile.forEach { profile ->
                         profile.token = token
-                        profile.imageUrl = ImagePathUtil.setCorrectPath(profile.imageUrl)
+                        profile.imageUrl = ServerPathUtil.setCorrectPath(profile.imageUrl)
                     }
                     studentDao.insertStudentProfile(item.studentProfile[0])
                 }
@@ -151,11 +142,12 @@ class StudentRepository @Inject constructor(
             override fun saveCallResult(item: AssignmentResponse) {
                 if (item.status == 200) {
                     item.assignment.forEach { pdf ->
-                        pdf.type = "pdf"
+                        pdf.format = "pdf"
                         pdf.token = token
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
-                        assignmentDao.deleteAssignmentPDF(token)
+                        assignmentDao.deleteAssignmentPDF()
                         assignmentDao.insertAssignmentPDF(item.assignment)
                     }
                 }
@@ -194,7 +186,8 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.assignment.forEach { image ->
                         image.token = token
-                        image.type = "image"
+                        image.format = "image"
+                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentImage()
@@ -230,11 +223,93 @@ class StudentRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun updateStudentAssignmentFilePath(id: Int,path:String):Int{
-        return assignmentDao.updateAssignmentPath(path,id)
+    fun updateStudentAssignmentFilePath(id: Int, path: String): Int {
+        return assignmentDao.updateAssignmentPath(path, id)
     }
 
-    fun deleteAssignmentById(id: Int){
+    fun deleteAssignmentById(id: Int) {
         return assignmentDao.deleteAssignmentById(id)
+    }
+
+    fun fetchStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
+        return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
+            override fun saveCallResult(item: ReportResponse) {
+                if (item.status == 200) {
+                    item.report.forEach { pdf ->
+                        pdf.format = "pdf"
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
+                        pdf.token = token
+                    }
+                    db.runInTransaction {
+                        db.reportDao().deleteReportPDF()
+                        db.reportDao().insertReport(item.report)
+                    }
+                }
+            }
+
+            override fun shouldFetch(data: List<ReportEntity>?): Boolean {
+                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                Timber.i("should fetch data? $fetch")
+                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+            }
+
+            override fun loadFromDb(): LiveData<List<ReportEntity>> {
+                return Transformations.switchMap(reportDao.getStudentReportPDF(token)) { pdf ->
+                    if (pdf.isEmpty()) {
+                        val data = MutableLiveData<List<ReportEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap reportDao.getStudentReportPDF(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
+                return apiService.getStudentReportPDF(token)
+            }
+        }.asLiveData()
+    }
+
+    fun fetchStudentReportImage(token: String): LiveData<Resource<List<ReportEntity>>> {
+        return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
+            override fun saveCallResult(item: ReportResponse) {
+                if (item.status == 200) {
+                    item.report.forEach { image ->
+                        image.format = "image"
+                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
+                        image.token = token
+                    }
+                    db.runInTransaction {
+                        db.reportDao().deleteReportImage()
+                        db.reportDao().insertReport(item.report)
+                    }
+                }
+            }
+
+            override fun shouldFetch(data: List<ReportEntity>?): Boolean {
+                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                Timber.i("should fetch data? $fetch")
+                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+            }
+
+            override fun loadFromDb(): LiveData<List<ReportEntity>> {
+                return Transformations.switchMap(reportDao.getStudentReportImage(token)) { image ->
+                    if (image.isEmpty()) {
+                        val data = MutableLiveData<List<ReportEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap reportDao.getStudentReportImage(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
+                return apiService.getStudentReportImage(token)
+            }
+        }.asLiveData()
+    }
+
+    fun updateStudentReportFilePath(id: Int, path: String): Int {
+        return reportDao.updateReportPath(path, id)
     }
 }

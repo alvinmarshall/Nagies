@@ -31,4 +31,10 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeAssignmentJpegFragment(): AssignmentJpegFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeReportPdfFragment():ReportPdfFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeReportFragment():ReportFragment
 }

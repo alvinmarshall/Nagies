@@ -5,7 +5,7 @@ import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.api.AuthResponse
-import com.wNagiesEducationalCenterj_9905.common.utils.ImagePathUtil
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
@@ -29,7 +29,7 @@ class AuthRepository @Inject constructor(
                             username,
                             password,
                             "Bearer "+item.Token,
-                            ImagePathUtil.setCorrectPath(item.image)
+                            ServerPathUtil.setCorrectPath(item.image)
                         )
                     )
                     preferenceProvider.setUserLogin(true, "Bearer "+item.Token)
@@ -60,7 +60,7 @@ class AuthRepository @Inject constructor(
                             username,
                             password,
                             "Bearer "+item.Token,
-                            ImagePathUtil.setCorrectPath(item.image)
+                            ServerPathUtil.setCorrectPath(item.image)
                         )
                     )
                     preferenceProvider.setUserLogin(true, "Bearer "+item.Token)

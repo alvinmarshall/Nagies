@@ -8,10 +8,10 @@
     <TextView
             android:text="@string/label_msg_available_files"
             android:layout_width="match_parent"
+            android:textColor="@android:color/white"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_height="wrap_content"
-
             android:id="@+id/label_msg_title"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,4 +21,10 @@
             android:layout_below="@id/label_msg_title"
             tools:listitem="@layout/list_assignment"
             android:layout_height="match_parent"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"/>
 </RelativeLayout>

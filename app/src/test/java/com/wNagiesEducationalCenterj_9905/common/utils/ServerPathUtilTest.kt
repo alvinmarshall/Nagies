@@ -5,12 +5,12 @@ import org.junit.Test
 
 import org.junit.Assert.*
 
-class ImagePathUtilTest {
+class ServerPathUtilTest {
 
     @Test
     fun setImageUrlPath() {
         val imagePath = "../students/uploads/filename.pdf"
-        val actual = ImagePathUtil.setCorrectPath(imagePath)
+        val actual = ServerPathUtil.setCorrectPath(imagePath)
         val expect = "$SERVER_URL/students/uploads/filename.pdf"
         assertEquals(expect,actual)
     }

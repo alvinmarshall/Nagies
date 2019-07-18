@@ -33,10 +33,11 @@ class RepositoryModule {
         database: AppDatabase,
         studentDao: StudentDao,
         complaintDao: ComplaintDao,
-        assignmentDao: AssignmentDao
+        assignmentDao: AssignmentDao,
+        reportDao: ReportDao
     ): StudentRepository {
         return StudentRepository(
-            appExecutors, apiService, messageDao, database, studentDao, complaintDao, assignmentDao
+            appExecutors, apiService, messageDao, database, studentDao, complaintDao, assignmentDao, reportDao
         )
     }
 

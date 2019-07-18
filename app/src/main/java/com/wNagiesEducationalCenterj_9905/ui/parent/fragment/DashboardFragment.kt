@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -108,10 +109,12 @@ class DashboardFragment : BaseFragment() {
     }
 
     private fun showLoadingDialog(show: Boolean = true) {
-        if (show) {
-            progressBar.visibility = View.VISIBLE
-        } else {
-            progressBar.visibility = View.GONE
+        showAnyView(progressBar,null,null,show){view,_,_,visible ->
+           if (visible){
+               (view as ProgressBar).visibility = View.VISIBLE
+           }else{
+               (view as ProgressBar).visibility = View.GONE
+           }
         }
     }
 

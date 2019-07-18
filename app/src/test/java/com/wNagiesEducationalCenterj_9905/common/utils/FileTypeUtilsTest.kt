@@ -11,7 +11,7 @@ class FileTypeUtilsTest {
         val path = "/storage/public/document/filename.pdf"
         val actual = FileTypeUtils.getType(path)
         val expected = "application/pdf"
-        assertEquals("get file type", expected, actual)
+        assertEquals("get file format", expected, actual)
     }
 
     @Test
@@ -19,7 +19,7 @@ class FileTypeUtilsTest {
         val path = "/storage/public/document/filename.jpg"
         val actual = FileTypeUtils.getType(path)
         val expected = "image/jpeg"
-        assertEquals("get file type", expected, actual)
+        assertEquals("get file format", expected, actual)
     }
 
     @Test
@@ -27,6 +27,6 @@ class FileTypeUtilsTest {
         val path = "/storage/public/document/filename.other"
         val actual = FileTypeUtils.getType(path)
         val expected = "*/*"
-        assertEquals("get file type", expected, actual)
+        assertEquals("get file format", expected, actual)
     }
 }

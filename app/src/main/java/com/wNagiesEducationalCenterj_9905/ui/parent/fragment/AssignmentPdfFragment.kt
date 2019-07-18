@@ -10,6 +10,7 @@ import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -21,6 +22,7 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
 import com.wNagiesEducationalCenterj_9905.common.REQUEST_EXTERNAL_STORAGE
+import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
@@ -41,6 +43,8 @@ class AssignmentPdfFragment : BaseFragment() {
     private var alertDialog: AlertDialog.Builder? = null
     private var callbackType: String? = null
     private var itemData: Pair<Int?, String?>? = null
+    private var loadingIndicator: ProgressBar? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +56,8 @@ class AssignmentPdfFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
+        loadingIndicator = progressBar
+        loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
     }
 
@@ -127,19 +133,33 @@ class AssignmentPdfFragment : BaseFragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         Timber.i("assignment files data :${resource.data?.size}")
+                        showLoadingDialog(false)
                         assignmentAdapter?.submitList(resource?.data)
                     }
                     Status.ERROR -> {
                         Timber.i(resource.message)
+                        showLoadingDialog(false)
                     }
                     Status.LOADING -> {
                         Timber.i("loading...")
+                        showLoadingDialog()
                     }
                 }
             })
 
         })
     }
+
+    private fun showLoadingDialog(show: Boolean = true) {
+        showAnyView(progressBar,null,null,show){view,_,_,visible ->
+            if (visible){
+                (view as ProgressBar).visibility = View.VISIBLE
+            }else{
+                (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
+
 
     //region Permission
     private fun showStorageRational(title: String, message: String) {

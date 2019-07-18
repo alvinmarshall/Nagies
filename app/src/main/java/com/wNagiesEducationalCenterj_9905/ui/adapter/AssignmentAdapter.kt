@@ -34,9 +34,14 @@ class AssignmentAdapter : ListAdapter<AssignmentEntity, AssignmentVH>(Assignment
 
 class AssignmentVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: AssignmentEntity?, itemCallback: ItemCallback<Pair<Int?, String?>>?) {
-        itemView.tv_item_date.text = item?.reportDate
+        itemView.tv_item_date.text = item?.date
         itemView.tv_item_subject.text = item?.teacherEmail
         itemView.tv_item_name.text = if (item?.path != null) "downloaded" else "download"
+        when (item?.format){
+            "pdf" -> {itemView.img_item_logo.setImageResource(R.drawable.ic_picture_as_pdf_black_24dp)}
+            "image" -> {itemView.img_item_logo.setImageResource(R.drawable.ic_image_black_24dp)}
+        }
+
         if (item?.path != null) {
             val file = File(item.path!!)
             if (file.exists()) {
@@ -51,7 +56,7 @@ class AssignmentVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             itemView.tv_item_download.visibility = View.VISIBLE
         }
         itemView.tv_item_download.setOnClickListener {
-            itemCallback?.onClick(Pair(item?.id, item?.reportFile))
+            itemCallback?.onClick(Pair(item?.id, item?.fileUrl))
         }
 
         itemView.setOnLongClickListener {
@@ -69,8 +74,8 @@ private class AssignmentDiffUtil : DiffUtil.ItemCallback<AssignmentEntity>() {
 
     override fun areContentsTheSame(oldItem: AssignmentEntity, newItem: AssignmentEntity): Boolean {
         return oldItem.teacherEmail == newItem.teacherEmail &&
-                oldItem.reportFile == newItem.reportFile &&
-                oldItem.studentName == newItem.reportDate &&
+                oldItem.fileUrl == newItem.fileUrl &&
+                oldItem.studentName == newItem.date &&
                 oldItem.studentName == newItem.studentName
     }
 }

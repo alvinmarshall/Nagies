@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 data class AssignmentEntity(
     val studentName: String,
     val teacherEmail: String,
-    val reportFile: String,
-    val reportDate: String,
-    var type: String?,
+    var fileUrl: String?,
+    val date: String,
+    var format: String?,
     var token: String?,
     var path: String?
 ) {

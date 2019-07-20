@@ -13,7 +13,7 @@
     <application
             android:name=".App"
             android:usesCleartextTraffic="true"
-            android:allowBackup="true"
+            android:allowBackup="false"
             android:fullBackupContent="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
@@ -21,6 +21,24 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning" tools:targetApi="n">
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@drawable/ic_business_black_24dp" />
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/colorAccent" />
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_channel_id"
+                android:value="@string/announcement_channel_id" />
+
+        <meta-data
+                android:name="firebase_messaging_auto_init_enabled"
+                android:value="false" />
+        <meta-data
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false" />
         <activity android:name=".ui.auth.RoleActivity">
         </activity>
         <activity android:name=".ui.settings.SettingsActivity">
@@ -55,6 +73,13 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider_path"/>
 
         </provider>
+
+        <service android:name=".notification.FirebaseMessageService">
+
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

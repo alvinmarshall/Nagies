@@ -64,4 +64,7 @@
     <string name="chooser_title">choose an application to open file</string>
     <string name="file_provider_authority" translatable="false">com.wNagiesEducationalCenterj_9905.fileprovider</string>
     <string name="des_icon">icon</string>
+    <string name="announcement_channel_id">announcement</string>
+    <string name="announcement_channel">Announcement</string>
+    <string name="announcement_description">Get informed with school activities</string>
 </resources>

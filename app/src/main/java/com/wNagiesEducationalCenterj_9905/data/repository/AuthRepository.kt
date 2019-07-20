@@ -5,12 +5,16 @@ import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.api.AuthResponse
+import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
+import com.wNagiesEducationalCenterj_9905.api.response.ChangePasswordResponse
 import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.UserDao
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
@@ -28,11 +32,11 @@ class AuthRepository @Inject constructor(
                             item.Id,
                             username,
                             password,
-                            "Bearer "+item.Token,
+                            "Bearer " + item.Token,
                             ServerPathUtil.setCorrectPath(item.image)
                         )
                     )
-                    preferenceProvider.setUserLogin(true, "Bearer "+item.Token)
+                    preferenceProvider.setUserLogin(true, "Bearer " + item.Token)
                 }
             }
 
@@ -59,11 +63,11 @@ class AuthRepository @Inject constructor(
                             item.Id,
                             username,
                             password,
-                            "Bearer "+item.Token,
+                            "Bearer " + item.Token,
                             ServerPathUtil.setCorrectPath(item.image)
                         )
                     )
-                    preferenceProvider.setUserLogin(true, "Bearer "+item.Token)
+                    preferenceProvider.setUserLogin(true, "Bearer " + item.Token)
                 }
             }
 
@@ -83,6 +87,15 @@ class AuthRepository @Inject constructor(
 
     fun getAuthenticatedUserFromDb(token: String): Flowable<List<UserEntity>> {
         return userDao.getAuthenticatedUserWithToken(token)
+    }
+
+    fun changeAccountPassword(token: String, changePasswordRequest: ChangePasswordRequest)
+            : Observable<ChangePasswordResponse> {
+        return apiService.requestAccountPasswordChange(token, changePasswordRequest)
+    }
+
+    fun updateAccountPassword(token: String,newPassword: String):Single<Int>{
+        return userDao.updateAccountPassword(newPassword,token)
     }
 
 }

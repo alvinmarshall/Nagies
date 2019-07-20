@@ -1,5 +1,6 @@
 package com.wNagiesEducationalCenterj_9905.di.modules
 
+import com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment
 import com.wNagiesEducationalCenterj_9905.ui.fragment.MessageDetailFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.fragment.*
 import dagger.Module
@@ -37,4 +38,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeReportFragment():ReportFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeChangePasswordFragment():ChangePasswordFragment
 }

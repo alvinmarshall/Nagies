@@ -1,6 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.api
 
 import androidx.lifecycle.LiveData
+import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.api.response.*
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
@@ -54,4 +55,10 @@ interface ApiService {
 
     @GET("students/report_image")
     fun getStudentReportImage(@Header("Authorization") token: String): LiveData<ApiResponse<ReportResponse>>
+
+    @POST("students/change_password")
+    fun requestAccountPasswordChange(
+        @Header("Authorization") token: String,
+        @Body changePassRequest: ChangePasswordRequest
+    ): Observable<ChangePasswordResponse>
 }

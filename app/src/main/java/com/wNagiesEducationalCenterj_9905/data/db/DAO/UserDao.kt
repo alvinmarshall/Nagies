@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 
 @Dao
 interface UserDao {
@@ -18,4 +20,7 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE token = :token")
     fun getAuthenticatedUserWithToken(token:String):Flowable<List<UserEntity>>
+
+    @Query("UPDATE users SET password = :newPass WHERE token =:token")
+    fun updateAccountPassword(newPass:String,token: String): Single<Int>
 }

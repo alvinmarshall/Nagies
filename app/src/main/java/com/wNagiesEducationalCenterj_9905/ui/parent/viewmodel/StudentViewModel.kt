@@ -14,7 +14,9 @@ import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Profile
 import com.wNagiesEducationalCenterj_9905.vo.Resource
-import io.reactivex.*
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.ResponseBody
@@ -22,9 +24,9 @@ import okio.BufferedSink
 import okio.Okio
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
-import java.io.*
-
 
 class StudentViewModel @Inject constructor(
     private val studentRepository: StudentRepository,

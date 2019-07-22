@@ -8,33 +8,32 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.ReportEntity
+import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 import kotlinx.android.synthetic.main.list_assignment.view.*
 import java.io.File
 
-class ReportAdapter : ListAdapter<ReportEntity, ReportVH>(ReportDiffUtil()) {
-
+class FileModelAdapter : ListAdapter<IFileModel, FileModelVH>(FileModelDiffUtil()) {
     private var itemCallback: ItemCallback<Pair<Int?, String?>>? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportVH {
-        return ReportVH(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileModelVH {
+        return FileModelVH(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.list_assignment, parent, false)
         )
 
     }
 
-    override fun onBindViewHolder(holder: ReportVH, position: Int) {
-        holder.bind(getItem(position),itemCallback)
-    }
+    override fun onBindViewHolder(holder: FileModelVH, position: Int) {
+        holder.bind(getItem(position), itemCallback)
 
+    }
 
     fun setItemCallback(callback: ItemCallback<Pair<Int?, String?>>) {
         itemCallback = callback
     }
 }
 
-class ReportVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(item: ReportEntity?, itemCallback: ItemCallback<Pair<Int?, String?>>?) {
+class FileModelVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    fun bind(item: IFileModel?, itemCallback: ItemCallback<Pair<Int?, String?>>?) {
         itemView.tv_item_date.text = item?.date
         itemView.tv_item_subject.text = item?.teacherEmail
         itemView.tv_item_name.text = if (item?.path != null) "downloaded" else "download"
@@ -68,15 +67,12 @@ class ReportVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 }
 
 
-private class ReportDiffUtil : DiffUtil.ItemCallback<ReportEntity>() {
-    override fun areItemsTheSame(oldItem: ReportEntity, newItem: ReportEntity): Boolean {
+private class FileModelDiffUtil : DiffUtil.ItemCallback<IFileModel>(){
+    override fun areItemsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: ReportEntity, newItem: ReportEntity): Boolean {
-        return oldItem.teacherEmail == newItem.teacherEmail &&
-                oldItem.fileUrl == newItem.fileUrl &&
-                oldItem.studentName == newItem.date &&
-                oldItem.date == newItem.date
+    override fun areContentsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
+        return false
     }
 }

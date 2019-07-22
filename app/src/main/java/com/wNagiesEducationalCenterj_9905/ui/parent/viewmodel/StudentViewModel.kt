@@ -4,6 +4,7 @@ import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
+import com.wNagiesEducationalCenterj_9905.common.DBEntities
 import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
@@ -36,7 +37,7 @@ class StudentViewModel @Inject constructor(
     val cachedMessage: MutableLiveData<MessageEntity> = MutableLiveData()
     val cachedLabels: MutableLiveData<MutableList<Pair<Profile, String?>>> = MutableLiveData()
     var cachedSavedComplaint: MutableLiveData<Resource<List<ComplaintEntity>>> = MutableLiveData()
-    val isSaved: MutableLiveData<Boolean> = MutableLiveData()
+    val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
 
@@ -120,10 +121,10 @@ class StudentViewModel @Inject constructor(
                 .subscribe({
                     if (it.status == 200) {
                         savingComplaintToDb(parentComplaintRequest)
-                        isSaved.value = true
+                        isSuccess.value = true
                         return@subscribe
                     }
-                    isSaved.value = false
+                    isSuccess.value = false
 
                 }, {
                     Timber.i("send error: $it")
@@ -186,7 +187,7 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    fun downloadFilesFromServer(filePath: DownloadRequest, entityId: Int?, entity: String = "assignment") {
+    fun downloadFilesFromServer(filePath: DownloadRequest, entityId: Int?, entity:DBEntities) {
         disposable.addAll(
             Observable.just(preferenceProvider.getUserToken())
                 .map {
@@ -200,8 +201,8 @@ class StudentViewModel @Inject constructor(
                 }
                 .flatMap {
                     when (entity) {
-                        "assignment" -> return@flatMap updateAssignmentEntityPath(it, entityId)
-                        "report" -> return@flatMap updateReportEntityPath(it, entityId)
+                        DBEntities.ASSIGNMENT -> return@flatMap updateAssignmentEntityPath(it, entityId)
+                        DBEntities.REPORT -> return@flatMap updateReportEntityPath(it, entityId)
                         else -> return@flatMap null
                     }
                 }
@@ -209,6 +210,7 @@ class StudentViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Timber.i("row $it updated")
+                    isSuccess.value = true
 
                 }, { Timber.i(it, "get assignment err") })
         )
@@ -275,10 +277,13 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentAssignmentImage(token)
     }
 
-    fun deleteAssignmentById(id: Int?, path: String?) {
+    fun deleteFileById(id: Int?, path: String?,entity: DBEntities) {
         disposable.addAll(
             Observable.create<String> {
-                id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }
+                when(entity){
+                    DBEntities.ASSIGNMENT -> {id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }}
+                    DBEntities.REPORT -> {id?.let { it1 -> studentRepository.deleteReportById(it1) }}
+                }
                 path?.let { p ->
                     val file = File(p)
                     if (file.exists()) {

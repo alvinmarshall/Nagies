@@ -67,4 +67,7 @@
     <string name="announcement_channel_id">announcement</string>
     <string name="announcement_channel">Announcement</string>
     <string name="announcement_description">Get informed with school activities</string>
+    <string name="download_complete_message">Download complete</string>
+    <string name="label_no_data_available">No Data Available</string>
+    <string name="label_no_messages_available">No Messages Available</string>
 </resources>

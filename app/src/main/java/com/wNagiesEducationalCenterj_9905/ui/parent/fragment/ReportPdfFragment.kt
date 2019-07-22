@@ -18,16 +18,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.REPORT_ENTITY
-import com.wNagiesEducationalCenterj_9905.common.REQUEST_EXTERNAL_STORAGE
-import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
-import com.wNagiesEducationalCenterj_9905.ui.adapter.ReportAdapter
+import com.wNagiesEducationalCenterj_9905.ui.adapter.FileModelAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -38,13 +36,13 @@ import java.io.File
 
 class ReportPdfFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
-    private var reportAdapter:ReportAdapter? = null
-    private var recyclerView:RecyclerView? = null
+    private var reportAdapter: FileModelAdapter? = null
+    private var recyclerView: RecyclerView? = null
     private var itemData: Pair<Int?, String?>? = null
     private var callbackType: String? = null
     private var alertDialog: AlertDialog.Builder? = null
     private var loadingIndicator: ProgressBar? = null
-
+    private var snackBar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +56,7 @@ class ReportPdfFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
         loadingIndicator = progressBar
+        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
     }
@@ -71,7 +70,7 @@ class ReportPdfFragment : BaseFragment() {
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
         recyclerView?.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
-        reportAdapter = ReportAdapter()
+        reportAdapter = FileModelAdapter()
         reportAdapter?.setItemCallback(object : ItemCallback<Pair<Int?, String?>> {
             override fun onClick(data: Pair<Int?, String?>?) {
                 itemData = data
@@ -99,12 +98,13 @@ class ReportPdfFragment : BaseFragment() {
     }
 
     private fun loadFile() {
-        studentViewModel.downloadFilesFromServer(DownloadRequest(itemData?.second), itemData?.first, REPORT_ENTITY)
+        showDownloadComplete(false)
+        studentViewModel.downloadFilesFromServer(DownloadRequest(itemData?.second), itemData?.first, DBEntities.REPORT)
         if (itemData?.second != null) {
             val file = File(itemData?.second!!)
             if (file.exists()) {
                 val openIntent = Intent(Intent.ACTION_VIEW)
-                val uri = FileProvider.getUriForFile(context!!,getString(R.string.file_provider_authority),file)
+                val uri = FileProvider.getUriForFile(context!!, getString(R.string.file_provider_authority), file)
                 openIntent.setDataAndType(uri, FileTypeUtils.getType(file.absolutePath))
                 openIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 val open = Intent.createChooser(openIntent, getString(R.string.chooser_title))
@@ -117,7 +117,7 @@ class ReportPdfFragment : BaseFragment() {
         alertDialog?.setTitle("Delete Alert")
         alertDialog?.setMessage("Do you want to delete this file ?")
         alertDialog?.setPositiveButton("yes") { dialog, _ ->
-            studentViewModel.deleteAssignmentById(itemData?.first, itemData?.second)
+            studentViewModel.deleteFileById(itemData?.first, itemData?.second, DBEntities.REPORT)
             dialog.dismiss()
         }
         alertDialog?.setNegativeButton("cancel", null)
@@ -126,12 +126,13 @@ class ReportPdfFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this,viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getStudentReportPDF(token).observe(viewLifecycleOwner, Observer {resource->
+            studentViewModel.getStudentReportPDF(token).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        showDataAvailableMessage(label_msg_title, resource.data,MessageType.FILES)
                         Timber.i("report_pdf files data :${resource.data?.size}")
                         showLoadingDialog(false)
                         reportAdapter?.submitList(resource?.data)
@@ -148,14 +149,27 @@ class ReportPdfFragment : BaseFragment() {
 
             })
         })
+        studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
+            showDownloadComplete(it)
+        })
     }
 
     private fun showLoadingDialog(show: Boolean = true) {
-        showAnyView(progressBar,null,null,show){view,_,_,visible ->
-            if (visible){
+        showAnyView(progressBar, null, null, show) { view, _, _, visible ->
+            if (visible) {
                 (view as ProgressBar).visibility = View.VISIBLE
-            }else{
+            } else {
                 (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
+
+    private fun showDownloadComplete(show: Boolean = true) {
+        showAnyView(snackBar, getString(R.string.download_complete_message), null, show) { view, msg, _, visible ->
+            if (visible) {
+                (view as Snackbar).setText(msg!!).show()
+            } else {
+                (view as Snackbar).setText("Download Started...").show()
             }
         }
     }

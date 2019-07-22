@@ -59,7 +59,7 @@ class CreateMessageFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
-        studentViewModel.isSaved.observe(viewLifecycleOwner, Observer {
+        studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             isBusy = when (it) {
                 true -> {
                     showLoadingDialog(false)

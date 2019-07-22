@@ -148,7 +148,7 @@ class StudentRepository @Inject constructor(
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentPDF()
-                        assignmentDao.insertAssignmentPDF(item.assignment)
+                        assignmentDao.insertAssignment(item.assignment)
                     }
                 }
             }
@@ -191,7 +191,7 @@ class StudentRepository @Inject constructor(
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentImage()
-                        assignmentDao.insertAssignmentImage(item.assignment)
+                        assignmentDao.insertAssignment(item.assignment)
                     }
                 }
             }
@@ -231,18 +231,22 @@ class StudentRepository @Inject constructor(
         return assignmentDao.deleteAssignmentById(id)
     }
 
+    fun deleteReportById(id: Int) {
+        return reportDao.deleteReportById(id)
+    }
+
     fun fetchStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
                     item.report.forEach { pdf ->
                         pdf.format = "pdf"
-                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                         pdf.token = token
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
-                        db.reportDao().deleteReportPDF()
-                        db.reportDao().insertReport(item.report)
+                        reportDao.deleteReportPDF()
+                        reportDao.insertReport(item.report)
                     }
                 }
             }
@@ -267,6 +271,10 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
                 return apiService.getStudentReportPDF(token)
             }
+
+            override fun onFetchFailed() {
+                studentRateLimiter.reset(token)
+            }
         }.asLiveData()
     }
 
@@ -275,13 +283,13 @@ class StudentRepository @Inject constructor(
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
                     item.report.forEach { image ->
+                        image.token = token
                         image.format = "image"
                         image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
-                        image.token = token
                     }
                     db.runInTransaction {
-                        db.reportDao().deleteReportImage()
-                        db.reportDao().insertReport(item.report)
+                        reportDao.deleteReportImage()
+                        reportDao.insertReport(item.report)
                     }
                 }
             }
@@ -306,8 +314,13 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
                 return apiService.getStudentReportImage(token)
             }
+
+            override fun onFetchFailed() {
+                studentRateLimiter.reset(token)
+            }
         }.asLiveData()
     }
+
 
     fun updateStudentReportFilePath(id: Int, path: String): Int {
         return reportDao.updateReportPath(path, id)

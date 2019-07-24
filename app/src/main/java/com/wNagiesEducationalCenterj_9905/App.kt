@@ -30,11 +30,18 @@ class App : DaggerApplication() {
         )
         FirebaseMessaging.getInstance().isAutoInitEnabled = true
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
-            if (!it.isSuccessful){
+            if (!it.isSuccessful) {
                 Timber.i("Task Failed")
                 return@addOnCompleteListener
             }
             Timber.i("result: ${it.result?.token}")
+        }
+        FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_global)).addOnCompleteListener {
+            if (!it.isSuccessful) {
+                Timber.i("Task Failed")
+                return@addOnCompleteListener
+            }
+            Timber.i("incoming global topic")
         }
     }
 

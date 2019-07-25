@@ -34,8 +34,8 @@ class StudentRepository @Inject constructor(
     private val assignmentDao: AssignmentDao,
     private val reportDao: ReportDao
 ) {
-    private val studentRateLimiter = RateLimiter<String>(10, TimeUnit.MINUTES)
-    fun fetchStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
+    private val studentRateLimiter = RateLimiter<String>(30, TimeUnit.SECONDS)
+    fun fetchStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
             override fun loadFromDb(): LiveData<List<MessageEntity>> {
                 return Transformations.switchMap(messageDao.getMessages()) { msg ->
@@ -57,19 +57,13 @@ class StudentRepository @Inject constructor(
                         messageDao.deleteMessages()
                         messageDao.insertMessages(item.messages)
                     }
-                } else {
-                    db.runInTransaction {
-                        messageDao.deleteMessages()
-                        messageDao.insertMessages(item.messages)
-                    }
-                    Timber.i("status ${item.status}")
                 }
             }
 
             override fun shouldFetch(data: List<MessageEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || shouldFetch || fetch
             }
 
             override fun createCall() = apiService.getStudentMessages(token)
@@ -91,11 +85,18 @@ class StudentRepository @Inject constructor(
                         profile.token = token
                         profile.imageUrl = ServerPathUtil.setCorrectPath(profile.imageUrl)
                     }
-                    studentDao.insertStudentProfile(item.studentProfile[0])
+                    db.runInTransaction {
+                        studentDao.deleteProfile(token)
+                        studentDao.insertStudentProfile(item.studentProfile[0])
+                    }
                 }
             }
 
-            override fun shouldFetch(data: StudentProfileEntity?): Boolean = data == null
+            override fun shouldFetch(data: StudentProfileEntity?): Boolean {
+                val fetch = data == null
+                Timber.i("should fetch data? $fetch")
+                return fetch
+            }
 
             override fun loadFromDb(): LiveData<StudentProfileEntity> {
                 return Transformations.switchMap(studentDao.getStudentProfile(token)) { profile ->
@@ -137,7 +138,10 @@ class StudentRepository @Inject constructor(
         return apiService.getFilesFromServer(token, url)
     }
 
-    fun fetchStudentAssignmentPDF(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+    fun fetchStudentAssignmentPDF(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
         return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
             override fun saveCallResult(item: AssignmentResponse) {
                 if (item.status == 200) {
@@ -154,14 +158,14 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
                 return Transformations.switchMap(assignmentDao.getStudentAssignmentPDF(token)) { pdf ->
-                    if (pdf.isEmpty()) {
+                    if (pdf == null) {
                         val data = MutableLiveData<List<AssignmentEntity>>()
                         data.postValue(null)
                         return@switchMap data
@@ -173,14 +177,13 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
                 return apiService.getStudentAssignmentPDF(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 
-    fun fetchStudentAssignmentImage(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+    fun fetchStudentAssignmentImage(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
         return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
             override fun saveCallResult(item: AssignmentResponse) {
                 if (item.status == 200) {
@@ -197,9 +200,9 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
@@ -216,10 +219,6 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
                 return apiService.getStudentAssignmentImage(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 
@@ -235,7 +234,7 @@ class StudentRepository @Inject constructor(
         return reportDao.deleteReportById(id)
     }
 
-    fun fetchStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
+    fun fetchStudentReportPDF(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
@@ -252,9 +251,9 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {
@@ -271,14 +270,10 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
                 return apiService.getStudentReportPDF(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 
-    fun fetchStudentReportImage(token: String): LiveData<Resource<List<ReportEntity>>> {
+    fun fetchStudentReportImage(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
@@ -295,9 +290,9 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {
@@ -314,13 +309,8 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<ReportResponse>> {
                 return apiService.getStudentReportImage(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
-
 
     fun updateStudentReportFilePath(id: Int, path: String): Int {
         return reportDao.updateReportPath(path, id)

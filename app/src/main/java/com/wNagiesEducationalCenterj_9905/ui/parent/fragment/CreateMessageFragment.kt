@@ -7,7 +7,6 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
@@ -121,7 +120,7 @@ class CreateMessageFragment : BaseFragment() {
     private fun sendComplaint() {
         Timber.i("internet access...")
         val content: String? = messageContent?.text.toString()
-        if (content.equals("") || content == null) {
+        if (content?.trim().isNullOrEmpty() || content == null) {
             showMessage(getString(R.string.message_field_empty_error))
             return
         }

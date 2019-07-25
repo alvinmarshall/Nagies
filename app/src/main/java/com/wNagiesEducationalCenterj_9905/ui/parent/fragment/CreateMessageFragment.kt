@@ -14,15 +14,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.utils.NetworkStateUtils
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import kotlinx.android.synthetic.main.fragment_create_message.*
 import timber.log.Timber
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class CreateMessageFragment : BaseFragment() {
 
     private lateinit var studentViewModel: StudentViewModel
@@ -32,6 +27,7 @@ class CreateMessageFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var isBusy: Boolean = false
     private var dialog: AlertDialog.Builder? = null
+    private var isDeviceConnected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,17 +55,24 @@ class CreateMessageFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        subscribeObservers()
+    }
+
+    private fun subscribeObservers() {
+        getNetworkState()?.observe(viewLifecycleOwner, Observer { isNetworkAvail ->
+            isDeviceConnected = isNetworkAvail
+        })
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             isBusy = when (it) {
                 true -> {
                     showLoadingDialog(false)
-                    showMessage("message sent")
+                    showMessage(getString(R.string.sent_message_success))
                     clearMessage()
                     false
                 }
                 false -> {
                     showLoadingDialog(false)
-                    showMessage("sending message failed")
+                    showMessage(getString(R.string.sent_message_failed))
                     false
                 }
             }
@@ -105,15 +108,12 @@ class CreateMessageFragment : BaseFragment() {
     }
 
     private fun preparingToSendComplaint() {
-        val isConnected = context?.let { NetworkStateUtils.isOnline(it) }
-        isConnected?.let {
-            when (it) {
-                true -> {
-                    sendComplaint()
-                }
-                false -> {
-                    showMessage("No internet connection...")
-                }
+        when (isDeviceConnected) {
+            true -> {
+                sendComplaint()
+            }
+            false -> {
+                showMessage(getString(R.string.network_state_no_connection))
             }
         }
     }
@@ -122,7 +122,7 @@ class CreateMessageFragment : BaseFragment() {
         Timber.i("internet access...")
         val content: String? = messageContent?.text.toString()
         if (content.equals("") || content == null) {
-            showMessage("message can't be empty")
+            showMessage(getString(R.string.message_field_empty_error))
             return
         }
         complaintRequest = ParentComplaintRequest(content)

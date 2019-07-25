@@ -71,4 +71,8 @@
     <string name="label_no_data_available">No Data Available</string>
     <string name="label_no_messages_available">No Messages Available</string>
     <string name="fcm_topic_global">global</string>
+    <string name="sent_message_success">Message sent</string>
+    <string name="sent_message_failed">sending message failed</string>
+    <string name="network_state_no_connection">No internet connection</string>
+    <string name="message_field_empty_error">Message can\'t be empty</string>
 </resources>

@@ -56,4 +56,7 @@
               android:label="Detail" tools:layout="@layout/fragment_complaint_detail">
         <argument android:name="arg_parent_complaint_id" app:argType="integer"/>
     </fragment>
+    <fragment android:id="@+id/classTeacherFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ClassTeacherFragment"
+              android:label="fragment_class_teacher" tools:layout="@layout/fragment_class_teacher"/>
 </navigation>

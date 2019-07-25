@@ -40,6 +40,10 @@
                 android:icon="@drawable/ic_radio_black_24dp"
                 android:title="@string/menu_announcement"/>
 
+        <item android:id="@+id/classTeacherFragment"
+              android:icon="@drawable/ic_supervisor_account_black_24dp"
+              android:title="@string/menu_class_teacher"/>
+
         <item
                 android:id="@+id/sendMessageFragment"
                 android:icon="@drawable/ic_message_black_24dp"
@@ -50,7 +54,6 @@
                 android:title="@string/menu_change_password"/>
 
     </group>
-
 
 
 </menu>

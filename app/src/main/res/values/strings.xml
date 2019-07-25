@@ -75,4 +75,7 @@
     <string name="sent_message_failed">sending message failed</string>
     <string name="network_state_no_connection">No internet connection</string>
     <string name="message_field_empty_error">Message can\'t be empty</string>
+    <string name="label_btn_call_teacher">Call Teacher</string>
+    <string name="label_btn_send_message">Send Message</string>
+    <string name="menu_class_teacher">Class Teacher</string>
 </resources>

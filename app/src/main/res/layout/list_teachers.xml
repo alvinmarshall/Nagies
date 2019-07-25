@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+        <ImageView android:layout_width="match_parent"
+                   android:src="@color/colorPrimary"
+                   android:id="@+id/img_item"
+                   android:contentDescription="@string/des_icon"
+                   android:layout_height="200dp"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                  android:id="@+id/tv_item_name"
+                  android:padding="15dp"
+                  android:layout_below="@id/img_item"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:padding="15dp"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                  android:id="@+id/tv_item_gender"
+                  android:layout_below="@id/tv_item_name"
+                  android:layout_height="wrap_content"/>
+
+        <com.google.android.material.chip.Chip android:layout_width="wrap_content"
+                                               android:id="@+id/btn_item_call"
+                                               android:layout_below="@id/tv_item_gender"
+                                               android:text="@string/label_btn_call_teacher"
+                                               app:checkedIconVisible="false"
+                                               app:chipIconTint="@color/colorPrimary"
+                                               android:padding="5dp"
+                                               app:chipIcon="@drawable/ic_call_black_24dp"
+                                               android:layout_height="wrap_content"/>
+
+        <com.google.android.material.chip.Chip android:layout_width="wrap_content"
+                                               android:id="@+id/btn_item_message"
+                                               android:layout_below="@id/tv_item_gender"
+                                               android:text="@string/label_btn_send_message"
+                                               app:chipIconTint="@color/colorPrimary"
+                                               app:checkedIconVisible="false"
+                                               android:layout_alignParentEnd="true"
+                                               android:padding="5dp"
+                                               app:chipIcon="@drawable/ic_message_black_24dp"
+                                               android:layout_alignEnd="@id/btn_item_call"
+                                               android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

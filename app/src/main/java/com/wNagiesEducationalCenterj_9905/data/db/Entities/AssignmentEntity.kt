@@ -2,17 +2,18 @@ package com.wNagiesEducationalCenterj_9905.data.db.Entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 
 @Entity(tableName = "assignment")
 data class AssignmentEntity(
-    val studentName: String,
-    val teacherEmail: String,
-    var fileUrl: String?,
-    val date: String,
-    var format: String?,
-    var token: String?,
-    var path: String?
-) {
+    override val studentName: String,
+    override val teacherEmail: String,
+    override var fileUrl: String?,
+    override val date: String,
+    override var format: String?,
+    override var token: String?,
+    override var path: String?
+) :IFileModel{
     @PrimaryKey(autoGenerate = true)
-    var id = 0
+    override var id:Int = 0
 }

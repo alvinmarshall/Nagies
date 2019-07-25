@@ -34,8 +34,8 @@ class StudentRepository @Inject constructor(
     private val assignmentDao: AssignmentDao,
     private val reportDao: ReportDao
 ) {
-    private val studentRateLimiter = RateLimiter<String>(10, TimeUnit.MINUTES)
-    fun fetchStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
+    private val studentRateLimiter = RateLimiter<String>(30, TimeUnit.SECONDS)
+    fun fetchStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
             override fun loadFromDb(): LiveData<List<MessageEntity>> {
                 return Transformations.switchMap(messageDao.getMessages()) { msg ->
@@ -57,19 +57,13 @@ class StudentRepository @Inject constructor(
                         messageDao.deleteMessages()
                         messageDao.insertMessages(item.messages)
                     }
-                } else {
-                    db.runInTransaction {
-                        messageDao.deleteMessages()
-                        messageDao.insertMessages(item.messages)
-                    }
-                    Timber.i("status ${item.status}")
                 }
             }
 
             override fun shouldFetch(data: List<MessageEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || shouldFetch || fetch
             }
 
             override fun createCall() = apiService.getStudentMessages(token)
@@ -91,11 +85,18 @@ class StudentRepository @Inject constructor(
                         profile.token = token
                         profile.imageUrl = ServerPathUtil.setCorrectPath(profile.imageUrl)
                     }
-                    studentDao.insertStudentProfile(item.studentProfile[0])
+                    db.runInTransaction {
+                        studentDao.deleteProfile(token)
+                        studentDao.insertStudentProfile(item.studentProfile[0])
+                    }
                 }
             }
 
-            override fun shouldFetch(data: StudentProfileEntity?): Boolean = data == null
+            override fun shouldFetch(data: StudentProfileEntity?): Boolean {
+                val fetch = data == null
+                Timber.i("should fetch data? $fetch")
+                return fetch
+            }
 
             override fun loadFromDb(): LiveData<StudentProfileEntity> {
                 return Transformations.switchMap(studentDao.getStudentProfile(token)) { profile ->
@@ -137,7 +138,10 @@ class StudentRepository @Inject constructor(
         return apiService.getFilesFromServer(token, url)
     }
 
-    fun fetchStudentAssignmentPDF(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+    fun fetchStudentAssignmentPDF(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
         return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
             override fun saveCallResult(item: AssignmentResponse) {
                 if (item.status == 200) {
@@ -148,20 +152,20 @@ class StudentRepository @Inject constructor(
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentPDF()
-                        assignmentDao.insertAssignmentPDF(item.assignment)
+                        assignmentDao.insertAssignment(item.assignment)
                     }
                 }
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
                 return Transformations.switchMap(assignmentDao.getStudentAssignmentPDF(token)) { pdf ->
-                    if (pdf.isEmpty()) {
+                    if (pdf == null) {
                         val data = MutableLiveData<List<AssignmentEntity>>()
                         data.postValue(null)
                         return@switchMap data
@@ -173,14 +177,13 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
                 return apiService.getStudentAssignmentPDF(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 
-    fun fetchStudentAssignmentImage(token: String): LiveData<Resource<List<AssignmentEntity>>> {
+    fun fetchStudentAssignmentImage(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
         return object : NetworkBoundResource<List<AssignmentEntity>, AssignmentResponse>(appExecutors) {
             override fun saveCallResult(item: AssignmentResponse) {
                 if (item.status == 200) {
@@ -191,15 +194,15 @@ class StudentRepository @Inject constructor(
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentImage()
-                        assignmentDao.insertAssignmentImage(item.assignment)
+                        assignmentDao.insertAssignment(item.assignment)
                     }
                 }
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
@@ -216,10 +219,6 @@ class StudentRepository @Inject constructor(
             override fun createCall(): LiveData<ApiResponse<AssignmentResponse>> {
                 return apiService.getStudentAssignmentImage(token)
             }
-
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 
@@ -231,26 +230,30 @@ class StudentRepository @Inject constructor(
         return assignmentDao.deleteAssignmentById(id)
     }
 
-    fun fetchStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
+    fun deleteReportById(id: Int) {
+        return reportDao.deleteReportById(id)
+    }
+
+    fun fetchStudentReportPDF(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
                     item.report.forEach { pdf ->
                         pdf.format = "pdf"
-                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                         pdf.token = token
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
-                        db.reportDao().deleteReportPDF()
-                        db.reportDao().insertReport(item.report)
+                        reportDao.deleteReportPDF()
+                        reportDao.insertReport(item.report)
                     }
                 }
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {
@@ -270,26 +273,26 @@ class StudentRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun fetchStudentReportImage(token: String): LiveData<Resource<List<ReportEntity>>> {
+    fun fetchStudentReportImage(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
                     item.report.forEach { image ->
+                        image.token = token
                         image.format = "image"
                         image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
-                        image.token = token
                     }
                     db.runInTransaction {
-                        db.reportDao().deleteReportImage()
-                        db.reportDao().insertReport(item.report)
+                        reportDao.deleteReportImage()
+                        reportDao.insertReport(item.report)
                     }
                 }
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                val fetch = studentRateLimiter.shouldFetch(token)
                 Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || studentRateLimiter.shouldFetch(token)
+                return data == null || data.isEmpty() || fetch || shouldFetch
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {

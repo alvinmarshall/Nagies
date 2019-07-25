@@ -27,4 +27,7 @@ interface ReportDao {
     @Query("UPDATE report SET path = :path WHERE id = :id")
     fun updateReportPath(path: String, id: Int): Int
 
+    @Query("DELETE FROM report WHERE id = :id")
+    fun deleteReportById(id: Int)
+
 }

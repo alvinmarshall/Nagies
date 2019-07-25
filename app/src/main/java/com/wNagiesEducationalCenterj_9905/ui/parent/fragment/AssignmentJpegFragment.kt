@@ -18,15 +18,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.REQUEST_EXTERNAL_STORAGE
-import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
-import com.wNagiesEducationalCenterj_9905.ui.adapter.AssignmentAdapter
+import com.wNagiesEducationalCenterj_9905.ui.adapter.FileModelAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -38,11 +37,12 @@ import java.io.File
 class AssignmentJpegFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var recyclerView: RecyclerView? = null
-    private var assignmentAdapter: AssignmentAdapter? = null
+    private var fileModelAdapter: FileModelAdapter? = null
     private var alertDialog: AlertDialog.Builder? = null
     private var itemData: Pair<Int?, String?>? = null
     private var callbackType: String? = null
     private var loadingIndicator: ProgressBar? = null
+    private var snackBar: Snackbar? = null
 
 
     override fun onCreateView(
@@ -56,6 +56,7 @@ class AssignmentJpegFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
         loadingIndicator = progressBar
+        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
     }
@@ -73,9 +74,10 @@ class AssignmentJpegFragment : BaseFragment() {
             studentViewModel.getStudentAssignmentImage(token).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        showDataAvailableMessage(label_msg_title, resource.data,MessageType.FILES)
                         Timber.i("assignment image data :${resource.data?.size}")
                         showLoadingDialog(false)
-                        assignmentAdapter?.submitList(resource?.data)
+                        fileModelAdapter?.submitList(resource?.data)
                     }
                     Status.ERROR -> {
                         Timber.i(resource.message)
@@ -88,13 +90,17 @@ class AssignmentJpegFragment : BaseFragment() {
                 }
             })
         })
+
+        studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
+            showDownloadComplete(it)
+        })
     }
 
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
         recyclerView?.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
-        assignmentAdapter = AssignmentAdapter()
-        assignmentAdapter?.setItemCallback(object : ItemCallback<Pair<Int?, String?>> {
+        fileModelAdapter = FileModelAdapter()
+        fileModelAdapter?.setItemCallback(object : ItemCallback<Pair<Int?, String?>> {
             override fun onClick(data: Pair<Int?, String?>?) {
                 itemData = data
                 callbackType = "onClick"
@@ -117,11 +123,16 @@ class AssignmentJpegFragment : BaseFragment() {
                 }
             }
         })
-        recyclerView?.adapter = assignmentAdapter
+        recyclerView?.adapter = fileModelAdapter
     }
 
     private fun loadFile() {
-        studentViewModel.downloadFilesFromServer(DownloadRequest(itemData?.second), itemData?.first)
+        showDownloadComplete(false)
+        studentViewModel.downloadFilesFromServer(
+            DownloadRequest(itemData?.second),
+            itemData?.first,
+            DBEntities.ASSIGNMENT
+        )
         if (itemData?.second != null) {
             val file = File(itemData?.second!!)
             if (file.exists()) {
@@ -139,7 +150,7 @@ class AssignmentJpegFragment : BaseFragment() {
         alertDialog?.setTitle("Delete Alert")
         alertDialog?.setMessage("Do you want to delete this file ?")
         alertDialog?.setPositiveButton("yes") { dialog, _ ->
-            studentViewModel.deleteAssignmentById(itemData?.first, itemData?.second)
+            studentViewModel.deleteFileById(itemData?.first, itemData?.second, DBEntities.ASSIGNMENT)
             dialog.dismiss()
         }
         alertDialog?.setNegativeButton("cancel", null)
@@ -153,6 +164,16 @@ class AssignmentJpegFragment : BaseFragment() {
                 (view as ProgressBar).visibility = View.VISIBLE
             } else {
                 (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
+
+    private fun showDownloadComplete(show: Boolean = true) {
+        showAnyView(snackBar, getString(R.string.download_complete_message), null, show) { view, msg, _, visible ->
+            if (visible) {
+                (view as Snackbar).setText(msg!!).show()
+            } else {
+                (view as Snackbar).setText("Download Started...").show()
             }
         }
     }

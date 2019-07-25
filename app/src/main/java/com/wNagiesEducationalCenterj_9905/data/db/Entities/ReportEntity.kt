@@ -2,17 +2,18 @@ package com.wNagiesEducationalCenterj_9905.data.db.Entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 
 @Entity(tableName = "report")
 data class ReportEntity(
-    val studentName: String,
-    val teacherEmail: String,
-    var fileUrl: String?,
-    var format: String?,
-    val date: String,
-    var token:String?,
-    var path:String?
-){
+    override val studentName: String,
+    override val teacherEmail: String,
+    override var fileUrl: String?,
+    override val date: String,
+    override var format: String?,
+    override var token: String?,
+    override var path: String?
+):IFileModel{
     @PrimaryKey(autoGenerate = true)
-    var id:Int = 0
+    override var id:Int = 0
 }

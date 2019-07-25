@@ -7,7 +7,7 @@
              tools:context=".ui.parent.fragment.ReportFragment">
 
     <TextView
-            android:text="@string/label_msg_available_files"
+            tools:text="@string/label_msg_available_files"
             android:layout_width="match_parent"
             android:textColor="@android:color/white"
             android:gravity="center"

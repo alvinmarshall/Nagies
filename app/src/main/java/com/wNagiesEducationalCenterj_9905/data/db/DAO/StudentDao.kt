@@ -14,4 +14,7 @@ interface StudentDao {
 
     @Query("SELECT * FROM profile WHERE token = :token")
     fun getStudentProfile(token: String): LiveData<StudentProfileEntity>
+
+    @Query("DELETE FROM profile WHERE token = :token")
+    fun deleteProfile(token: String)
 }

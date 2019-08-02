@@ -61,4 +61,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body changePassRequest: ChangePasswordRequest
     ): Observable<ChangePasswordResponse>
+
+    @GET("students/teachers")
+    fun getClassTeacher(@Header("Authorization") token: String): LiveData<ApiResponse<StudentTeachersResponse>>
 }

@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
+import timber.log.Timber
 
 class ParentNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
@@ -38,6 +40,14 @@ class ParentNavigationActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+        FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_parent)).addOnCompleteListener {
+            if (!it.isSuccessful) {
+                Timber.i("Task Failed")
+                return@addOnCompleteListener
+            }
+            Timber.i("incoming parent topic")
+        }
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_teacher))
         setupNavigation()
         if (intent.hasExtra(USER_INFO)) {
             setUserInfo(intent)

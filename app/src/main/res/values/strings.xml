@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NagiesEducationalCenter</string>
+    <string name="app_name">Nagies Angels</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -78,4 +78,6 @@
     <string name="label_btn_call_teacher">Call Teacher</string>
     <string name="label_btn_send_message">Send Message</string>
     <string name="menu_class_teacher">Class Teacher</string>
+    <string name="fcm_topic_parent">parent</string>
+    <string name="fcm_topic_teacher">teachers</string>
 </resources>

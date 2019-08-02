@@ -58,5 +58,5 @@
     </fragment>
     <fragment android:id="@+id/classTeacherFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ClassTeacherFragment"
-              android:label="fragment_class_teacher" tools:layout="@layout/fragment_class_teacher"/>
+              android:label="Class Teachers" tools:layout="@layout/fragment_class_teacher"/>
 </navigation>

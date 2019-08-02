@@ -187,7 +187,7 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    fun downloadFilesFromServer(filePath: DownloadRequest, entityId: Int?, entity:DBEntities) {
+    fun downloadFilesFromServer(filePath: DownloadRequest, entityId: Int?, entity: DBEntities) {
         disposable.addAll(
             Observable.just(preferenceProvider.getUserToken())
                 .map {
@@ -277,12 +277,16 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentAssignmentImage(token)
     }
 
-    fun deleteFileById(id: Int?, path: String?,entity: DBEntities) {
+    fun deleteFileById(id: Int?, path: String?, entity: DBEntities) {
         disposable.addAll(
             Observable.create<String> {
-                when(entity){
-                    DBEntities.ASSIGNMENT -> {id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }}
-                    DBEntities.REPORT -> {id?.let { it1 -> studentRepository.deleteReportById(it1) }}
+                when (entity) {
+                    DBEntities.ASSIGNMENT -> {
+                        id?.let { it1 -> studentRepository.deleteAssignmentById(it1) }
+                    }
+                    DBEntities.REPORT -> {
+                        id?.let { it1 -> studentRepository.deleteReportById(it1) }
+                    }
                 }
                 path?.let { p ->
                     val file = File(p)
@@ -317,6 +321,10 @@ class StudentViewModel @Inject constructor(
             }
             it.onComplete()
         }
+    }
+
+    fun getClassTeacher(token: String): LiveData<Resource<List<StudentTeacherEntity>>> {
+        return studentRepository.getClassTeacher(token)
     }
 
 }

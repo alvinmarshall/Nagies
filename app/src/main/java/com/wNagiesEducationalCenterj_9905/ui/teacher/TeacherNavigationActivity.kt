@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
@@ -37,6 +38,14 @@ class TeacherNavigationActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+        FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_teacher)).addOnCompleteListener {
+            if (!it.isSuccessful) {
+                Timber.i("Task Failed")
+                return@addOnCompleteListener
+            }
+            Timber.i("incoming teachers topic")
+        }
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_parent))
         setupNavigation()
         if (intent.hasExtra(USER_INFO)) {
             setUserInfo(intent)

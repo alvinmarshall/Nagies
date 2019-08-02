@@ -315,4 +315,40 @@ class StudentRepository @Inject constructor(
     fun updateStudentReportFilePath(id: Int, path: String): Int {
         return reportDao.updateReportPath(path, id)
     }
+
+    fun getClassTeacher(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<StudentTeacherEntity>>> {
+        return object : NetworkBoundResource<List<StudentTeacherEntity>, StudentTeachersResponse>(appExecutors) {
+            override fun saveCallResult(item: StudentTeachersResponse) {
+                if (item.status == 200) {
+                    item.studentTeachers.forEach { teacher ->
+                        teacher.imageUrl = ServerPathUtil.setCorrectPath(teacher.imageUrl)
+                        teacher.token = token
+                    }
+                    db.runInTransaction {
+                        studentDao.deleteClassTeacher(token)
+                        studentDao.insertStudentTeacher(item.studentTeachers)
+                    }
+                }
+            }
+
+            override fun shouldFetch(data: List<StudentTeacherEntity>?): Boolean {
+                return data == null || data.isEmpty() || shouldFetch
+            }
+
+            override fun loadFromDb(): LiveData<List<StudentTeacherEntity>> {
+                return Transformations.switchMap(studentDao.getClassTeacher(token)) { teacher ->
+                    if (teacher == null) {
+                        val data: MutableLiveData<List<StudentTeacherEntity>> = MutableLiveData()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap studentDao.getClassTeacher(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<StudentTeachersResponse>> =
+                apiService.getClassTeacher(token)
+        }.asLiveData()
+
+    }
 }

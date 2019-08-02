@@ -34,11 +34,14 @@ abstract class FragmentModule {
     abstract fun contributeAssignmentJpegFragment(): AssignmentJpegFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeReportPdfFragment():ReportPdfFragment
+    abstract fun contributeReportPdfFragment(): ReportPdfFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeReportFragment():ReportFragment
+    abstract fun contributeReportFragment(): ReportFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeChangePasswordFragment():ChangePasswordFragment
+    abstract fun contributeChangePasswordFragment(): ChangePasswordFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeClassTeacherFragment(): ClassTeacherFragment
 }

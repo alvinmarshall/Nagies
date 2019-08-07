@@ -3,6 +3,8 @@ package com.wNagiesEducationalCenterj_9905.di.modules
 import com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment
 import com.wNagiesEducationalCenterj_9905.ui.fragment.MessageDetailFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.fragment.*
+import com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.ParentComplaintDetailsFragment
+import com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.ParentComplaintFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -44,4 +46,10 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeClassTeacherFragment(): ClassTeacherFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeParentComplaintFragment(): ParentComplaintFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeParentComplaintDetailsFragment(): ParentComplaintDetailsFragment
 }

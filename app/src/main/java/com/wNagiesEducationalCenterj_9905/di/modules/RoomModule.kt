@@ -44,4 +44,12 @@ class RoomModule {
     @Singleton
     @Provides
     fun provideReportDao(database: AppDatabase): ReportDao = database.reportDao()
+
+    @Singleton
+    @Provides
+    fun provideTeacherDao(database: AppDatabase): TeacherDao = database.teacherDao()
+
+    @Singleton
+    @Provides
+    fun provideAnnouncementDao(database: AppDatabase):AnnouncementDao = database.announcementDao()
 }

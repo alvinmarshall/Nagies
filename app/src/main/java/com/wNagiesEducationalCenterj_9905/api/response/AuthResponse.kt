@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.api
+package com.wNagiesEducationalCenterj_9905.api.response
 
 import com.google.gson.annotations.SerializedName
 

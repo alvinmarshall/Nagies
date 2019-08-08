@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
+import com.wNagiesEducationalCenterj_9905.common.UserAccount
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.common.utils.InputValidationProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.NetworkStateUtils
@@ -30,6 +31,7 @@ class ChangePasswordFragment : BaseFragment() {
     private var newPass: String? = null
     private var confirmPass: String? = null
     private var loadingIndicator: ProgressBar? = null
+    private var userAccount: UserAccount? = null
 
 
     override fun onCreateView(
@@ -43,10 +45,20 @@ class ChangePasswordFragment : BaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         configureViewModel()
+
     }
 
     private fun configureViewModel() {
         authViewModel = ViewModelProviders.of(this, viewModelFactory)[AuthViewModel::class.java]
+        authViewModel.getUserAccount()
+        subscribeObservers()
+
+    }
+
+    private fun subscribeObservers() {
+        authViewModel.account.observe(viewLifecycleOwner, Observer { account ->
+            userAccount = account
+        })
         authViewModel.isSuccess.observe(viewLifecycleOwner, Observer { isSuccess ->
             if (isSuccess) {
                 toast("Account Password changed Success")
@@ -92,13 +104,13 @@ class ChangePasswordFragment : BaseFragment() {
         newPass = et_new_password.text.toString()
         confirmPass = et_confirm_password.text.toString()
         val changePasswordRequest = ChangePasswordRequest(oldPass, newPass, confirmPass)
-        accountPasswordChange(changePasswordRequest)
+        accountPasswordChange(changePasswordRequest, userAccount)
     }
 
-    private fun accountPasswordChange(request: ChangePasswordRequest) {
+    private fun accountPasswordChange(request: ChangePasswordRequest, userAccount: UserAccount?) {
         if (NetworkStateUtils.isOnline(context!!)) {
             showLoadingDialog()
-            authViewModel.changeAccountPassword(request)
+            userAccount?.let { authViewModel.changeAccountPassword(request, it) }
         }
     }
 

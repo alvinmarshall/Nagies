@@ -16,4 +16,5 @@ data class UserEntity (
 ){
     @PrimaryKey(autoGenerate = true)
     var id:Int = 0
+    var role:String = ""
 }

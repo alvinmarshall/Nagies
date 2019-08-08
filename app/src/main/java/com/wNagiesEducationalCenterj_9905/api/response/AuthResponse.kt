@@ -12,5 +12,6 @@ data class AuthResponse(
     @SerializedName("token")
     val Token:String,
     @SerializedName("imageUrl")
-    val image:String
+    val image:String,
+    val role:String
 )

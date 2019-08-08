@@ -24,7 +24,7 @@ interface ComplaintDao {
     @Insert
     fun insertTeacherComplaint(teacherComplaintEntityList: List<TeacherComplaintEntity>)
 
-    @Query("SELECT * FROM teacher_complaint WHERE token = :token")
+    @Query("SELECT * FROM teacher_complaint WHERE token = :token ORDER BY id DESC")
     fun getTeacherComplaintMessage(token: String): LiveData<List<TeacherComplaintEntity>>
 
     @Query("DELETE FROM teacher_complaint WHERE token = :token")

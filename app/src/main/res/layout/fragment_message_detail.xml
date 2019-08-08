@@ -8,10 +8,10 @@
                 android:background="@drawable/gradient_list_bg"
                 tools:context=".ui.fragment.MessageDetailFragment">
 
-    <com.google.android.material.circularreveal.cardview.CircularRevealCardView android:layout_width="match_parent"
-                                                                                app:cardElevation="5dp"
-                                                                                app:cardUseCompatPadding="true"
-                                                                                android:layout_height="wrap_content">
+    <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
+                                                       app:cardElevation="5dp"
+                                                       app:cardUseCompatPadding="true"
+                                                       android:layout_height="wrap_content">
         <ScrollView android:layout_width="match_parent"
                     android:scrollbarStyle="outsideOverlay"
                     android:layout_height="wrap_content">
@@ -52,6 +52,7 @@
             </RelativeLayout>
 
         </ScrollView>
+    </com.google.android.material.card.MaterialCardView>
 
-    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
 </RelativeLayout>

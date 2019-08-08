@@ -107,8 +107,8 @@ class ParentComplaintFragment : BaseFragment() {
             teacherViewModel.getComplaintMessage(token).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        showLoadingDialog(false)
                         adapter?.submitList(resource?.data)
+                        showLoadingDialog(false)
                         Timber.i("data size: ${resource.data?.size}")
                     }
                     Status.ERROR -> {

@@ -3,6 +3,7 @@ package com.wNagiesEducationalCenterj_9905.api
 import androidx.lifecycle.LiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
+import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
 import com.wNagiesEducationalCenterj_9905.api.response.*
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
@@ -57,11 +58,30 @@ interface ApiService {
     fun getStudentReportImage(@Header("Authorization") token: String): LiveData<ApiResponse<ReportResponse>>
 
     @POST("students/change_password")
-    fun requestAccountPasswordChange(
+    fun requestParentAccountPasswordChange(
         @Header("Authorization") token: String,
         @Body changePassRequest: ChangePasswordRequest
     ): Observable<ChangePasswordResponse>
 
     @GET("students/teachers")
     fun getClassTeacher(@Header("Authorization") token: String): LiveData<ApiResponse<StudentTeachersResponse>>
+
+    @GET("teachers/announcement")
+    fun getTeachersAnnouncement(@Header("Authorization") token: String): LiveData<ApiResponse<AnnouncementResponse>>
+
+    @GET("teachers/complaints")
+    fun getTeacherComplaint(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherComplaintResponse>>
+
+    @POST("teachers/change_password")
+    fun requestTeacherAccountPasswordChange(
+        @Header("Authorization") token: String,
+        @Body changePassRequest: ChangePasswordRequest
+    ): Observable<ChangePasswordResponse>
+
+    @GET("teachers/profile")
+    fun getTeacherProfile(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherProfileResponse>>
+
+    @POST("teachers/send_message")
+    fun sendTeacherMessage(@Header("Authorization") token: String, @Body teacherMessage: TeacherMessageRequest)
+            : Single<TeacherMessageResponse>
 }

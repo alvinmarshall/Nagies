@@ -91,6 +91,7 @@ class AuthActivity : BaseActivity() {
                 }
                 Status.ERROR -> {
                     showProgressBar(false)
+                    showFailedMessage()
                     Timber.i(it.message)
                 }
                 Status.LOADING -> {
@@ -101,8 +102,8 @@ class AuthActivity : BaseActivity() {
 
     }
 
-    private fun showFailedMessage(show: Boolean = true) {
-        snackbar = Snackbar.make(mv, "username or password incorrect", Snackbar.LENGTH_SHORT)
+    private fun showFailedMessage(show: Boolean = true,msg:String = getString(R.string.auth_failed_message)) {
+        snackbar = Snackbar.make(mv, msg, Snackbar.LENGTH_SHORT)
         if (show) {
             snackbar?.show()
         } else {

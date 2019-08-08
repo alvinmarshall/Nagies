@@ -7,4 +7,5 @@ interface IMessageModel {
     val read: String?
     var token:String?
     var id:Int
+    val date:String
 }

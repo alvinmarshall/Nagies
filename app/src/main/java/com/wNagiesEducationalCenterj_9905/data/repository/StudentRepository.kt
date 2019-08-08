@@ -54,7 +54,7 @@ class StudentRepository @Inject constructor(
                         msg.token = token
                     }
                     db.runInTransaction {
-                        messageDao.deleteMessages()
+                        messageDao.deleteMessages(token)
                         messageDao.insertMessages(item.messages)
                     }
                 }

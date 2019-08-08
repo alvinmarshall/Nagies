@@ -1,8 +1,6 @@
-package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
+package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,35 +8,37 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ClassTeacherAction
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
-import com.wNagiesEducationalCenterj_9905.ui.adapter.ClassTeacherAdapter
-import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
+import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
+import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
-import kotlinx.android.synthetic.main.fragment_class_teacher.*
+import kotlinx.android.synthetic.main.fragment_teacher_announcement.*
 import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
-class ClassTeacherFragment : BaseFragment() {
-    private lateinit var studentViewModel: StudentViewModel
-    private var adapter: ClassTeacherAdapter? = null
+class TeacherAnnouncementFragment : BaseFragment() {
+    private lateinit var teacherViewModel: TeacherViewModel
+    private var loadingIndicator: ProgressBar? = null
+    private var adapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_class_teacher, container, false)
+        return inflater.inflate(R.layout.fragment_teacher_announcement, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadingIndicator = progressBar
+        loadingIndicator?.visibility = View.GONE
         recyclerView = recycler_view
     }
 
@@ -50,52 +50,39 @@ class ClassTeacherFragment : BaseFragment() {
 
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
-        recyclerView?.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        adapter = ClassTeacherAdapter()
-        adapter?.setItemCallBack(object : ItemCallback<Pair<ClassTeacherAction, String?>> {
-            override fun onClick(data: Pair<ClassTeacherAction, String?>?) {
-                when (data?.first) {
-                    ClassTeacherAction.CALL -> {
-                        callTeacher(data.second)
-                    }
-                    ClassTeacherAction.MESSAGE -> {
-                        sendSMSToTeacher(data.second)
-                    }
+        recyclerView?.layoutManager = LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
+        adapter = MessageAdapter()
+        adapter?.setItemCallback(object : ItemCallback<Int> {
+            override fun onClick(data: Int?) {
+                val action = data?.let {
+                    TeacherAnnouncementFragmentDirections
+                        .actionTeacherAnnouncementFragmentToAnnouncementDetailsFragment(it)
                 }
+                activity?.let { Navigation.findNavController(it, R.id.fragment_socket).navigate(action!!) }
             }
 
-            override fun onHold(data: Pair<ClassTeacherAction, String?>?) {
+            override fun onHold(data: Int?) {
             }
-
         })
         recyclerView?.adapter = adapter
     }
 
-    private fun sendSMSToTeacher(contact: String?) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", contact, null)))
-    }
-
-    private fun callTeacher(contact: String?) {
-        startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$contact")))
-    }
-
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
-        studentViewModel.getUserToken()
+        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel.getUserToken()
         subscribeObservers()
     }
 
     private fun subscribeObservers() {
-        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getClassTeacher(token).observe(viewLifecycleOwner, Observer { resource ->
+        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
+            teacherViewModel.getAnnouncementMessage(token).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        Timber.i("fetch data size ${resource.data?.size}")
-                        adapter?.submitList(resource.data)
                         showLoadingDialog(false)
+                        adapter?.submitList(resource?.data)
+                        Timber.i("data size: ${resource.data?.size}")
                     }
                     Status.ERROR -> {
-                        Timber.i(resource.message)
                         showLoadingDialog(false)
                         toast("${resource.message}")
                     }
@@ -105,7 +92,6 @@ class ClassTeacherFragment : BaseFragment() {
                     }
                 }
             })
-
         })
     }
 
@@ -118,6 +104,5 @@ class ClassTeacherFragment : BaseFragment() {
             }
         }
     }
-
 
 }

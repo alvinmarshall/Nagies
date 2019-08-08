@@ -19,6 +19,7 @@ import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
@@ -31,16 +32,7 @@ class AuthRepository @Inject constructor(
         return object : NetworkBoundResource<UserEntity, AuthResponse>(appExecutors) {
             override fun saveCallResult(item: AuthResponse) {
                 if (item.Status == 200 && item.role == LOGIN_ROLE_OPTIONS[0].toLowerCase()) {
-                    val entity = UserEntity(
-                        item.Id,
-                        username,
-                        password,
-                        "Bearer " + item.Token,
-                        ServerPathUtil.setCorrectPath(item.image)
-                    )
-                    entity.role = item.role
-                    userDao.insertUserToken(entity)
-                    preferenceProvider.setUserLogin(true, "Bearer " + item.Token)
+                    saveUserInfo(username, password, item)
                 }
             }
 
@@ -51,9 +43,7 @@ class AuthRepository @Inject constructor(
             }
 
             override fun createCall(): LiveData<ApiResponse<AuthResponse>> {
-                return apiService.getAuthenticatedParent(
-                    UserEntity(null, username, password, "", null)
-                )
+                return apiService.getAuthenticatedParent(UserEntity(username, password))
             }
         }.asLiveData()
     }
@@ -62,16 +52,7 @@ class AuthRepository @Inject constructor(
         return object : NetworkBoundResource<UserEntity, AuthResponse>(appExecutors) {
             override fun saveCallResult(item: AuthResponse) {
                 if (item.Status == 200 && item.role == LOGIN_ROLE_OPTIONS[1].toLowerCase()) {
-                    val entity = UserEntity(
-                        item.Id,
-                        username,
-                        password,
-                        "Bearer " + item.Token,
-                        ServerPathUtil.setCorrectPath(item.image)
-                    )
-                    entity.role = item.role
-                    userDao.insertUserToken(entity)
-                    preferenceProvider.setUserLogin(true, "Bearer " + item.Token)
+                    saveUserInfo(username, password, item)
                 }
             }
 
@@ -82,14 +63,26 @@ class AuthRepository @Inject constructor(
             }
 
             override fun createCall(): LiveData<ApiResponse<AuthResponse>> {
-                return apiService.getAuthenticatedTeacher(
-                    UserEntity(null, username, password, "", null)
-                )
+                return apiService.getAuthenticatedTeacher(UserEntity(username, password))
             }
         }.asLiveData()
     }
 
-    fun getAuthenticatedUserFromDb(token: String): Flowable<List<UserEntity>> {
+    private fun saveUserInfo(
+        username: String,
+        password: String,
+        item: AuthResponse
+    ) {
+        val entity = UserEntity(username, password)
+        entity.role = item.role
+        entity.photo = ServerPathUtil.setCorrectPath(item.image)
+        entity.token = "Bearer ${item.Token}"
+        entity.uid = item.Id
+        userDao.insertUser(entity)
+        preferenceProvider.setUserLogin(true, entity.token)
+    }
+
+    fun getAuthenticatedUserFromDb(token: String): Single<UserEntity> {
         return userDao.getAuthenticatedUserWithToken(token)
     }
 

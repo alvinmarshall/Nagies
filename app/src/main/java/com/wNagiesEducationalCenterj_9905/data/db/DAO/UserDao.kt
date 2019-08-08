@@ -12,13 +12,13 @@ import io.reactivex.Single
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertUserToken(userEntity: UserEntity)
+    fun insertUser(userEntity: UserEntity)
 
     @Query("SELECT * FROM users WHERE username = :username AND password = :password")
     fun getAuthenticatedUser(username:String,password:String):LiveData<UserEntity>
 
     @Query("SELECT * FROM users WHERE token = :token")
-    fun getAuthenticatedUserWithToken(token:String):Flowable<List<UserEntity>>
+    fun getAuthenticatedUserWithToken(token:String):Single<UserEntity>
 
     @Query("UPDATE users SET password = :newPass WHERE token =:token")
     fun updateAccountPassword(newPass:String,token: String): Single<Int>

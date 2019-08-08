@@ -31,8 +31,8 @@ import timber.log.Timber
  */
 class ProfileFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
-    private var profileAdapter:ProfileAdapter? = null
-    private var recyclerView:RecyclerView? = null
+    private var profileAdapter: ProfileAdapter? = null
+    private var recyclerView: RecyclerView? = null
     private var loadingIndicator: ProgressBar? = null
 
 
@@ -53,7 +53,7 @@ class ProfileFragment : BaseFragment() {
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
         recyclerView?.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
-        recyclerView?.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.VERTICAL))
+        recyclerView?.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         profileAdapter = ProfileAdapter()
     }
 
@@ -76,12 +76,12 @@ class ProfileFragment : BaseFragment() {
                 when (it.status) {
                     Status.SUCCESS -> {
                         studentViewModel.setProfileLabels(it.data)
-                        showLoadingDialog(false)
-                        studentViewModel.cachedLabels.observe(viewLifecycleOwner, Observer {profile->
+                        studentViewModel.cachedLabels.observe(viewLifecycleOwner, Observer { profile ->
                             profileAdapter?.setProfileData(profile)
                             recyclerView?.adapter = profileAdapter
+                            setProfileImage(it.data?.imageUrl)
+                            showLoadingDialog(false)
                         })
-                        setProfileImage(it.data?.imageUrl)
                         Timber.i("profile name: ${it.data?.studentName}")
                     }
                     Status.ERROR -> {
@@ -97,8 +97,8 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun setProfileImage(imageUrl: String?) =launch {
-        if (imageUrl != null){
+    private fun setProfileImage(imageUrl: String?) = launch {
+        if (imageUrl != null) {
             context?.let {
                 GlideApp.with(it).load(imageUrl)
                     .placeholder(R.drawable.default_user_avatar)

@@ -7,6 +7,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/app_bar_teacher_navigation"
+        android:background="@drawable/gradient_list_bg"
         tools:context=".ui.teacher.TeacherNavigationActivity">
     <fragment
             android:name="androidx.navigation.fragment.NavHostFragment"

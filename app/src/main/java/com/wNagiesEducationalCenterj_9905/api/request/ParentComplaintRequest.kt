@@ -1,5 +1,5 @@
 package com.wNagiesEducationalCenterj_9905.api.request
 
-data class ParentComplaintRequest(
-    val content:String
-)
+import com.wNagiesEducationalCenterj_9905.vo.IMessageRequestModel
+
+data class ParentComplaintRequest(override val content: String) : IMessageRequestModel

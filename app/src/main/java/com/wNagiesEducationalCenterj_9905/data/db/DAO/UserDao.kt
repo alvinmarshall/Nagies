@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
 
 @Dao

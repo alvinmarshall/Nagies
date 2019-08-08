@@ -9,6 +9,14 @@
                 android:icon="@drawable/ic_dashboard_black_24dp"
                 android:title="@string/menu_dashboard"/>
         <item
+                android:id="@+id/teacherAnnouncementFragment"
+                android:icon="@drawable/ic_radio_black_24dp"
+                android:title="@string/menu_announcement"/>
+        <item
+                android:id="@+id/parentComplaintFragment"
+                android:icon="@drawable/ic_contact_mail_black_24dp"
+                android:title="@string/menu_parent_complaints"/>
+        <item
                 android:id="@+id/sendMessageTeacherFragment"
                 android:icon="@drawable/ic_message_black_24dp"
                 android:title="@string/menu_send_message"/>
@@ -17,23 +25,19 @@
                 android:icon="@drawable/ic_description_black_24dp"
                 android:title="@string/menu_attachment"/>
         <item
+                android:id="@+id/teacherProfileFragment"
+                android:icon="@drawable/ic_person_black_24dp"
+                android:title="@string/menu_profile"/>
+        <item
                 android:id="@+id/fileManagementFragment"
                 android:icon="@drawable/ic_folder_open_black_24dp"
                 android:title="@string/menu_file_management"/>
 
         <item
-                android:id="@+id/announcementFragment"
-                android:icon="@drawable/ic_radio_black_24dp"
-                android:title="@string/menu_announcement"/>
-        <item
-                android:id="@+id/parentComplaintFragment"
-                android:icon="@drawable/ic_contact_mail_black_24dp"
-                android:title="@string/menu_parent_complaints"/>
-
-        <item
                 android:id="@+id/changePasswordFragmentTeacher"
                 android:icon="@drawable/ic_lock_black_24dp"
                 android:title="@string/menu_change_password"/>
+
     </group>
 
 

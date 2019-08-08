@@ -80,4 +80,7 @@
     <string name="menu_class_teacher">Class Teacher</string>
     <string name="fcm_topic_parent">parent</string>
     <string name="fcm_topic_teacher">teachers</string>
+    <string name="label_btn_call_parent">call parent</string>
+    <string name="lablel_msg_parent_complaint">Available Message</string>
+    <string name="auth_failed_message">username or password incorrect</string>
 </resources>

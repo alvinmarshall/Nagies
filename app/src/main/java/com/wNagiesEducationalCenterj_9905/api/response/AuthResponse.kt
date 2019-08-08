@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.api
+package com.wNagiesEducationalCenterj_9905.api.response
 
 import com.google.gson.annotations.SerializedName
 
@@ -12,5 +12,6 @@ data class AuthResponse(
     @SerializedName("token")
     val Token:String,
     @SerializedName("imageUrl")
-    val image:String
+    val image:String,
+    val role:String
 )

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,16 +16,19 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ClassTeacherAction
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.ui.adapter.ClassTeacherAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_class_teacher.*
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class ClassTeacherFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
-    private var adapter:ClassTeacherAdapter? = null
-    private var recyclerView:RecyclerView? = null
+    private var adapter: ClassTeacherAdapter? = null
+    private var recyclerView: RecyclerView? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,13 +50,17 @@ class ClassTeacherFragment : BaseFragment() {
 
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
-        recyclerView?.layoutManager = LinearLayoutManager(context,RecyclerView.VERTICAL,false)
+        recyclerView?.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         adapter = ClassTeacherAdapter()
-        adapter?.setItemCallBack(object:ItemCallback<Pair<ClassTeacherAction,String?>>{
+        adapter?.setItemCallBack(object : ItemCallback<Pair<ClassTeacherAction, String?>> {
             override fun onClick(data: Pair<ClassTeacherAction, String?>?) {
-                when(data?.first){
-                    ClassTeacherAction.CALL -> {callTeacher(data.second)}
-                    ClassTeacherAction.MESSAGE -> {sendSMSToTeacher(data.second)}
+                when (data?.first) {
+                    ClassTeacherAction.CALL -> {
+                        callTeacher(data.second)
+                    }
+                    ClassTeacherAction.MESSAGE -> {
+                        sendSMSToTeacher(data.second)
+                    }
                 }
             }
 
@@ -64,7 +72,7 @@ class ClassTeacherFragment : BaseFragment() {
     }
 
     private fun sendSMSToTeacher(contact: String?) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.fromParts("sms",contact,null)))
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", contact, null)))
     }
 
     private fun callTeacher(contact: String?) {
@@ -78,19 +86,37 @@ class ClassTeacherFragment : BaseFragment() {
     }
 
     private fun subscribeObservers() {
-        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer {token->
-            studentViewModel.getClassTeacher(token).observe(viewLifecycleOwner, Observer {resource->
-                when(resource.status){
+        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
+            studentViewModel.getClassTeacher(token).observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
                     Status.SUCCESS -> {
                         Timber.i("fetch data size ${resource.data?.size}")
                         adapter?.submitList(resource.data)
+                        showLoadingDialog(false)
                     }
-                    Status.ERROR -> {Timber.i(resource.message)}
-                    Status.LOADING -> {Timber.i("loading...")}
+                    Status.ERROR -> {
+                        Timber.i(resource.message)
+                        showLoadingDialog(false)
+                        toast("${resource.message}")
+                    }
+                    Status.LOADING -> {
+                        Timber.i("loading...")
+                        showLoadingDialog()
+                    }
                 }
             })
 
         })
+    }
+
+    private fun showLoadingDialog(show: Boolean = true) {
+        showAnyView(progressBar, null, null, show) { view, _, _, visible ->
+            if (visible) {
+                (view as ProgressBar).visibility = View.VISIBLE
+            } else {
+                (view as ProgressBar).visibility = View.GONE
+            }
+        }
     }
 
 

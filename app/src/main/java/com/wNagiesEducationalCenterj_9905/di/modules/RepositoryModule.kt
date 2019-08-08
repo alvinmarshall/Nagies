@@ -7,6 +7,7 @@ import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
 import com.wNagiesEducationalCenterj_9905.data.repository.AuthRepository
 import com.wNagiesEducationalCenterj_9905.data.repository.StudentRepository
+import com.wNagiesEducationalCenterj_9905.data.repository.TeacherRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -39,6 +40,20 @@ class RepositoryModule {
         return StudentRepository(
             appExecutors, apiService, messageDao, database, studentDao, complaintDao, assignmentDao, reportDao
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideTeacherRepository(
+        appExecutors: AppExecutors,
+        apiService: ApiService,
+        database: AppDatabase,
+        teacherDao: TeacherDao,
+        announcementDao: AnnouncementDao,
+        complaintDao: ComplaintDao,
+        messageDao: MessageDao
+    ): TeacherRepository {
+        return TeacherRepository(appExecutors, apiService, teacherDao, database,announcementDao,complaintDao,messageDao)
     }
 
 }

@@ -12,10 +12,10 @@ interface ReportDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertReport(reportEntityList: List<ReportEntity>)
 
-    @Query("SELECT * FROM report WHERE token = :token AND format = :format")
+    @Query("SELECT * FROM report WHERE token = :token AND format = :format ORDER BY id DESC")
     fun getStudentReportPDF(token: String, format: String = "pdf"): LiveData<List<ReportEntity>>
 
-    @Query("SELECT * FROM report WHERE token = :token AND format = :format")
+    @Query("SELECT * FROM report WHERE token = :token AND format = :format ORDER BY id DESC")
     fun getStudentReportImage(token: String, format: String = "image"): LiveData<List<ReportEntity>>
 
     @Query("DELETE FROM report where format = :format")

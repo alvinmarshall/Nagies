@@ -8,8 +8,7 @@
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.DashboardFragment"
               android:label="Dashboard" tools:layout="@layout/fragment_dashboard">
         <action android:id="@+id/action_dashboardFragment_to_messageDetailFragment"
-                app:destination="@+id/messageDetailFragment"
-        />
+                app:destination="@id/messageDetailFragment"/>
     </fragment>
     <fragment android:id="@+id/assignmentJpegFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AssignmentJpegFragment"

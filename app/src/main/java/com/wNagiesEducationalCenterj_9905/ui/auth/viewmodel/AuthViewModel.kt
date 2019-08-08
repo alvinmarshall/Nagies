@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.SessionManager
 import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
+import com.wNagiesEducationalCenterj_9905.common.LOGIN_ROLE_OPTIONS
+import com.wNagiesEducationalCenterj_9905.common.UserAccount
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.data.repository.AuthRepository
@@ -24,6 +26,7 @@ class AuthViewModel @Inject constructor(
     private val preferenceProvider: PreferenceProvider
 ) : BaseViewModel() {
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
+    val account: MutableLiveData<UserAccount> = MutableLiveData()
 
     fun authenticatingParent(username: String, password: String): LiveData<Resource<UserEntity>> {
         return authRepository.authenticateParent(username, password)
@@ -47,13 +50,13 @@ class AuthViewModel @Inject constructor(
 
     fun authCachedUserData(): LiveData<AuthResource<UserEntity>> = sessionManager.getCachedUser()
 
-    fun changeAccountPassword(changePasswordRequest: ChangePasswordRequest) {
+    fun changeAccountPassword(changePasswordRequest: ChangePasswordRequest, userAccount: UserAccount) {
         disposable.addAll(Observable.just(preferenceProvider.getUserToken())
             .map { token ->
                 return@map token
             }
             .flatMap { token ->
-                authRepository.changeAccountPassword(token, changePasswordRequest)
+                authRepository.changeAccountPassword(token, changePasswordRequest, userAccount)
             }
 
             .subscribeOn(Schedulers.io())
@@ -89,5 +92,21 @@ class AuthViewModel @Inject constructor(
             })
         )
 
+    }
+
+    fun getUserAccount() {
+        disposable.addAll(Single.just(preferenceProvider.getUserLoginRole())
+            .map { role ->
+                when (role) {
+                    LOGIN_ROLE_OPTIONS[0] -> return@map UserAccount.PARENT
+                    else -> return@map UserAccount.TEACHER
+                }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                account.value = it
+            }, {})
+        )
     }
 }

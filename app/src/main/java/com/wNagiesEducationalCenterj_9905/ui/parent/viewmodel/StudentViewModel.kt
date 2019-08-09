@@ -41,8 +41,8 @@ class StudentViewModel @Inject constructor(
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
 
-    fun getStudentMessages(token: String): LiveData<Resource<List<MessageEntity>>> {
-        return studentRepository.fetchStudentMessages(token)
+    fun getStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
+        return studentRepository.fetchStudentMessages(token, shouldFetch)
     }
 
     fun getUserToken() {

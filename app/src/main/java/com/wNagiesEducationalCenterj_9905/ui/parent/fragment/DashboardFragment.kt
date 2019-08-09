@@ -4,7 +4,6 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 import android.os.Bundle
 import android.view.*
 import android.widget.ProgressBar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -16,19 +15,19 @@ import com.wNagiesEducationalCenterj_9905.common.ItemCallback
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
+import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class DashboardFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var loadingIndicator: ProgressBar? = null
     private var messageAdapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
+    private var shouldFetch: Boolean = false
+    private lateinit var sharedViewModel: SharedViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,7 +87,7 @@ class DashboardFragment : BaseFragment() {
 
     private fun subscribeObserver(token: String?) {
         token?.let {
-            studentViewModel.getStudentMessages(it).observe(viewLifecycleOwner, Observer { r ->
+            studentViewModel.getStudentMessages(it, shouldFetch).observe(viewLifecycleOwner, Observer { r ->
                 when (r.status) {
                     Status.SUCCESS -> {
                         showLoadingDialog(false)
@@ -105,18 +104,37 @@ class DashboardFragment : BaseFragment() {
                 }
             })
         }
+        getShouldFetch().observe(viewLifecycleOwner, Observer {
+            if (it) {
+                toast("notification received")
+                shouldFetch = it
+            }
+        })
 
-    }
-
-    private fun showLoadingDialog(show: Boolean = true) {
-        showAnyView(progressBar,null,null,show){view,_,_,visible ->
-           if (visible){
-               (view as ProgressBar).visibility = View.VISIBLE
-           }else{
-               (view as ProgressBar).visibility = View.GONE
-           }
+        activity?.let {
+            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
+            sharedViewModel.fetchMessage.observe(it, Observer { fetch ->
+                if (fetch) {
+                    toast("notification received from activity")
+                    shouldFetch = fetch
+                }
+            })
         }
     }
 
+    private fun showLoadingDialog(show: Boolean = true) {
+        showAnyView(progressBar, null, null, show) { view, _, _, visible ->
+            if (visible) {
+                (view as ProgressBar).visibility = View.VISIBLE
+            } else {
+                (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        sharedViewModel.fetchMessage.value = false
+    }
 
 }

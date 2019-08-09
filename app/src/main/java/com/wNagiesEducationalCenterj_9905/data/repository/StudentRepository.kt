@@ -61,15 +61,11 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: List<MessageEntity>?): Boolean {
-                val fetch = studentRateLimiter.shouldFetch(token)
-                Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || shouldFetch || fetch
+                Timber.i("should fetch data? $shouldFetch")
+                return data == null || data.isEmpty() || shouldFetch
             }
 
             override fun createCall() = apiService.getStudentMessages(token)
-            override fun onFetchFailed() {
-                studentRateLimiter.reset(token)
-            }
         }.asLiveData()
     }
 

@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -18,8 +19,10 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
+import com.wNagiesEducationalCenterj_9905.common.MESSAGE_RECEIVE_EXTRA
 import com.wNagiesEducationalCenterj_9905.common.USER_INFO
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.content_parent_navigation.*
 import kotlinx.android.synthetic.main.nav_header_parent_navigation.view.*
 import kotlinx.coroutines.launch
@@ -32,7 +35,10 @@ class ParentNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
-    private var snackBar:Snackbar? = null
+    private var snackBar: Snackbar? = null
+    private var fetch: Boolean? = false
+    private lateinit var sharedViewModel: SharedViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
@@ -40,6 +46,7 @@ class ParentNavigationActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+
         FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_parent)).addOnCompleteListener {
             if (!it.isSuccessful) {
                 Timber.i("Task Failed")
@@ -49,17 +56,28 @@ class ParentNavigationActivity : BaseActivity() {
         }
         FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_teacher))
         setupNavigation()
+
         if (intent.hasExtra(USER_INFO)) {
             setUserInfo(intent)
         }
+        if (intent.hasExtra(MESSAGE_RECEIVE_EXTRA)) {
+            fetch = intent.extras?.getBoolean(MESSAGE_RECEIVE_EXTRA)
+        }
+        configureSharedViewModel()
     }
+
+    private fun configureSharedViewModel() {
+        sharedViewModel = ViewModelProviders.of(this)[SharedViewModel::class.java]
+        sharedViewModel.fetchMessage.value = fetch
+    }
+
 
     private fun setUserInfo(intent: Intent?) = launch {
         val bundle = intent?.extras?.getStringArrayList(USER_INFO)
         val photo = bundle?.get(1)
         val index = bundle?.get(0)
         val title = "index: $index"
-        snackBar = Snackbar.make(root,"welcome back $index",Snackbar.LENGTH_LONG)
+        snackBar = Snackbar.make(root, "welcome back $index", Snackbar.LENGTH_LONG)
         snackBar?.show()
         navView.getHeaderView(0).nav_header_title.text = title
         GlideApp.with(applicationContext).load(photo)

@@ -1,12 +1,11 @@
 package com.wNagiesEducationalCenterj_9905
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
-import com.wNagiesEducationalCenterj_9905.common.LOGIN_ROLE_OPTIONS
-import com.wNagiesEducationalCenterj_9905.common.USER_INFO
-import com.wNagiesEducationalCenterj_9905.common.UserAccount
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.delegate.lazyDeferred
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
@@ -26,10 +25,33 @@ class SplashActivity : BaseActivity() {
     @Inject
     lateinit var authViewModel: AuthViewModel
     private var userAccount: UserAccount? = null
+    private var shouldFetch: Boolean? = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.flags == Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) {
+            shouldFetch = getFetchValue()
+        }
+
         configViewModel()
         skipLoginPage()
+    }
+
+    private fun getFetchValue(): Boolean {
+        if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
+            return intent.getBooleanExtra(NOTIFICATION_EXTRA_MESSAGE, false)
+        }
+        if (intent.hasExtra(NOTIFICATION_EXTRA_REPORT)) {
+            return intent.getBooleanExtra(NOTIFICATION_EXTRA_REPORT, false)
+        }
+
+        if (intent.hasExtra(NOTIFICATION_EXTRA_ASSIGNMENT)) {
+            return intent.getBooleanExtra(NOTIFICATION_EXTRA_ASSIGNMENT, false)
+        }
+
+        if (intent.hasExtra(MESSAGE_RECEIVE_EXTRA)) {
+            return intent.getBooleanExtra(MESSAGE_RECEIVE_EXTRA, false)
+        }
+        return false
     }
 
     private fun subscribeObserver() {
@@ -72,7 +94,12 @@ class SplashActivity : BaseActivity() {
             when (account) {
                 UserAccount.PARENT -> {
                     Timber.i("starting parent dashboard")
-                    startActivity(intentFor<ParentNavigationActivity>(USER_INFO to userInfo))
+                    startActivity(
+                        intentFor<ParentNavigationActivity>(
+                            USER_INFO to userInfo,
+                            MESSAGE_RECEIVE_EXTRA to shouldFetch
+                        )
+                    )
                     finish()
                 }
                 UserAccount.TEACHER -> {

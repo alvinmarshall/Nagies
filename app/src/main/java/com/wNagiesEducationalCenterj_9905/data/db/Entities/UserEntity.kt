@@ -5,16 +5,16 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "users")
-data class UserEntity (
-    val userId:String?,
+data class UserEntity(
     @SerializedName("username")
-    val username:String,
+    val username: String,
     @SerializedName("password")
-    val password:String,
-    val token:String,
-    val photo:String?
-){
+    val password: String
+) {
     @PrimaryKey(autoGenerate = true)
-    var id:Int = 0
-    var role:String = ""
+    var id: Int = 0
+    var uid: String? = null
+    var role: String? = null
+    var token: String? = null
+    var photo: String? = null
 }

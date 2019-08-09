@@ -15,8 +15,8 @@ data class AuthResource<out T>(val status: AuthStatus, val data: T?, val message
             return AuthResource(AuthStatus.ERROR, data, message)
         }
 
-        fun <T> logout(): AuthResource<T> {
-            return AuthResource(AuthStatus.LOG_OUT, null, null)
+        fun <T> logout(data:T?): AuthResource<T> {
+            return AuthResource(AuthStatus.LOG_OUT, data, null)
         }
     }
 

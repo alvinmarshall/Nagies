@@ -1,9 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.ui.auth.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
-import com.wNagiesEducationalCenterj_9905.SessionManager
 import com.wNagiesEducationalCenterj_9905.api.request.ChangePasswordRequest
 import com.wNagiesEducationalCenterj_9905.common.LOGIN_ROLE_OPTIONS
 import com.wNagiesEducationalCenterj_9905.common.UserAccount
@@ -22,11 +20,11 @@ import javax.inject.Inject
 
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val sessionManager: SessionManager,
     private val preferenceProvider: PreferenceProvider
 ) : BaseViewModel() {
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val account: MutableLiveData<UserAccount> = MutableLiveData()
+    val cachedUser: MutableLiveData<AuthResource<UserEntity>> = MutableLiveData()
 
     fun authenticatingParent(username: String, password: String): LiveData<Resource<UserEntity>> {
         return authRepository.authenticateParent(username, password)
@@ -35,20 +33,6 @@ class AuthViewModel @Inject constructor(
     fun authenticatingTeacher(username: String, password: String): LiveData<Resource<UserEntity>> {
         return authRepository.authenticateTeacher(username, password)
     }
-
-    private fun queryAuthToken(token: String): LiveData<AuthResource<UserEntity>> {
-        return LiveDataReactiveStreams.fromPublisher(authRepository.getAuthenticatedUserFromDb(token)
-            .map {
-                if (it.isEmpty()) return@map AuthResource.error("user not found", null)
-                return@map AuthResource.authenticated(it[0])
-            })
-    }
-
-    fun authenticateWithToken(token: String) {
-        sessionManager.authenticateWith(queryAuthToken(token))
-    }
-
-    fun authCachedUserData(): LiveData<AuthResource<UserEntity>> = sessionManager.getCachedUser()
 
     fun changeAccountPassword(changePasswordRequest: ChangePasswordRequest, userAccount: UserAccount) {
         disposable.addAll(Observable.just(preferenceProvider.getUserToken())
@@ -108,5 +92,27 @@ class AuthViewModel @Inject constructor(
                 account.value = it
             }, {})
         )
+    }
+
+    fun authenticateWithToken() {
+        disposable.addAll(Single.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { token ->
+                authRepository.getAuthenticatedUserFromDb(token)
+            }
+            .map {
+                if (it.id == 0) {
+                    return@map AuthResource.error("user not found", null)
+                }
+                return@map AuthResource.authenticated(it)
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                AuthResource.loading(null)
+                cachedUser.value = it
+            }, { err -> Timber.i(err) })
+        )
+
     }
 }

@@ -5,17 +5,24 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.SplashActivity
+import com.wNagiesEducationalCenterj_9905.common.MESSAGE_RECEIVE_EXTRA
+import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_ASSIGNMENT
+import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_MESSAGE
+import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_REPORT
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.reflect.KClass
+
 
 @Singleton
 class AppNotificationManager @Inject constructor(val context: Application) {
+    private val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
     fun registerNotificationChannel(channelId: String, channelName: String, channelDescription: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -27,10 +34,17 @@ class AppNotificationManager @Inject constructor(val context: Application) {
         }
     }
 
-    fun triggerNotification(title: String?, msg: String?) {
+    fun triggerNotification(title: String?, msg: String?, type: String?) {
+        val extras = when (type) {
+            context.getString(R.string.notification_type_message) -> NOTIFICATION_EXTRA_MESSAGE
+            context.getString(R.string.notification_type_report) -> NOTIFICATION_EXTRA_REPORT
+            context.getString(R.string.notification_type_assignment) -> NOTIFICATION_EXTRA_ASSIGNMENT
+            else -> MESSAGE_RECEIVE_EXTRA
+        }
         val intent = Intent(context, SplashActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        intent.putExtra(extras, true)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT)
         val notificationBuilder =
             NotificationCompat.Builder(context, context.getString(R.string.announcement_channel_id))
                 .setSmallIcon(R.drawable.ic_business_black_24dp)
@@ -38,6 +52,7 @@ class AppNotificationManager @Inject constructor(val context: Application) {
                 .setContentTitle(msg)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
+                .setSound(defaultSoundUri)
                 .setAutoCancel(true)
                 .build()
         val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -61,6 +76,7 @@ class AppNotificationManager @Inject constructor(val context: Application) {
                 .setContentText(title)
                 .setContentTitle(msg)
                 .setPriority(priority)
+                .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()

@@ -83,4 +83,8 @@
     <string name="label_btn_call_parent">call parent</string>
     <string name="lablel_msg_parent_complaint">Available Message</string>
     <string name="auth_failed_message">username or password incorrect</string>
+    <string name="notification_type_message">message</string>
+    <string name="notification_type_report">report</string>
+    <string name="notification_type_assignment">assignment</string>
+
 </resources>

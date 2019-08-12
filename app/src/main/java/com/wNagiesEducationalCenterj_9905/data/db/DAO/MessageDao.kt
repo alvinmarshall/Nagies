@@ -14,8 +14,8 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessages(messageEntity: List<MessageEntity>)
 
-    @Query("SELECT * FROM messages ORDER BY id DESC")
-    fun getMessages():LiveData<List<MessageEntity>>
+    @Query("SELECT * FROM messages WHERE token = :token")
+    fun getMessages(token: String):LiveData<List<MessageEntity>>
 
     @Query("SELECT * FROM messages WHERE token = :token LIMIT 1")
     fun isMessageResent(token:String):Flowable<List<MessageEntity>>
@@ -29,6 +29,6 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSentMessage(messageEntity: MessageEntity):Single<Long>
 
-    @Query("SELECT * FROM messages WHERE token = :token ORDER BY id DESC")
+    @Query("SELECT * FROM messages WHERE token = :token")
     fun getSentMessages(token: String):Flowable<List<MessageEntity>>
 }

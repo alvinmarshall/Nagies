@@ -9,7 +9,6 @@ import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.data.repository.AuthRepository
 import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
-import com.wNagiesEducationalCenterj_9905.vo.AuthResource
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -24,7 +23,7 @@ class AuthViewModel @Inject constructor(
 ) : BaseViewModel() {
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val account: MutableLiveData<UserAccount> = MutableLiveData()
-    val cachedUser: MutableLiveData<AuthResource<UserEntity>> = MutableLiveData()
+    val cachedUser: MutableLiveData<Resource<UserEntity>> = MutableLiveData()
 
     fun authenticatingParent(username: String, password: String): LiveData<Resource<UserEntity>> {
         return authRepository.authenticateParent(username, password)
@@ -102,14 +101,13 @@ class AuthViewModel @Inject constructor(
             }
             .map {
                 if (it.id == 0) {
-                    return@map AuthResource.error("user not found", null)
+                    return@map Resource.error("user not found", null)
                 }
-                return@map AuthResource.authenticated(it)
+                return@map Resource.success(it)
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                AuthResource.loading(null)
                 cachedUser.value = it
             }, { err -> Timber.i(err) })
         )

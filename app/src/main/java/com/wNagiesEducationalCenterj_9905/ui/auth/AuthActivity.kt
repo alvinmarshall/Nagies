@@ -36,7 +36,6 @@ class AuthActivity : BaseActivity() {
         setContentView(R.layout.activity_auth)
         setSupportActionBar(toolbar)
 
-        showErrorMessage()
         showLoadingDialog(false)
         if (!intent.hasExtra(SELECTED_ROLE)) {
             return
@@ -78,19 +77,11 @@ class AuthActivity : BaseActivity() {
         when (userAccount) {
             UserAccount.PARENT -> {
                 authViewModel.authenticatingParent(username, password).observe(this, Observer { resource ->
-                    if (resource.data?.role != LOGIN_ROLE_OPTIONS[0].toLowerCase()) {
-                        showErrorMessage(true)
-                        return@Observer
-                    }
                     loadDashboard(resource, userAccount)
                 })
             }
             UserAccount.TEACHER -> {
                 authViewModel.authenticatingTeacher(username, password).observe(this, Observer { resource ->
-                    if (resource.data?.role != LOGIN_ROLE_OPTIONS[1].toLowerCase()) {
-                        showErrorMessage(true)
-                        return@Observer
-                    }
                     loadDashboard(resource, userAccount)
                 })
             }
@@ -107,16 +98,22 @@ class AuthActivity : BaseActivity() {
         when (resource.status) {
             Status.SUCCESS -> {
                 showLoadingDialog(false)
-                showErrorMessage()
-                preferenceProvider.setUserLoginRole(LOGIN_ROLE_OPTIONS[0])
-                preferenceProvider.setUserLogin(true, resource.data?.token)
-                Timber.i("user authenticated with id: ${resource.data?.id}")
                 when (userAccount) {
                     UserAccount.PARENT -> {
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[0].toLowerCase()){
+                            showErrorMessage(true)
+                            return
+                        }
+                        setPreference(LOGIN_ROLE_OPTIONS[0],resource.data)
                         startActivity(intentFor<ParentNavigationActivity>().newTask().clearTask())
                         finish()
                     }
                     UserAccount.TEACHER -> {
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[1].toLowerCase()){
+                            showErrorMessage(true)
+                            return
+                        }
+                        setPreference(LOGIN_ROLE_OPTIONS[1],resource.data)
                         startActivity(intentFor<TeacherNavigationActivity>().newTask().clearTask())
                         finish()
                     }
@@ -124,22 +121,33 @@ class AuthActivity : BaseActivity() {
             }
             Status.ERROR -> {
                 showLoadingDialog(false)
-                showErrorMessage(true)
-                toast("${resource.message}")
+                resource.message?.let {
+                    if (it.toLowerCase().contains("unable to resolve host")){
+                        showErrorMessage(true,getString(R.string.network_state_no_connection))
+                    }
+                    if (it.toLowerCase().contains("status")){
+                        showErrorMessage(true)
+                    }
+                }
                 Timber.i(resource.message)
             }
             Status.LOADING -> {
                 Timber.i("loading...")
-                showErrorMessage()
                 showLoadingDialog()
             }
         }
     }
 
-    private fun showErrorMessage(show: Boolean = false) {
+    private fun setPreference(role:String,data: UserEntity) {
+        preferenceProvider.setUserLoginRole(role)
+        preferenceProvider.setUserLogin(true, data.token)
+        Timber.i("user authenticated with id: ${data.id}")
+    }
+
+    private fun showErrorMessage(show: Boolean = false,msg:String?=null) {
         if (show) {
             label_msg_error.visibility = View.VISIBLE
-            label_msg_error.text = getString(R.string.auth_failed_message)
+            label_msg_error.text = msg ?: getString(R.string.auth_failed_message)
             return
         }
         label_msg_error.visibility = View.GONE

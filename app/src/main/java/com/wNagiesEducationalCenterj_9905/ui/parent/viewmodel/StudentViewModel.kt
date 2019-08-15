@@ -1,6 +1,5 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel
 
-import android.os.Environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
@@ -20,13 +19,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import okhttp3.ResponseBody
-import okio.BufferedSink
-import okio.Okio
-import retrofit2.Response
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 class StudentViewModel @Inject constructor(
@@ -40,6 +34,7 @@ class StudentViewModel @Inject constructor(
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
+    val cachedFileName: MutableLiveData<String> = MutableLiveData()
 
     fun getStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return studentRepository.fetchStudentMessages(token, shouldFetch)
@@ -187,7 +182,7 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    fun downloadFilesFromServer(filePath: DownloadRequest, entityId: Int?, entity: DBEntities) {
+    fun downloadFilesFromServer(filePath: DownloadRequest) {
         disposable.addAll(
             Observable.just(preferenceProvider.getUserToken())
                 .map {
@@ -196,77 +191,18 @@ class StudentViewModel @Inject constructor(
                 .flatMap {
                     return@flatMap studentRepository.fetchFileFromServer(it, filePath)
                 }
-                .flatMap {
-                    saveToDisk(it)
-                }
-                .flatMap {
-                    when (entity) {
-                        DBEntities.ASSIGNMENT -> return@flatMap updateAssignmentEntityPath(it, entityId)
-                        DBEntities.REPORT -> return@flatMap updateReportEntityPath(it, entityId)
-                        else -> return@flatMap null
-                    }
-                }
+
+
+                .doOnSubscribe { isSuccess.postValue(false) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    val headerFileName = it.headers().get("Content-Disposition")
+                    val filename = headerFileName?.replace("attachment; filename=", "")
+                    cachedFileName.value = filename
                     Timber.i("row $it updated")
-                    isSuccess.value = true
-
                 }, { Timber.i(it, "get assignment err") })
         )
-    }
-
-    private fun updateAssignmentEntityPath(file: File, id: Int?): Observable<Int> {
-        return Observable.create {
-            id?.let { it1 ->
-                val row = studentRepository.updateStudentAssignmentFilePath(it1, file.absolutePath)
-                it.onNext(row)
-            }
-            it.onComplete()
-        }
-    }
-
-    private fun saveToDisk(response: Response<ResponseBody>): Observable<File> {
-        return Observable.create {
-            try {
-                val headerFileName = response.headers().get("Content-Disposition")
-                val headerFileType = response.headers().get("Content-Type")
-                val destinationFile: File?
-                val filename = headerFileName?.replace("attachment; filename=", "")
-
-                destinationFile = when (headerFileType) {
-                    "image/jpeg" -> {
-                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename!!)
-                    }
-                    "image/png" -> {
-                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), filename!!)
-                    }
-                    "application/pdf" -> {
-                        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename!!)
-                    }
-                    else -> null
-                }
-                if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                    val file = File(destinationFile?.absolutePath!!)
-                    if (!file.exists()) {
-                        destinationFile.createNewFile()
-                        Timber.i("file not created")
-                        val bufferSink: BufferedSink = Okio.buffer(Okio.sink(destinationFile))
-                        bufferSink.writeAll(response.body()?.source()!!)
-                        bufferSink.close()
-                        it.onNext(file)
-                        it.onComplete()
-                        Timber.i("file created")
-                    } else {
-                        it.onNext(file)
-                        it.onComplete()
-                        Timber.i("file already created")
-                    }
-                }
-            } catch (e: IOException) {
-                it.onError(e)
-            }
-        }
     }
 
     fun getStudentAssignmentPDF(token: String): LiveData<Resource<List<AssignmentEntity>>> {
@@ -313,14 +249,27 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentReportImage(token)
     }
 
-    private fun updateReportEntityPath(file: File, id: Int?): Observable<Int> {
-        return Observable.create {
-            id?.let { it1 ->
-                val row = studentRepository.updateStudentReportFilePath(it1, file.absolutePath)
-                it.onNext(row)
+    fun saveDownloadFilePathToDb(id: Int?,path: String?, entity: DBEntities) {
+        disposable.addAll(
+            Observable.fromCallable {
+                when (entity) {
+                    DBEntities.ASSIGNMENT -> {
+                        id?.let { path?.let { it1 -> studentRepository.updateStudentAssignmentFilePath(it, it1) } }
+                    }
+                    DBEntities.REPORT -> {
+                        Timber.i("report id $id")
+                        id?.let { path?.let { it1 -> studentRepository.updateStudentReportFilePath(it, it1) } }
+                    }
+                }
             }
-            it.onComplete()
-        }
+                .doOnComplete { isSuccess.postValue(true) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Timber.i("data is saved to db $it")
+                }, {})
+        )
+
     }
 
     fun getClassTeacher(token: String): LiveData<Resource<List<StudentTeacherEntity>>> {

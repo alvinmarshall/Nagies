@@ -8,7 +8,10 @@ import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.api.response.*
-import com.wNagiesEducationalCenterj_9905.common.utils.RateLimiter
+import com.wNagiesEducationalCenterj_9905.common.FetchType
+import com.wNagiesEducationalCenterj_9905.common.IMAGE_FORMAT
+import com.wNagiesEducationalCenterj_9905.common.PDF_FORMAT
+import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
@@ -21,7 +24,6 @@ import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class StudentRepository @Inject constructor(
@@ -32,19 +34,19 @@ class StudentRepository @Inject constructor(
     private val studentDao: StudentDao,
     private val complaintDao: ComplaintDao,
     private val assignmentDao: AssignmentDao,
-    private val reportDao: ReportDao
+    private val reportDao: ReportDao,
+    private val preferenceProvider: PreferenceProvider
 ) {
-    private val studentRateLimiter = RateLimiter<String>(30, TimeUnit.SECONDS)
     fun fetchStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
             override fun loadFromDb(): LiveData<List<MessageEntity>> {
-                return Transformations.switchMap(messageDao.getMessages()) { msg ->
+                return Transformations.switchMap(messageDao.getMessages(token)) { msg ->
                     if (msg == null) {
                         val data = MutableLiveData<List<MessageEntity>>()
                         data.postValue(null)
                         return@switchMap data
                     }
-                    return@switchMap messageDao.getMessages()
+                    return@switchMap messageDao.getMessages(token)
                 }
             }
 
@@ -57,12 +59,14 @@ class StudentRepository @Inject constructor(
                         messageDao.deleteMessages(token)
                         messageDao.insertMessages(item.messages)
                     }
+                    preferenceProvider.setFetchDate(FetchType.MESSAGE)
                 }
             }
 
             override fun shouldFetch(data: List<MessageEntity>?): Boolean {
-                Timber.i("should fetch data? $shouldFetch")
-                return data == null || data.isEmpty() || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.MESSAGE)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun createCall() = apiService.getStudentMessages(token)
@@ -89,9 +93,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun shouldFetch(data: StudentProfileEntity?): Boolean {
-                val fetch = data == null
-                Timber.i("should fetch data? $fetch")
-                return fetch
+                return data == null
             }
 
             override fun loadFromDb(): LiveData<StudentProfileEntity> {
@@ -144,19 +146,19 @@ class StudentRepository @Inject constructor(
                     item.assignment.forEach { pdf ->
                         pdf.format = "pdf"
                         pdf.token = token
-                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
-                        assignmentDao.deleteAssignmentPDF()
+                        assignmentDao.deleteAssignmentPDF(token)
                         assignmentDao.insertAssignment(item.assignment)
                     }
+                    preferenceProvider.setFetchDate(FetchType.ASSIGNMENT_PDF)
                 }
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = studentRateLimiter.shouldFetch(token)
-                Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || fetch || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.ASSIGNMENT_PDF)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
@@ -186,19 +188,19 @@ class StudentRepository @Inject constructor(
                     item.assignment.forEach { image ->
                         image.token = token
                         image.format = "image"
-                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
                     }
                     db.runInTransaction {
-                        assignmentDao.deleteAssignmentImage()
+                        assignmentDao.deleteAssignmentImage(token)
                         assignmentDao.insertAssignment(item.assignment)
                     }
+                    preferenceProvider.setFetchDate(FetchType.ASSIGNMENT_IMAGE)
                 }
             }
 
             override fun shouldFetch(data: List<AssignmentEntity>?): Boolean {
-                val fetch = studentRateLimiter.shouldFetch(token)
-                Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || fetch || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.ASSIGNMENT_IMAGE)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<AssignmentEntity>> {
@@ -235,21 +237,21 @@ class StudentRepository @Inject constructor(
             override fun saveCallResult(item: ReportResponse) {
                 if (item.status == 200) {
                     item.report.forEach { pdf ->
-                        pdf.format = "pdf"
+                        pdf.format = PDF_FORMAT
                         pdf.token = token
-                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
-                        reportDao.deleteReportPDF()
+                        reportDao.deleteReportPDF(token)
                         reportDao.insertReport(item.report)
                     }
+                    preferenceProvider.setFetchDate(FetchType.REPORT_PDF)
                 }
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = studentRateLimiter.shouldFetch(token)
-                Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || fetch || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.REPORT_PDF)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {
@@ -275,20 +277,20 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.report.forEach { image ->
                         image.token = token
-                        image.format = "image"
-                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
+                        image.format = IMAGE_FORMAT
                     }
                     db.runInTransaction {
-                        reportDao.deleteReportImage()
+                        reportDao.deleteReportImage(token)
                         reportDao.insertReport(item.report)
                     }
+                    preferenceProvider.setFetchDate(FetchType.REPORT_IMAGE)
                 }
             }
 
             override fun shouldFetch(data: List<ReportEntity>?): Boolean {
-                val fetch = studentRateLimiter.shouldFetch(token)
-                Timber.i("should fetch data? $fetch")
-                return data == null || data.isEmpty() || fetch || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.REPORT_IMAGE)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<ReportEntity>> {
@@ -324,11 +326,14 @@ class StudentRepository @Inject constructor(
                         studentDao.deleteClassTeacher(token)
                         studentDao.insertStudentTeacher(item.studentTeachers)
                     }
+                    preferenceProvider.setFetchDate(FetchType.CLASSTEACHER)
                 }
             }
 
             override fun shouldFetch(data: List<StudentTeacherEntity>?): Boolean {
-                return data == null || data.isEmpty() || shouldFetch
+                val isOld = preferenceProvider.getFetchType(FetchType.CLASSTEACHER)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<StudentTeacherEntity>> {

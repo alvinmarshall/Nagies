@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.wNagiesEducationalCenterj_9905.common.IMAGE_FORMAT
+import com.wNagiesEducationalCenterj_9905.common.PDF_FORMAT
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.AssignmentEntity
 
 @Dao
@@ -13,16 +15,16 @@ interface AssignmentDao {
     fun insertAssignment(assignmentEntityList: List<AssignmentEntity>)
 
     @Query("SELECT * FROM assignment WHERE  token = :token AND format = :format")
-    fun getStudentAssignmentPDF(token: String, format: String = "pdf"): LiveData<List<AssignmentEntity>>
+    fun getStudentAssignmentPDF(token: String, format: String = PDF_FORMAT): LiveData<List<AssignmentEntity>>
 
-    @Query("DELETE FROM assignment WHERE format = :format")
-    fun deleteAssignmentPDF(format: String = "pdf")
+    @Query("DELETE FROM assignment WHERE token = :token AND  format = :format")
+    fun deleteAssignmentPDF(token: String,format: String = PDF_FORMAT)
 
     @Query("SELECT * FROM assignment WHERE token = :token AND format = :format")
-    fun getAssignmentImage(token: String, format: String = "image"): LiveData<List<AssignmentEntity>>
+    fun getAssignmentImage(token: String, format: String = IMAGE_FORMAT): LiveData<List<AssignmentEntity>>
 
-    @Query("DELETE FROM assignment WHERE format = :format")
-    fun deleteAssignmentImage(format: String = "image")
+    @Query("DELETE FROM assignment WHERE  token = :token AND format = :format")
+    fun deleteAssignmentImage(token: String,format: String = IMAGE_FORMAT)
 
     @Query("UPDATE assignment SET path = :path WHERE id = :id")
     fun updateAssignmentPath(path: String, id: Int): Int

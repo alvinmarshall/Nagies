@@ -2,10 +2,15 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.Manifest
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +30,10 @@ import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.ui.adapter.FileModelAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
+import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_assignment_jpeg.*
@@ -43,7 +50,10 @@ class AssignmentJpegFragment : BaseFragment() {
     private var callbackType: String? = null
     private var loadingIndicator: ProgressBar? = null
     private var snackBar: Snackbar? = null
-
+    private var shouldFetch: Boolean = false
+    private lateinit var sharedViewModel: SharedViewModel
+    private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
+    private var downloadReceiver: BroadcastReceiver? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +69,17 @@ class AssignmentJpegFragment : BaseFragment() {
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
+        downloadReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                downloadList.forEach {
+                    if (it.third == id) {
+                        studentViewModel.saveDownloadFilePathToDb(it.first, it.second, DBEntities.ASSIGNMENT)
+                    }
+                }
+            }
+        }
+        context?.registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -70,29 +91,53 @@ class AssignmentJpegFragment : BaseFragment() {
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
+        subscribeObservers()
+    }
+
+    private fun subscribeObservers() {
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getStudentAssignmentImage(token).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        showDataAvailableMessage(label_msg_title, resource.data,MessageType.FILES)
-                        Timber.i("assignment image data :${resource.data?.size}")
-                        showLoadingDialog(false)
-                        fileModelAdapter?.submitList(resource?.data)
+            studentViewModel.getStudentAssignmentImage(token, shouldFetch)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            Timber.i("assignment image data :${resource.data?.size}")
+                            fileModelAdapter?.submitList(resource?.data)
+                            showLoadingDialog(false)
+                        }
+                        Status.ERROR -> {
+                            Timber.i(resource.message)
+                            showLoadingDialog(false)
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                        }
+                        Status.LOADING -> {
+                            Timber.i("loading...")
+                            showLoadingDialog()
+                        }
                     }
-                    Status.ERROR -> {
-                        Timber.i(resource.message)
-                        showLoadingDialog(false)
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading...")
-                        showLoadingDialog()
-                    }
-                }
-            })
+                })
         })
 
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
+        })
+        getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
+            if (fetch) {
+                toast("assignment image received")
+                shouldFetch = fetch
+            }
+        })
+        activity?.let {
+            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
+            sharedViewModel.fetchAssignmentJPEG.observe(it, Observer { fetch ->
+                if (fetch) {
+                    toast("assignment received from activity")
+                    shouldFetch = fetch
+                }
+            })
+        }
+        studentViewModel.cachedFileName.observe(viewLifecycleOwner, Observer {
+            getFileName(it)
         })
     }
 
@@ -127,12 +172,7 @@ class AssignmentJpegFragment : BaseFragment() {
     }
 
     private fun loadFile() {
-        showDownloadComplete(false)
-        studentViewModel.downloadFilesFromServer(
-            DownloadRequest(itemData?.second),
-            itemData?.first,
-            DBEntities.ASSIGNMENT
-        )
+        studentViewModel.downloadFilesFromServer(DownloadRequest(itemData?.second))
         if (itemData?.second != null) {
             val file = File(itemData?.second!!)
             if (file.exists()) {
@@ -144,6 +184,41 @@ class AssignmentJpegFragment : BaseFragment() {
                 startActivity(open)
             }
         }
+    }
+
+    private fun getFileName(it: String?) {
+        val url = ServerPathUtil.setCorrectPath(itemData?.second)
+        url?.let { link ->
+            it?.let {filename->
+                downloadList = downloadWithManager(link,filename,itemData)
+            }
+        }
+    }
+
+    private fun downloadWithManager(
+        url: String,
+        filename: String,
+        data: Pair<Int?, String?>?
+    ):ArrayList<Triple<Int?, String?, Long?>> {
+        val downloadList:ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
+        val id = data?.first
+        val path =
+            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename)
+        if (path.exists()) {
+            studentViewModel.saveDownloadFilePathToDb(id, path.absolutePath, DBEntities.ASSIGNMENT)
+            return downloadList
+        }
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        request.setTitle(filename)
+        request.setDescription("file downloading...")
+        request.allowScanningByMediaScanner()
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+        val manager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as? DownloadManager
+        val downloadId = manager?.enqueue(request)
+        downloadList.add(Triple(id, path.absolutePath, downloadId))
+        return downloadList
     }
 
     private fun showDeleteDialog() {
@@ -176,6 +251,16 @@ class AssignmentJpegFragment : BaseFragment() {
                 (view as Snackbar).setText("Download Started...").show()
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        sharedViewModel.fetchAssignmentJPEG.value = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        context?.unregisterReceiver(downloadReceiver)
     }
 
     //region Permission

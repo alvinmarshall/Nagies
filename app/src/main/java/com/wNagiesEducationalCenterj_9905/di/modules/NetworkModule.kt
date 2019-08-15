@@ -18,9 +18,10 @@ class NetworkModule {
     @Provides
     fun provideOkttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .callTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30,TimeUnit.SECONDS)
-            .writeTimeout(30,TimeUnit.SECONDS)
+            .connectTimeout(5, TimeUnit.MINUTES)
+            .writeTimeout(5, TimeUnit.MINUTES)
+            .readTimeout(5, TimeUnit.MINUTES)
+            .retryOnConnectionFailure(true)
             .build()
     }
 

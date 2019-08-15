@@ -9,7 +9,7 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="match_parent"
             android:layout_alignParentStart="true"
-            android:text="@string/lablel_msg_parent_complaint"
+            tools:text="@string/lablel_msg_parent_complaint"
             android:gravity="center_horizontal"
             android:textColor="?attr/secondaryTextColor"
             android:layout_height="wrap_content" android:id="@+id/label_msg_title"

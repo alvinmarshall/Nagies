@@ -9,10 +9,13 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.MessageType
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.showDataAvailableMessage
 import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
@@ -28,6 +31,7 @@ class DashboardFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var shouldFetch: Boolean = false
     private lateinit var sharedViewModel: SharedViewModel
+    private var snackBar:Snackbar? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +41,13 @@ class DashboardFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        getNetworkState()?.observe(viewLifecycleOwner, Observer {
+            if (!it){
+                snackBar?.show()
+                return@Observer
+            }
+            snackBar?.dismiss()
+        })
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer {
             subscribeObserver(it)
@@ -61,6 +72,7 @@ class DashboardFragment : BaseFragment() {
         loadingIndicator?.visibility = View.GONE
         recyclerView = recycler_view
         initRecyclerView()
+        snackBar = Snackbar.make(root,getString(R.string.label_msg_offline),Snackbar.LENGTH_INDEFINITE)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -90,12 +102,14 @@ class DashboardFragment : BaseFragment() {
             studentViewModel.getStudentMessages(it, shouldFetch).observe(viewLifecycleOwner, Observer { r ->
                 when (r.status) {
                     Status.SUCCESS -> {
-                        showLoadingDialog(false)
                         messageAdapter?.submitList(r.data)
+                        showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
+                        showLoadingDialog(false)
                         Timber.i("message data size: ${r.data?.size}")
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
+                        showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
                         Timber.i(r.message)
                     }
                     Status.LOADING -> {
@@ -104,7 +118,7 @@ class DashboardFragment : BaseFragment() {
                 }
             })
         }
-        getShouldFetch().observe(viewLifecycleOwner, Observer {
+        getFetchMessage().observe(viewLifecycleOwner, Observer {
             if (it) {
                 toast("notification received")
                 shouldFetch = it

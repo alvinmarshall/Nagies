@@ -133,6 +133,7 @@ class AuthActivity : BaseActivity() {
             }
             Status.LOADING -> {
                 Timber.i("loading...")
+                showErrorMessage()
                 showLoadingDialog()
             }
         }

@@ -11,6 +11,8 @@ import com.wNagiesEducationalCenterj_9905.api.response.AnnouncementResponse
 import com.wNagiesEducationalCenterj_9905.api.response.TeacherComplaintResponse
 import com.wNagiesEducationalCenterj_9905.api.response.TeacherMessageResponse
 import com.wNagiesEducationalCenterj_9905.api.response.TeacherProfileResponse
+import com.wNagiesEducationalCenterj_9905.common.FetchType
+import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.AnnouncementDao
@@ -25,6 +27,7 @@ import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import timber.log.Timber
 import javax.inject.Inject
 
 class TeacherRepository @Inject constructor(
@@ -34,7 +37,8 @@ class TeacherRepository @Inject constructor(
     private val db: AppDatabase,
     private val announcementDao: AnnouncementDao,
     private val complaintDao: ComplaintDao,
-    private val messageDao: MessageDao
+    private val messageDao: MessageDao,
+    private val preferenceProvider: PreferenceProvider
 ) {
     fun fetchAnnouncement(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<AnnouncementEntity>>> {
         return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
@@ -47,12 +51,15 @@ class TeacherRepository @Inject constructor(
                         announcementDao.deleteAnnouncement(token)
                         announcementDao.insertAnnouncement(item.messages)
                     }
+                    preferenceProvider.setFetchDate(FetchType.ANNOUNCEMENT)
                 }
 
             }
 
             override fun shouldFetch(data: List<AnnouncementEntity>?): Boolean {
-                return data == null || data.isEmpty()
+                val isOld = preferenceProvider.getFetchType(FetchType.ANNOUNCEMENT)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<AnnouncementEntity>> {
@@ -82,11 +89,14 @@ class TeacherRepository @Inject constructor(
                         complaintDao.deleteTeacherComplaint(token)
                         complaintDao.insertTeacherComplaint(item.complaints)
                     }
+                    preferenceProvider.setFetchDate(FetchType.COMPLAINT)
                 }
             }
 
             override fun shouldFetch(data: List<TeacherComplaintEntity>?): Boolean {
-                return data == null || data.isEmpty()
+                val isOld = preferenceProvider.getFetchType(FetchType.COMPLAINT)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
             override fun loadFromDb(): LiveData<List<TeacherComplaintEntity>> {
@@ -159,7 +169,7 @@ class TeacherRepository @Inject constructor(
         return announcementDao.getAnnouncementById(id)
     }
 
-    fun getSentMessages(token: String):Flowable<List<MessageEntity>>{
+    fun getSentMessages(token: String): Flowable<List<MessageEntity>> {
         return messageDao.getSentMessages(token)
     }
 

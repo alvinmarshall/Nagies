@@ -35,10 +35,19 @@ class RepositoryModule {
         studentDao: StudentDao,
         complaintDao: ComplaintDao,
         assignmentDao: AssignmentDao,
-        reportDao: ReportDao
+        reportDao: ReportDao,
+        preferenceProvider: PreferenceProvider
     ): StudentRepository {
         return StudentRepository(
-            appExecutors, apiService, messageDao, database, studentDao, complaintDao, assignmentDao, reportDao
+            appExecutors,
+            apiService,
+            messageDao,
+            database,
+            studentDao,
+            complaintDao,
+            assignmentDao,
+            reportDao,
+            preferenceProvider
         )
     }
 
@@ -51,9 +60,19 @@ class RepositoryModule {
         teacherDao: TeacherDao,
         announcementDao: AnnouncementDao,
         complaintDao: ComplaintDao,
-        messageDao: MessageDao
+        messageDao: MessageDao,
+        preferenceProvider: PreferenceProvider
     ): TeacherRepository {
-        return TeacherRepository(appExecutors, apiService, teacherDao, database,announcementDao,complaintDao,messageDao)
+        return TeacherRepository(
+            appExecutors,
+            apiService,
+            teacherDao,
+            database,
+            announcementDao,
+            complaintDao,
+            messageDao,
+            preferenceProvider
+        )
     }
 
 }

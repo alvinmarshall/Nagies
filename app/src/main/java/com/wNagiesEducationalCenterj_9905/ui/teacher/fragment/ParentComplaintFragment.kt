@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ComplaintAction
-import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.adapter.TeacherComplaintAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
+import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_parent_complaint.*
 import org.jetbrains.anko.support.v4.toast
@@ -32,6 +31,9 @@ class ParentComplaintFragment : BaseFragment() {
     private var adapter: TeacherComplaintAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var loadingIndicator: ProgressBar? = null
+    private var shouldFetch: Boolean = false
+    private lateinit var sharedViewModel: SharedViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -104,15 +106,17 @@ class ParentComplaintFragment : BaseFragment() {
 
     private fun subscribeObservers() {
         teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
-            teacherViewModel.getComplaintMessage(token).observe(viewLifecycleOwner, Observer { resource ->
+            teacherViewModel.getComplaintMessage(token, shouldFetch).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
                         adapter?.submitList(resource?.data)
                         showLoadingDialog(false)
                         Timber.i("data size: ${resource.data?.size}")
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
                         Timber.i(resource?.message)
                     }
                     Status.LOADING -> {
@@ -123,6 +127,23 @@ class ParentComplaintFragment : BaseFragment() {
 
             })
         })
+
+        getFetchComplaint().observe(viewLifecycleOwner, Observer {
+            if (it) {
+                toast("complaint notification received")
+                shouldFetch = it
+            }
+        })
+
+        activity?.let {
+            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
+            sharedViewModel.fetchComplaint.observe(it, Observer { fetch ->
+                if (fetch) {
+                    toast("complaint received from activity")
+                    shouldFetch = fetch
+                }
+            })
+        }
     }
 
     private fun configureViewModel() {
@@ -131,5 +152,9 @@ class ParentComplaintFragment : BaseFragment() {
         subscribeObservers()
     }
 
+    override fun onStop() {
+        super.onStop()
+        sharedViewModel.fetchComplaint.value = false
+    }
 
 }

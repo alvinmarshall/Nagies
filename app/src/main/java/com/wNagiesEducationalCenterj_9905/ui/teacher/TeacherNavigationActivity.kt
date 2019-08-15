@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -16,9 +17,9 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
-import com.wNagiesEducationalCenterj_9905.common.GlideApp
-import com.wNagiesEducationalCenterj_9905.common.USER_INFO
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.nav_header_teacher_navigation.view.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
@@ -29,6 +30,9 @@ class TeacherNavigationActivity : BaseActivity() {
     private lateinit var navView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
+    private lateinit var sharedViewModel: SharedViewModel
+    private var fetchMessage: Boolean? = false
+    private var fetchComplaint: Boolean? = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +55,21 @@ class TeacherNavigationActivity : BaseActivity() {
             setUserInfo(intent)
         }
 
+        if (intent.hasExtra(NOTIFICATION_EXTRA_COMPLAINT)) {
+            fetchComplaint = intent.extras?.getBoolean(NOTIFICATION_EXTRA_COMPLAINT)
+        }
+        if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
+            fetchMessage = intent.extras?.getBoolean(NOTIFICATION_EXTRA_MESSAGE)
+        }
+
+        configureSharedViewModel()
+
+    }
+
+    private fun configureSharedViewModel() {
+        sharedViewModel = ViewModelProviders.of(this)[SharedViewModel::class.java]
+        sharedViewModel.fetchMessage.value = fetchMessage
+        sharedViewModel.fetchComplaint.value = fetchComplaint
     }
 
     private fun setupNavigation() {

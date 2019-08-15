@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
@@ -27,6 +28,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var adapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
+    private var snackBar:Snackbar? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,6 +42,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
         loadingIndicator = progressBar
         loadingIndicator?.visibility = View.GONE
         recyclerView = recycler_view
+        snackBar = Snackbar.make(root,getString(R.string.label_msg_offline),Snackbar.LENGTH_INDEFINITE)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -69,6 +72,13 @@ class TeacherAnnouncementFragment : BaseFragment() {
 
     private fun configureViewModel() {
         teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        getNetworkState()?.observe(viewLifecycleOwner, Observer {
+            if (!it){
+                snackBar?.show()
+                return@Observer
+            }
+            snackBar?.dismiss()
+        })
         teacherViewModel.getUserToken()
         subscribeObservers()
     }

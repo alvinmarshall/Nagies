@@ -14,9 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ClassTeacherAction
-import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.adapter.ClassTeacherAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -91,11 +89,13 @@ class ClassTeacherFragment : BaseFragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         Timber.i("fetch data size ${resource.data?.size}")
+                        showDataAvailableMessage(label_msg_title,resource.data, MessageType.TEACHERS)
                         adapter?.submitList(resource.data)
                         showLoadingDialog(false)
                     }
                     Status.ERROR -> {
                         Timber.i(resource.message)
+                        showDataAvailableMessage(label_msg_title,resource.data, MessageType.TEACHERS)
                         showLoadingDialog(false)
                         toast("${resource.message}")
                     }

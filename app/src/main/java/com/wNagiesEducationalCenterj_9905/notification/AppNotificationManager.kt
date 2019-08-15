@@ -12,10 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.SplashActivity
-import com.wNagiesEducationalCenterj_9905.common.MESSAGE_RECEIVE_EXTRA
-import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_ASSIGNMENT
-import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_MESSAGE
-import com.wNagiesEducationalCenterj_9905.common.NOTIFICATION_EXTRA_REPORT
+import com.wNagiesEducationalCenterj_9905.common.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,6 +36,7 @@ class AppNotificationManager @Inject constructor(val context: Application) {
             context.getString(R.string.notification_type_message) -> NOTIFICATION_EXTRA_MESSAGE
             context.getString(R.string.notification_type_report) -> NOTIFICATION_EXTRA_REPORT
             context.getString(R.string.notification_type_assignment) -> NOTIFICATION_EXTRA_ASSIGNMENT
+            context.getString(R.string.notification_type_complaint) -> NOTIFICATION_EXTRA_COMPLAINT
             else -> MESSAGE_RECEIVE_EXTRA
         }
         val intent = Intent(context, SplashActivity::class.java)

@@ -209,8 +209,11 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentAssignmentPDF(token)
     }
 
-    fun getStudentAssignmentImage(token: String): LiveData<Resource<List<AssignmentEntity>>> {
-        return studentRepository.fetchStudentAssignmentImage(token)
+    fun getStudentAssignmentImage(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
+        return studentRepository.fetchStudentAssignmentImage(token, shouldFetch)
     }
 
     fun deleteFileById(id: Int?, path: String?, entity: DBEntities) {

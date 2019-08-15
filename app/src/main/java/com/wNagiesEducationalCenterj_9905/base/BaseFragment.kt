@@ -14,7 +14,6 @@ import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import org.jetbrains.anko.toast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -24,7 +23,10 @@ abstract class BaseFragment : DaggerFragment(), CoroutineScope {
     private var connectionLiveData: ConnectionLiveData? = null
     private val job = Job()
     private var messageReceiver: BroadcastReceiver? = null
-    private var fetch: MutableLiveData<Boolean> = MutableLiveData()
+    private var fetchMessage: MutableLiveData<Boolean> = MutableLiveData()
+    private var fetchAssignment: MutableLiveData<Boolean> = MutableLiveData()
+    private var fetchReport: MutableLiveData<Boolean> = MutableLiveData()
+    private var fetchComplaint: MutableLiveData<Boolean> = MutableLiveData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,22 +48,22 @@ abstract class BaseFragment : DaggerFragment(), CoroutineScope {
 
     private fun setFetchValue(intent: Intent) {
         if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
-            fetch.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_MESSAGE, false)
-            return
+            fetchMessage.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_MESSAGE, false)
         }
         if (intent.hasExtra(NOTIFICATION_EXTRA_REPORT)) {
-            fetch.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_REPORT, false)
-            return
+            fetchReport.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_REPORT, false)
         }
 
         if (intent.hasExtra(NOTIFICATION_EXTRA_ASSIGNMENT)) {
-            fetch.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_ASSIGNMENT, false)
-            return
+            fetchAssignment.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_ASSIGNMENT, false)
+        }
+
+        if (intent.hasExtra(NOTIFICATION_EXTRA_COMPLAINT)) {
+            fetchComplaint.value = intent.getBooleanExtra(NOTIFICATION_EXTRA_COMPLAINT, false)
         }
 
         if (intent.hasExtra(MESSAGE_RECEIVE_EXTRA)) {
-            fetch.value = intent.getBooleanExtra(MESSAGE_RECEIVE_EXTRA, false)
-            return
+            fetchMessage.value = intent.getBooleanExtra(MESSAGE_RECEIVE_EXTRA, false)
         }
     }
 
@@ -93,9 +95,22 @@ abstract class BaseFragment : DaggerFragment(), CoroutineScope {
         return intentFilter
     }
 
-    protected fun getShouldFetch(): LiveData<Boolean> {
-        return fetch
+    protected fun getFetchMessage(): LiveData<Boolean> {
+        return fetchMessage
     }
+
+    protected fun getFetchAssignment(): LiveData<Boolean> {
+        return fetchAssignment
+    }
+
+    protected fun getFetchReport(): LiveData<Boolean> {
+        return fetchReport
+    }
+
+    protected fun getFetchComplaint(): LiveData<Boolean> {
+        return fetchComplaint
+    }
+
 
 
 }

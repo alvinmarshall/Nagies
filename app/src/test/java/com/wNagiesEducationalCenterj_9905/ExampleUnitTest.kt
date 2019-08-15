@@ -1,15 +1,5 @@
 package com.wNagiesEducationalCenterj_9905
 
-import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
-import com.wNagiesEducationalCenterj_9905.common.extension.toString
-import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
-import com.wNagiesEducationalCenterj_9905.vo.Profile
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import timber.log.Timber
-import java.time.LocalDate
-import java.util.*
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *

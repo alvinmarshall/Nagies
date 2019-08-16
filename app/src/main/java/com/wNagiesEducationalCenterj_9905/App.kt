@@ -7,6 +7,7 @@ import com.wNagiesEducationalCenterj_9905.di.AppComponent
 import com.wNagiesEducationalCenterj_9905.di.DaggerAppComponent
 import com.wNagiesEducationalCenterj_9905.notification.AppNotificationManager
 import dagger.android.DaggerApplication
+import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class App : DaggerApplication() {
             }
             Timber.i("incoming global topic")
         }
+        RxJavaPlugins.setErrorHandler { err->Timber.i(err) }
     }
 
     override fun applicationInjector() = appComponent

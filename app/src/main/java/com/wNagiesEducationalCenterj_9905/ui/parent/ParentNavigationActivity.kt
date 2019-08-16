@@ -18,9 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
-import com.wNagiesEducationalCenterj_9905.common.GlideApp
-import com.wNagiesEducationalCenterj_9905.common.MESSAGE_RECEIVE_EXTRA
-import com.wNagiesEducationalCenterj_9905.common.USER_INFO
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.content_parent_navigation.*
@@ -36,7 +34,9 @@ class ParentNavigationActivity : BaseActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private var snackBar: Snackbar? = null
-    private var fetch: Boolean? = false
+    private var fetchMessage: Boolean? = false
+    private var fetchAssignment: Boolean? = false
+    private var fetchReport: Boolean? = false
     private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,15 +60,24 @@ class ParentNavigationActivity : BaseActivity() {
         if (intent.hasExtra(USER_INFO)) {
             setUserInfo(intent)
         }
-        if (intent.hasExtra(MESSAGE_RECEIVE_EXTRA)) {
-            fetch = intent.extras?.getBoolean(MESSAGE_RECEIVE_EXTRA)
+        if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
+            fetchMessage = intent.extras?.getBoolean(NOTIFICATION_EXTRA_MESSAGE)
+        }
+        if (intent.hasExtra(NOTIFICATION_EXTRA_ASSIGNMENT)) {
+            fetchAssignment = intent.extras?.getBoolean(NOTIFICATION_EXTRA_ASSIGNMENT)
+        }
+        if (intent.hasExtra(NOTIFICATION_EXTRA_REPORT)) {
+            fetchReport = intent.extras?.getBoolean(NOTIFICATION_EXTRA_REPORT)
         }
         configureSharedViewModel()
     }
 
     private fun configureSharedViewModel() {
         sharedViewModel = ViewModelProviders.of(this)[SharedViewModel::class.java]
-        sharedViewModel.fetchMessage.value = fetch
+        sharedViewModel.fetchMessage.value = fetchMessage
+        sharedViewModel.fetchAssignmentJPEG.value = fetchAssignment
+        sharedViewModel.fetchAssignmentPDF.value = fetchAssignment
+        sharedViewModel.fetchReport.value = fetchReport
     }
 
 

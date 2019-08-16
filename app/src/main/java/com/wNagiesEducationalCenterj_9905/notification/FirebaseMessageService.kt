@@ -24,6 +24,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
                     getString(R.string.notification_type_message) -> NOTIFICATION_EXTRA_MESSAGE
                     getString(R.string.notification_type_report) -> NOTIFICATION_EXTRA_REPORT
                     getString(R.string.notification_type_assignment) -> NOTIFICATION_EXTRA_ASSIGNMENT
+                    getString(R.string.notification_type_complaint) -> NOTIFICATION_EXTRA_COMPLAINT
                     else -> MESSAGE_RECEIVE_EXTRA
                 }
                 val intent = Intent()

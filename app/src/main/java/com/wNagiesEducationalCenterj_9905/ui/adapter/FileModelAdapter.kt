@@ -73,6 +73,6 @@ private class FileModelDiffUtil : DiffUtil.ItemCallback<IFileModel>(){
     }
 
     override fun areContentsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
-        return false
+        return oldItem.path == newItem.path
     }
 }

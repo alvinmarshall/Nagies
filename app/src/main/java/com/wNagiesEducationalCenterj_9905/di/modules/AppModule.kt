@@ -32,8 +32,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providePreferenceProvider(sharedPreferences: SharedPreferences): PreferenceProvider {
-        return PreferenceProvider(sharedPreferences)
+    fun providePreferenceProvider(sharedPreferences: SharedPreferences,application: Application): PreferenceProvider {
+        return PreferenceProvider(sharedPreferences,application)
     }
 
 

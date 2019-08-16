@@ -3,9 +3,10 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+                android:id="@+id/root"
              tools:context=".ui.teacher.fragment.TeacherAnnouncementFragment">
     <TextView
-            android:text="@string/label_admin_message"
+            tools:text="@string/label_admin_message"
             android:layout_width="match_parent"
             android:gravity="center"
             android:padding="5dp"

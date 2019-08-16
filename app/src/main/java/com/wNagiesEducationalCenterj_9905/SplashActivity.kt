@@ -6,26 +6,27 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
-import com.wNagiesEducationalCenterj_9905.common.delegate.lazyDeferred
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.auth.viewmodel.AuthViewModel
 import com.wNagiesEducationalCenterj_9905.ui.parent.ParentNavigationActivity
 import com.wNagiesEducationalCenterj_9905.ui.teacher.TeacherNavigationActivity
-import com.wNagiesEducationalCenterj_9905.vo.AuthResource
-import com.wNagiesEducationalCenterj_9905.vo.AuthStatus
+import com.wNagiesEducationalCenterj_9905.vo.Resource
+import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.toast
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
 import javax.inject.Inject
 
 class SplashActivity : BaseActivity() {
+    private val getLoginStatus by lazy { preferenceProvider.getUserLoginStatus() }
     @Inject
     lateinit var authViewModel: AuthViewModel
     private var userAccount: UserAccount? = null
     private var shouldFetch: Boolean? = false
+    private var extras = "default"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (intent.flags == Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) {
@@ -38,14 +39,22 @@ class SplashActivity : BaseActivity() {
 
     private fun getFetchValue(): Boolean {
         if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
+            extras = NOTIFICATION_EXTRA_MESSAGE
             return intent.getBooleanExtra(NOTIFICATION_EXTRA_MESSAGE, false)
         }
         if (intent.hasExtra(NOTIFICATION_EXTRA_REPORT)) {
+            extras = NOTIFICATION_EXTRA_REPORT
             return intent.getBooleanExtra(NOTIFICATION_EXTRA_REPORT, false)
         }
 
         if (intent.hasExtra(NOTIFICATION_EXTRA_ASSIGNMENT)) {
+            extras = NOTIFICATION_EXTRA_ASSIGNMENT
             return intent.getBooleanExtra(NOTIFICATION_EXTRA_ASSIGNMENT, false)
+        }
+
+        if (intent.hasExtra(NOTIFICATION_EXTRA_COMPLAINT)) {
+            extras = NOTIFICATION_EXTRA_COMPLAINT
+            return intent.getBooleanExtra(NOTIFICATION_EXTRA_COMPLAINT, false)
         }
 
         if (intent.hasExtra(MESSAGE_RECEIVE_EXTRA)) {
@@ -57,23 +66,21 @@ class SplashActivity : BaseActivity() {
     private fun subscribeObserver() {
         authViewModel.cachedUser.observe(this, Observer { resource ->
             when (resource.status) {
-                AuthStatus.LOADING -> {
-                    Timber.i("loading...")
-                }
-                AuthStatus.AUTHENTICATED -> {
+                Status.SUCCESS -> {
+                    Timber.i("AUTHENTICATED...")
                     loadAccountDashboard(resource)
                 }
-                AuthStatus.ERROR -> {
-                    Timber.i(resource.message)
+                Status.ERROR ->{
                     toast("${resource.message}")
+                    Timber.i(resource.message)
                 }
-                AuthStatus.LOG_OUT -> {
+                Status.LOADING -> {
                 }
             }
         })
     }
 
-    private fun loadAccountDashboard(resource: AuthResource<UserEntity>) {
+    private fun loadAccountDashboard(resource: Resource<UserEntity>) {
         userAccount = when (resource.data?.role) {
             LOGIN_ROLE_OPTIONS[0].toLowerCase() -> {
                 UserAccount.PARENT
@@ -97,14 +104,19 @@ class SplashActivity : BaseActivity() {
                     startActivity(
                         intentFor<ParentNavigationActivity>(
                             USER_INFO to userInfo,
-                            MESSAGE_RECEIVE_EXTRA to shouldFetch
+                            extras to shouldFetch
                         )
                     )
                     finish()
                 }
                 UserAccount.TEACHER -> {
                     Timber.i("starting teachers dashboard")
-                    startActivity(intentFor<TeacherNavigationActivity>(USER_INFO to userInfo))
+                    startActivity(
+                        intentFor<TeacherNavigationActivity>(
+                            USER_INFO to userInfo,
+                            extras to shouldFetch
+                        )
+                    )
                     finish()
                 }
             }
@@ -112,16 +124,13 @@ class SplashActivity : BaseActivity() {
     }
 
     private fun skipLoginPage() = launch {
-        val getLoginStatus by lazyDeferred {
-            preferenceProvider.getUserLoginStatus()
-        }
-        when (getLoginStatus.await()) {
+        when (getLoginStatus) {
             true -> {
-                Timber.i("user login status ${getLoginStatus.await()} ")
+                Timber.i("user login status $getLoginStatus ")
                 authViewModel.authenticateWithToken()
             }
             false -> {
-                Timber.i("user login status ${getLoginStatus.await()} ")
+                Timber.i("user login status $getLoginStatus ")
                 startActivity(intentFor<RoleActivity>())
                 finish()
             }

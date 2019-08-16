@@ -14,7 +14,7 @@ interface ComplaintDao {
     @Insert
     fun insertParentComplaint(complaintEntity: ComplaintEntity): Single<Long>
 
-    @Query("SELECT * FROM parent_complaint WHERE token = :token ORDER BY id DESC")
+    @Query("SELECT * FROM parent_complaint WHERE token = :token")
     fun getSavedComplaintMessage(token: String): Flowable<List<ComplaintEntity>>
 
     @Query("SELECT * FROM parent_complaint WHERE id = :id")
@@ -24,7 +24,7 @@ interface ComplaintDao {
     @Insert
     fun insertTeacherComplaint(teacherComplaintEntityList: List<TeacherComplaintEntity>)
 
-    @Query("SELECT * FROM teacher_complaint WHERE token = :token ORDER BY id DESC")
+    @Query("SELECT * FROM teacher_complaint WHERE token = :token")
     fun getTeacherComplaintMessage(token: String): LiveData<List<TeacherComplaintEntity>>
 
     @Query("DELETE FROM teacher_complaint WHERE token = :token")

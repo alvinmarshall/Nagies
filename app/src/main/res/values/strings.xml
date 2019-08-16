@@ -86,5 +86,18 @@
     <string name="notification_type_message">message</string>
     <string name="notification_type_report">report</string>
     <string name="notification_type_assignment">assignment</string>
+    <string name="notification_type_complaint">complaint</string>
+    <string name="label_msg_available_class_teachers">Class Teachers</string>
+    <string name="label_msg_no_class_teachers">No Class Teacher Found</string>
+    <string name="fetch_assignment_pdf">AssignmentPDF</string>
+    <string name="fetch_assignment_image">AssignmentIMAGE</string>
+    <string name="fetch_report_pdf">ReportPDF</string>
+    <string name="fetch_report_image">ReportIMAGE</string>
+    <string name="fetch_complaint">Complaint</string>
+    <string name="fetch_announcement">Announcement</string>
+    <string name="fetch_message">Message</string>
+    <string name="fetch_class_teacher">ClassTeacher</string>
+    <string name="label_msg_offline">Device is offline</string>
+
 
 </resources>

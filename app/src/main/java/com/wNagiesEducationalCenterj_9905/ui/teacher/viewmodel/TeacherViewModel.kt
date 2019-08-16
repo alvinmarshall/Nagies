@@ -51,8 +51,8 @@ class TeacherViewModel @Inject constructor(
         )
     }
 
-    fun getComplaintMessage(token: String): LiveData<Resource<List<TeacherComplaintEntity>>> {
-        return teacherRepository.fetchComplaint(token)
+    fun getComplaintMessage(token: String,shouldFetch:Boolean): LiveData<Resource<List<TeacherComplaintEntity>>> {
+        return teacherRepository.fetchComplaint(token,shouldFetch)
     }
 
     fun getAnnouncementMessage(token: String): LiveData<Resource<List<AnnouncementEntity>>> {

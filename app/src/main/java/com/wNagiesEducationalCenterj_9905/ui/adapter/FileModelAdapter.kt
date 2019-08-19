@@ -8,12 +8,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.ViewFilesAction
 import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 import kotlinx.android.synthetic.main.list_assignment.view.*
 import java.io.File
 
 class FileModelAdapter : ListAdapter<IFileModel, FileModelVH>(FileModelDiffUtil()) {
-    private var itemCallback: ItemCallback<Pair<Int?, String?>>? = null
+    private var itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileModelVH {
         return FileModelVH(
             LayoutInflater.from(parent.context)
@@ -27,19 +28,23 @@ class FileModelAdapter : ListAdapter<IFileModel, FileModelVH>(FileModelDiffUtil(
 
     }
 
-    fun setItemCallback(callback: ItemCallback<Pair<Int?, String?>>) {
+    fun setItemCallback(callback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>) {
         itemCallback = callback
     }
 }
 
 class FileModelVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(item: IFileModel?, itemCallback: ItemCallback<Pair<Int?, String?>>?) {
+    fun bind(item: IFileModel?, itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>?) {
         itemView.tv_item_date.text = item?.date
         itemView.tv_item_subject.text = item?.teacherEmail
         itemView.tv_item_name.text = if (item?.path != null) "downloaded" else "download"
-        when (item?.format){
-            "pdf" -> {itemView.img_item_logo.setImageResource(R.drawable.ic_picture_as_pdf_black_24dp)}
-            "image" -> {itemView.img_item_logo.setImageResource(R.drawable.ic_image_black_24dp)}
+        when (item?.format) {
+            "pdf" -> {
+                itemView.img_item_logo.setImageResource(R.drawable.ic_picture_as_pdf_black_24dp)
+            }
+            "image" -> {
+                itemView.img_item_logo.setImageResource(R.drawable.ic_image_black_24dp)
+            }
         }
 
         if (item?.path != null) {
@@ -47,7 +52,7 @@ class FileModelVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             if (file.exists()) {
                 itemView.tv_item_download.visibility = View.GONE
                 itemView.setOnClickListener {
-                    itemCallback?.onClick(Pair(item.id, item.path))
+                    itemCallback?.onClick(Triple(ViewFilesAction.VIEW, item.id, item.path))
                 }
             } else {
                 itemView.tv_item_download.visibility = View.VISIBLE
@@ -56,18 +61,18 @@ class FileModelVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             itemView.tv_item_download.visibility = View.VISIBLE
         }
         itemView.tv_item_download.setOnClickListener {
-            itemCallback?.onClick(Pair(item?.id, item?.fileUrl))
+            itemCallback?.onClick(Triple(ViewFilesAction.DOWNLOAD, item?.id, item?.fileUrl))
         }
 
         itemView.setOnLongClickListener {
-            itemCallback?.onHold(Pair(item?.id, item?.path))
+            itemCallback?.onHold(Triple(ViewFilesAction.DELETE, item?.id, item?.path))
             true
         }
     }
 }
 
 
-private class FileModelDiffUtil : DiffUtil.ItemCallback<IFileModel>(){
+private class FileModelDiffUtil : DiffUtil.ItemCallback<IFileModel>() {
     override fun areItemsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
         return oldItem.id == newItem.id
     }

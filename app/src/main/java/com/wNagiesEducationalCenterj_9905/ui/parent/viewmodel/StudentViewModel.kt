@@ -36,6 +36,8 @@ class StudentViewModel @Inject constructor(
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     val cachedFileName: MutableLiveData<String> = MutableLiveData()
+    var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
+
 
     fun getStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return studentRepository.fetchStudentMessages(token, shouldFetch)
@@ -295,6 +297,22 @@ class StudentViewModel @Inject constructor(
 
     fun getStudentBill(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<BillingEntity>>> {
         return studentRepository.fetchStudentBills(token, shouldFetch)
+    }
+
+    fun getAnnouncementMessage(token: String): LiveData<Resource<List<AnnouncementEntity>>> {
+        return studentRepository.fetchStudentAnnouncement(token)
+    }
+
+    fun getAnnouncementById(id: Int) {
+        disposable.addAll(
+            studentRepository.getAnnouncementById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    cachedAnnouncement.value = it
+                }, { err -> Timber.i(err) })
+        )
+
     }
 
 

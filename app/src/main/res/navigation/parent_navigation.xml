@@ -37,7 +37,10 @@
     </fragment>
     <fragment android:id="@+id/announcementFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AnnouncementFragment"
-              android:label="Announcement" tools:layout="@layout/fragment_announcement"/>
+              android:label="Announcement" tools:layout="@layout/fragment_announcement">
+        <action android:id="@+id/action_announcementFragment_to_studentAnnouncementDetailsFragment"
+                app:destination="@id/studentAnnouncementDetailsFragment"/>
+    </fragment>
     <fragment android:id="@+id/circularFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.CircularFragment"
               android:label="Circular" tools:layout="@layout/fragment_circular"/>
@@ -61,4 +64,9 @@
     <fragment android:id="@+id/studentBillingFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.StudentBillingFragment"
               android:label="Student Bill" tools:layout="@layout/fragment_student_billing"/>
+    <fragment android:id="@+id/studentAnnouncementDetailsFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.StudentAnnouncementDetailsFragment"
+              android:label="Detail">
+        <argument android:name="args_announcement_id" app:argType="integer"/>
+    </fragment>
 </navigation>

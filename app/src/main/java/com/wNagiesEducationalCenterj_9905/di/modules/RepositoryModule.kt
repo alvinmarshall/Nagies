@@ -36,7 +36,8 @@ class RepositoryModule {
         complaintDao: ComplaintDao,
         assignmentDao: AssignmentDao,
         reportDao: ReportDao,
-        preferenceProvider: PreferenceProvider
+        preferenceProvider: PreferenceProvider,
+        announcementDao: AnnouncementDao
     ): StudentRepository {
         return StudentRepository(
             appExecutors,
@@ -47,7 +48,8 @@ class RepositoryModule {
             complaintDao,
             assignmentDao,
             reportDao,
-            preferenceProvider
+            preferenceProvider,
+            announcementDao
         )
     }
 

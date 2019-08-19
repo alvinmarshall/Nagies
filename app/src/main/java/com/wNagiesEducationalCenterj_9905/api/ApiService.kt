@@ -90,4 +90,7 @@ interface ApiService {
 
     @GET("students/billing")
     fun getBilling(@Header("Authorization") token: String): LiveData<ApiResponse<BillingResponse>>
+
+    @GET("students/announcement")
+    fun getStudentAnnouncement(@Header("Authorization") token: String): LiveData<ApiResponse<AnnouncementResponse>>
 }

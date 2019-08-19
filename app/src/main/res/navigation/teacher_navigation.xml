@@ -45,6 +45,6 @@
     <fragment android:id="@+id/announcementDetailsFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.AnnouncementDetailsFragment"
               android:label="Detail" tools:layout="@layout/fragment_announcement_details">
-        <argument android:name="arg_announcement_id" app:argType="integer"/>
+        <argument android:name="args_announcement_id" app:argType="integer"/>
     </fragment>
 </navigation>

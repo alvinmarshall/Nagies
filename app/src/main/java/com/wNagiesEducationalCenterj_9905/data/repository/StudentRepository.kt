@@ -391,6 +391,51 @@ class StudentRepository @Inject constructor(
     }
 
     fun updateCircularFilePath(id: Int, path: String): Int {
-        return studentDao.updateCircularImagePath(id,path)
+        return studentDao.updateCircularImagePath(id, path)
+    }
+
+    fun fetchStudentBills(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<BillingEntity>>> {
+        return object : NetworkBoundResource<List<BillingEntity>, BillingResponse>(appExecutors) {
+            override fun saveCallResult(item: BillingResponse) {
+                if (item.status == 200) {
+                    item.billing.forEach { bill ->
+                        bill.token = token
+                        bill.format = IMAGE_FORMAT
+                    }
+                    db.runInTransaction {
+                        studentDao.deleteStudentBill(token)
+                        studentDao.insertStudentBills(item.billing)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.BILLING)
+                }
+            }
+
+            override fun shouldFetch(data: List<BillingEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.BILLING)
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<BillingEntity>> {
+                return Transformations.switchMap(studentDao.getStudentBills(token)) { bills ->
+                    if (bills.isEmpty()) {
+                        val data = MutableLiveData<List<BillingEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap studentDao.getStudentBills(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<BillingResponse>> = apiService.getBilling(token)
+
+        }.asLiveData()
+    }
+
+    fun updateBillingFilePath(id: Int, path: String): Int {
+        return studentDao.updateBillingImagePath(id, path)
+    }
+
+    fun deleteBillingById(id: Int) {
+        return studentDao.deleteBillingById(id)
     }
 }

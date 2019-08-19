@@ -58,4 +58,7 @@
     <fragment android:id="@+id/classTeacherFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ClassTeacherFragment"
               android:label="Class Teachers" tools:layout="@layout/fragment_class_teacher"/>
+    <fragment android:id="@+id/studentBillingFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.StudentBillingFragment"
+              android:label="Student Bill" tools:layout="@layout/fragment_student_billing"/>
 </navigation>

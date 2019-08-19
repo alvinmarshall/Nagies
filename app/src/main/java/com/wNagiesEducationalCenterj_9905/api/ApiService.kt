@@ -87,4 +87,7 @@ interface ApiService {
 
     @GET("students/circular")
     fun getCircular(@Header("Authorization") token: String): LiveData<ApiResponse<CircularResponse>>
+
+    @GET("students/billing")
+    fun getBilling(@Header("Authorization") token: String): LiveData<ApiResponse<BillingResponse>>
 }

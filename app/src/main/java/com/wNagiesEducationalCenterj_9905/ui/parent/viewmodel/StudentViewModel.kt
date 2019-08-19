@@ -228,6 +228,9 @@ class StudentViewModel @Inject constructor(
                         id?.let { it1 -> studentRepository.deleteReportById(it1) }
                     }
                     DBEntities.CIRCULAR -> {}
+                    DBEntities.BILLING -> {
+                        id?.let { it1 -> studentRepository.deleteBillingById(it1) }
+                    }
                 }
                 path?.let { p ->
                     val file = File(p)
@@ -265,8 +268,10 @@ class StudentViewModel @Inject constructor(
                         id?.let { path?.let { it1 -> studentRepository.updateStudentReportFilePath(it, it1) } }
                     }
                     DBEntities.CIRCULAR -> {
-                        Timber.i("here $path")
                         id?.let { path?.let { it1 -> studentRepository.updateCircularFilePath(it, it1) } }
+                    }
+                    DBEntities.BILLING -> {
+                        id?.let { path?.let { it1 -> studentRepository.updateBillingFilePath(it, it1) } }
                     }
                 }
             }
@@ -287,5 +292,11 @@ class StudentViewModel @Inject constructor(
     fun getCircularInformation(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<CircularEntity>>> {
         return studentRepository.fetchCircular(token, shouldFetch)
     }
+
+    fun getStudentBill(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<BillingEntity>>> {
+        return studentRepository.fetchStudentBills(token, shouldFetch)
+    }
+
+
 
 }

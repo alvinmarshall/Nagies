@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.BillingEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.CircularEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentTeacherEntity
@@ -42,6 +43,24 @@ interface StudentDao {
     fun deleteCircular(token: String)
 
     @Query("UPDATE circular SET filePath = :file WHERE id = :id")
-    fun updateCircularImagePath(id:Int,file:String):Int
+    fun updateCircularImagePath(id: Int, file: String): Int
+    //endregion
+
+    //region Billing
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertStudentBills(billingEntityList: List<BillingEntity>)
+
+    @Query("SELECT * FROM billing WHERE token = :token")
+    fun getStudentBills(token: String): LiveData<List<BillingEntity>>
+
+    @Query("DELETE FROM billing WHERE token = :token")
+    fun deleteStudentBill(token: String)
+
+    @Query("UPDATE billing SET path = :file WHERE id = :id")
+    fun updateBillingImagePath(id: Int, file: String): Int
+
+    @Query("DELETE FROM billing WHERE id = :id")
+    fun deleteBillingById(id: Int)
     //endregion
 }

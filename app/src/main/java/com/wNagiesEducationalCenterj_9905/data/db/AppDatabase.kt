@@ -19,7 +19,8 @@ import com.wNagiesEducationalCenterj_9905.data.db.converter.DateTypeConverter
         AnnouncementEntity::class,
         TeacherComplaintEntity::class,
         TeacherProfileEntity::class,
-        CircularEntity::class
+        CircularEntity::class,
+        BillingEntity::class
     ], version = 1, exportSchema = false
 )
 @TypeConverters(DateTypeConverter::class)

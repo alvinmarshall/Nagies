@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+                android:id="@+id/root"
+             tools:context=".ui.parent.fragment.StudentBillingFragment">
+    <TextView
+            tools:text="@string/label_msg_available_files"
+            android:layout_width="match_parent"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_height="wrap_content"
+            android:id="@+id/label_msg_title"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="5dp"
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_below="@id/label_msg_title"
+            tools:listitem="@layout/list_assignment"
+            android:layout_height="match_parent"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"/>
+</RelativeLayout>

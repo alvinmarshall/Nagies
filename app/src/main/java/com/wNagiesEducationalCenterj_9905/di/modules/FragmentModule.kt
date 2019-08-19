@@ -69,4 +69,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeCircularFragment(): CircularFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeStudentBillingFragment(): StudentBillingFragment
 }

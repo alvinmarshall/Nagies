@@ -35,7 +35,8 @@ class StudentRepository @Inject constructor(
     private val complaintDao: ComplaintDao,
     private val assignmentDao: AssignmentDao,
     private val reportDao: ReportDao,
-    private val preferenceProvider: PreferenceProvider
+    private val preferenceProvider: PreferenceProvider,
+    private val announcementDao: AnnouncementDao
 ) {
     fun fetchStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
         return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
@@ -437,5 +438,47 @@ class StudentRepository @Inject constructor(
 
     fun deleteBillingById(id: Int) {
         return studentDao.deleteBillingById(id)
+    }
+
+    fun fetchStudentAnnouncement(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<AnnouncementEntity>>> {
+        return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
+            override fun saveCallResult(item: AnnouncementResponse) {
+                if (item.status == 200) {
+                    item.messages.forEach { msg ->
+                        msg.token = token
+                    }
+                    db.runInTransaction {
+                        announcementDao.deleteAnnouncement(token)
+                        announcementDao.insertAnnouncement(item.messages)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.ANNOUNCEMENT)
+                }
+
+            }
+
+            override fun shouldFetch(data: List<AnnouncementEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.ANNOUNCEMENT)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<AnnouncementEntity>> {
+                return Transformations.switchMap(announcementDao.getAnnouncement(token)) { msg ->
+                    if (msg.isEmpty()) {
+                        val data = MutableLiveData<List<AnnouncementEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap announcementDao.getAnnouncement(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<AnnouncementResponse>> =
+                apiService.getStudentAnnouncement(token)
+        }.asLiveData()
+    }
+
+    fun getAnnouncementById(id: Int): Single<AnnouncementEntity> {
+        return announcementDao.getAnnouncementById(id)
     }
 }

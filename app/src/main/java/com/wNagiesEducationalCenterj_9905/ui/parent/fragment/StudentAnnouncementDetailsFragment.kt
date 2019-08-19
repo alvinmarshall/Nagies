@@ -1,4 +1,4 @@
-package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
+package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.os.Bundle
@@ -9,38 +9,35 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
+import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import kotlinx.android.synthetic.main.fragment_announcement_details.*
-import org.jetbrains.anko.support.v4.toast
 
-class AnnouncementDetailsFragment : BaseFragment() {
-    private lateinit var teacherViewModel: TeacherViewModel
-    private var announcementId: Int? = 0
 
+class StudentAnnouncementDetailsFragment : BaseFragment() {
+    private var announcementId:Int? = 0
+    private lateinit var studentViewModel: StudentViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_announcement_details, container, false)
     }
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        announcementId = arguments?.let { AnnouncementDetailsFragmentArgs.fromBundle(it).argsAnnouncementId }
+        announcementId = arguments?.let { StudentAnnouncementDetailsFragmentArgs.fromBundle(it).argsAnnouncementId }
         configureViewModel()
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
-        announcementId?.let {  teacherViewModel.getAnnouncementById(it) }
+        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        announcementId?.let {  studentViewModel.getAnnouncementById(it) }
         subscribeObservers()
     }
 
     private fun subscribeObservers() {
 
-        teacherViewModel.cachedAnnouncement.observe(viewLifecycleOwner, Observer { msg ->
+        studentViewModel.cachedAnnouncement.observe(viewLifecycleOwner, Observer { msg ->
             val title = "from: ${msg.level}"
             val sender = "name: ${msg.sender}"
             item_title.text = title

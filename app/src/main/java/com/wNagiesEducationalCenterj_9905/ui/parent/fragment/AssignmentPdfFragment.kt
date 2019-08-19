@@ -11,7 +11,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,8 +46,7 @@ class AssignmentPdfFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var fileModelAdapter: FileModelAdapter? = null
     private var alertDialog: AlertDialog.Builder? = null
-    private var callbackType: String? = null
-    private var itemData: Pair<Int?, String?>? = null
+    private var itemData: Triple<ViewFilesAction, Int?, String?>? = null
     private var loadingIndicator: ProgressBar? = null
     private var snackBar: Snackbar? = null
     private var shouldFetch: Boolean = false
@@ -60,14 +58,14 @@ class AssignmentPdfFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_assignment_pdf, container, false)
+        return inflater.inflate(R.layout.fragment_assignment_jpeg, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
         loadingIndicator = progressBar
-        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         loadingIndicator?.visibility = View.GONE
         alertDialog = context?.let { AlertDialog.Builder(it) }
         downloadReceiver = object : BroadcastReceiver() {
@@ -87,98 +85,6 @@ class AssignmentPdfFragment : BaseFragment() {
         super.onActivityCreated(savedInstanceState)
         initRecyclerView()
         configureViewModel()
-    }
-
-    private fun initRecyclerView() {
-        recyclerView?.hasFixedSize()
-        recyclerView?.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
-        fileModelAdapter = FileModelAdapter()
-        fileModelAdapter?.setItemCallback(object : ItemCallback<Pair<Int?, String?>> {
-            override fun onClick(data: Pair<Int?, String?>?) {
-                itemData = data
-                callbackType = "onClick"
-                context?.let {
-                    PermissionUtils.checkPermission(
-                        it,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE, listener
-                    )
-                }
-            }
-
-            override fun onHold(data: Pair<Int?, String?>?) {
-                itemData = data
-                callbackType = "onHold"
-                context?.let {
-                    PermissionUtils.checkPermission(
-                        it,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE, listener
-                    )
-                }
-            }
-        })
-        recyclerView?.adapter = fileModelAdapter
-    }
-
-    private fun loadFile() {
-        studentViewModel.downloadFilesFromServer(DownloadRequest(itemData?.second))
-        if (itemData?.second != null) {
-            val file = File(itemData?.second!!)
-            if (file.exists()) {
-                val openIntent = Intent(Intent.ACTION_VIEW)
-                val uri = FileProvider.getUriForFile(context!!, getString(R.string.file_provider_authority), file)
-                openIntent.setDataAndType(uri, FileTypeUtils.getType(file.absolutePath))
-                openIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                val open = Intent.createChooser(openIntent, getString(R.string.chooser_title))
-                startActivity(open)
-            }
-        }
-    }
-
-    private fun getFileName(it: String?) {
-        val url = ServerPathUtil.setCorrectPath(itemData?.second)
-        url?.let { link ->
-            it?.let {filename->
-                downloadList = downloadWithManager(link,filename,itemData)
-            }
-        }
-    }
-
-    private fun downloadWithManager(
-        url: String,
-        filename: String,
-        data: Pair<Int?, String?>?
-    ):ArrayList<Triple<Int?, String?, Long?>> {
-        val downloadList:ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
-        val id = data?.first
-        val path =
-            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename)
-        if (path.exists()) {
-            studentViewModel.saveDownloadFilePathToDb(id, path.absolutePath, DBEntities.ASSIGNMENT)
-            return downloadList
-        }
-        val request = DownloadManager.Request(Uri.parse(url))
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-        request.setTitle(filename)
-        request.setDescription("file downloading...")
-        request.allowScanningByMediaScanner()
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
-        val manager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as? DownloadManager
-        val downloadId = manager?.enqueue(request)
-        downloadList.add(Triple(id, path.absolutePath, downloadId))
-        return downloadList
-    }
-
-    private fun showDeleteDialog() {
-        alertDialog?.setTitle("Delete Alert")
-        alertDialog?.setMessage("Do you want to delete this file ?")
-        alertDialog?.setPositiveButton("yes") { dialog, _ ->
-            studentViewModel.deleteFileById(itemData?.first, itemData?.second, DBEntities.ASSIGNMENT)
-            dialog.dismiss()
-        }
-        alertDialog?.setNegativeButton("cancel", null)
-        alertDialog?.setCancelable(false)
-        alertDialog?.show()
     }
 
     private fun configureViewModel() {
@@ -233,6 +139,104 @@ class AssignmentPdfFragment : BaseFragment() {
         })
     }
 
+    private fun initRecyclerView() {
+        recyclerView?.hasFixedSize()
+        recyclerView?.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
+        fileModelAdapter = FileModelAdapter()
+        fileModelAdapter?.setItemCallback(object : ItemCallback<Triple<ViewFilesAction, Int?, String?>> {
+            override fun onClick(data: Triple<ViewFilesAction, Int?, String?>?) {
+                itemData = data
+                context?.let {
+                    PermissionUtils.checkPermission(
+                        it,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE, listener
+                    )
+                }
+            }
+
+            override fun onHold(data: Triple<ViewFilesAction, Int?, String?>?) {
+                itemData = data
+                context?.let {
+                    PermissionUtils.checkPermission(
+                        it,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE, listener
+                    )
+                }
+            }
+        })
+        recyclerView?.adapter = fileModelAdapter
+    }
+
+    private fun loadFile(path: String?) {
+        if (itemData?.first == ViewFilesAction.VIEW) {
+            path?.let {
+                val file = File(it)
+                if (file.exists()) {
+                    val openIntent = Intent(Intent.ACTION_VIEW)
+                    val url = FileProvider.getUriForFile(context!!, getString(R.string.file_provider_authority), file)
+                    openIntent.setDataAndType(url, FileTypeUtils.getType(file.absolutePath))
+                    openIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    val open = Intent.createChooser(openIntent, getString(R.string.chooser_title))
+                    startActivity(open)
+                }
+            } ?: toast("file not downloaded")
+        }
+    }
+
+    private fun fetchFileNameFromServer(url: String?) {
+        studentViewModel.downloadFilesFromServer(DownloadRequest(url))
+    }
+
+    private fun getFileName(it: String?) {
+        if (itemData?.first == ViewFilesAction.DOWNLOAD) {
+            val url = ServerPathUtil.setCorrectPath(itemData?.third)
+            url?.let { link ->
+                it?.let { filename ->
+                    downloadList = downloadWithManager(link, filename, itemData)
+                }
+            }
+        }
+
+    }
+
+    private fun downloadWithManager(
+        url: String,
+        filename: String,
+        data: Triple<ViewFilesAction, Int?, String?>?
+    ): ArrayList<Triple<Int?, String?, Long?>> {
+        val downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
+        val id = data?.second
+        val path =
+            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename)
+        if (path.exists()) {
+            studentViewModel.saveDownloadFilePathToDb(id, path.absolutePath, DBEntities.ASSIGNMENT)
+            return downloadList
+        }
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        request.setTitle(filename)
+        request.setDescription("file downloading...")
+        request.allowScanningByMediaScanner()
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename)
+        val manager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as? DownloadManager
+        val downloadId = manager?.enqueue(request)
+        downloadList.add(Triple(id, path.absolutePath, downloadId))
+        return downloadList
+    }
+
+    private fun showDeleteDialog() {
+        alertDialog?.setTitle("Delete Alert")
+        alertDialog?.setMessage("Do you want to delete this file ?")
+        alertDialog?.setPositiveButton("yes") { dialog, _ ->
+            studentViewModel.deleteFileById(itemData?.second, itemData?.third, DBEntities.ASSIGNMENT)
+            dialog.dismiss()
+        }
+        alertDialog?.setNegativeButton("cancel", null)
+        alertDialog?.setCancelable(false)
+        alertDialog?.show()
+    }
+
     private fun showLoadingDialog(show: Boolean = true) {
         showAnyView(progressBar, null, null, show) { view, _, _, visible ->
             if (visible) {
@@ -247,7 +251,6 @@ class AssignmentPdfFragment : BaseFragment() {
         showAnyView(snackBar, getString(R.string.download_complete_message), null, show) { view, msg, _, visible ->
             if (visible) {
                 (view as Snackbar).setText(msg!!).show()
-                view.dismiss()
             } else {
                 (view as Snackbar).setText("Download Started...").show()
             }
@@ -256,7 +259,7 @@ class AssignmentPdfFragment : BaseFragment() {
 
     override fun onStop() {
         super.onStop()
-        sharedViewModel.fetchAssignmentPDF.value = false
+        sharedViewModel.fetchAssignmentJPEG.value = false
     }
 
     override fun onDestroy() {
@@ -264,60 +267,24 @@ class AssignmentPdfFragment : BaseFragment() {
         context?.unregisterReceiver(downloadReceiver)
     }
 
-
     //region Permission
-    private fun showStorageRational(title: String, message: String) {
-        alertDialog?.setTitle(title)
-        alertDialog?.setMessage(message)
-        alertDialog?.setPositiveButton("retry") { dialog, _ ->
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
-                    REQUEST_EXTERNAL_STORAGE
-                )
-            }
-            dialog.dismiss()
-        }
-        alertDialog?.setNegativeButton("i'm sure", null)
-        alertDialog?.setCancelable(false)
-        alertDialog?.show()
-    }
-
-    private fun dialogForSettings(title: String, message: String) {
-        alertDialog?.setTitle(title)
-        alertDialog?.setMessage(message)
-        alertDialog?.setPositiveButton("settings") { dialog, _ ->
-            goToSettings()
-            dialog.dismiss()
-        }
-        alertDialog?.setNegativeButton("not now", null)
-        alertDialog?.setCancelable(false)
-        alertDialog?.show()
-
-    }
-
-    private fun goToSettings() {
-        val openAppSettings = Intent()
-        openAppSettings.action = ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.parse("package:${context?.packageName}")
-        openAppSettings.data = uri
-        startActivity(openAppSettings)
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    when (callbackType) {
-                        "onClick" -> {
-                            loadFile()
+                    when (itemData?.first) {
+                        ViewFilesAction.VIEW -> {
+                            loadFile(itemData?.third)
+
                         }
-                        "onHold" -> {
+                        ViewFilesAction.DOWNLOAD -> {
+                            fetchFileNameFromServer(itemData?.third)
+                        }
+                        ViewFilesAction.DELETE -> {
                             showDeleteDialog()
                         }
                     }
-
                 } else {
                     toast("Permission Denied")
                 }
@@ -325,7 +292,7 @@ class AssignmentPdfFragment : BaseFragment() {
         }
     }
 
-    val listener: PermissionAskListener
+    private val listener: PermissionAskListener
         get() = object : PermissionAskListener {
             override fun onPermissionPreviouslyDenied() {
                 showStorageRational(
@@ -355,11 +322,15 @@ class AssignmentPdfFragment : BaseFragment() {
             }
 
             override fun onPermissionGranted() {
-                when (callbackType) {
-                    "onClick" -> {
-                        loadFile()
+                when (itemData?.first) {
+                    ViewFilesAction.VIEW -> {
+                        loadFile(itemData?.third)
+
                     }
-                    "onHold" -> {
+                    ViewFilesAction.DOWNLOAD -> {
+                        fetchFileNameFromServer(itemData?.third)
+                    }
+                    ViewFilesAction.DELETE -> {
                         showDeleteDialog()
                     }
                 }

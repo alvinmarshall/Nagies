@@ -11,12 +11,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
@@ -46,8 +44,6 @@ class CircularFragment : BaseFragment() {
     private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
     private var itemData: Triple<CircularAction, Int?, String?>? = null
     private var snackBar: Snackbar? = null
-    private var alertDialog: AlertDialog.Builder? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +57,6 @@ class CircularFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewPager = view_pager
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
-        alertDialog = context?.let { AlertDialog.Builder(it) }
         downloadReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
@@ -87,7 +82,7 @@ class CircularFragment : BaseFragment() {
             override fun onClick(data: Triple<CircularAction, Int?, String?>?) {
                 when (data?.first) {
                     CircularAction.VIEW -> {
-                        itemData = Triple(CircularAction.VIEW, data.second, data.third)
+                        itemData = data
                         context?.let {
                             PermissionUtils.checkPermission(
                                 it,
@@ -97,7 +92,7 @@ class CircularFragment : BaseFragment() {
 
                     }
                     CircularAction.DOWNLOAD -> {
-                        itemData = Triple(CircularAction.DOWNLOAD, data.second, data.third)
+                        itemData = data
                         context?.let {
                             PermissionUtils.checkPermission(
                                 it,
@@ -118,7 +113,6 @@ class CircularFragment : BaseFragment() {
 
     private fun loadFile(path: String?) {
         if (itemData?.first == CircularAction.VIEW) {
-
             path?.let {
                 val file = File(it)
                 if (file.exists()) {
@@ -234,44 +228,6 @@ class CircularFragment : BaseFragment() {
     }
 
     //region Permission
-    private fun showStorageRational(title: String, message: String) {
-        alertDialog?.setTitle(title)
-        alertDialog?.setMessage(message)
-        alertDialog?.setPositiveButton("retry") { dialog, _ ->
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
-                    REQUEST_EXTERNAL_STORAGE
-                )
-            }
-            dialog.dismiss()
-        }
-        alertDialog?.setNegativeButton("i'm sure", null)
-        alertDialog?.setCancelable(false)
-        alertDialog?.show()
-    }
-
-    private fun dialogForSettings(title: String, message: String) {
-        alertDialog?.setTitle(title)
-        alertDialog?.setMessage(message)
-        alertDialog?.setPositiveButton("settings") { dialog, _ ->
-            goToSettings()
-            dialog.dismiss()
-        }
-        alertDialog?.setNegativeButton("not now", null)
-        alertDialog?.setCancelable(false)
-        alertDialog?.show()
-
-    }
-
-    private fun goToSettings() {
-        val openAppSettings = Intent()
-        openAppSettings.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.parse("package:${context?.packageName}")
-        openAppSettings.data = uri
-        startActivity(openAppSettings)
-    }
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -279,14 +235,9 @@ class CircularFragment : BaseFragment() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     when (itemData?.first) {
                         CircularAction.VIEW -> {
-                            toast("view file ${itemData?.third}")
-                            itemData = Triple(CircularAction.VIEW, itemData?.second, itemData?.third)
                             loadFile(itemData?.third)
-
                         }
                         CircularAction.DOWNLOAD -> {
-                            toast("download file ${itemData?.third}")
-                            itemData = Triple(CircularAction.DOWNLOAD, itemData?.second, itemData?.third)
                             fetchFileNameFromServer(itemData?.third)
                         }
                     }
@@ -298,7 +249,7 @@ class CircularFragment : BaseFragment() {
         }
     }
 
-    val listener: PermissionAskListener
+    private val listener: PermissionAskListener
         get() = object : PermissionAskListener {
             override fun onPermissionPreviouslyDenied() {
                 showStorageRational(
@@ -336,13 +287,13 @@ class CircularFragment : BaseFragment() {
 
                     }
                     CircularAction.DOWNLOAD -> {
-                        toast("download file ${itemData?.third}")
-                        itemData = Triple(CircularAction.DOWNLOAD, itemData?.second, itemData?.third)
                         fetchFileNameFromServer(itemData?.third)
                     }
                 }
             }
         }
+
+
     //endregion
 
 }

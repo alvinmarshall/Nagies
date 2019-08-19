@@ -64,8 +64,8 @@ class AuthActivity : BaseActivity() {
         if (!inputValidationProvider.isEditTextFilled(et_password)) {
             return
         }
-        val username: String = et_username.text.toString()
-        val password: String = et_password.text.toString()
+        val username: String = et_username.text.trim().toString().toLowerCase()
+        val password: String = et_password.text.trim().toString().toLowerCase()
         subscribeObservers(username, password, userAccount)
     }
 

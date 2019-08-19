@@ -14,11 +14,11 @@ const val PERMISSION_PREF = "permission_pref"
 const val REQUEST_EXTERNAL_STORAGE = 100
 
 enum class DBEntities {
-    ASSIGNMENT, REPORT,CIRCULAR
+    ASSIGNMENT, REPORT, CIRCULAR
 }
 
 enum class MessageType {
-    MESSAGES, FILES,TEACHERS
+    MESSAGES, FILES, TEACHERS
 }
 
 enum class ClassTeacherAction {
@@ -39,14 +39,20 @@ const val NOTIFICATION_EXTRA_MESSAGE = "notification_message_extra"
 const val NOTIFICATION_EXTRA_REPORT = "notification_report_extra"
 const val NOTIFICATION_EXTRA_ASSIGNMENT = "notification_assignment_extra"
 const val NOTIFICATION_EXTRA_COMPLAINT = "notification_complaint_extra"
-enum class FetchType{
-    ASSIGNMENT_PDF,ASSIGNMENT_IMAGE,REPORT_PDF,REPORT_IMAGE,MESSAGE,ANNOUNCEMENT,COMPLAINT,CLASS_TEACHER,CIRCULAR
+
+enum class FetchType {
+    ASSIGNMENT_PDF, ASSIGNMENT_IMAGE, REPORT_PDF, REPORT_IMAGE, MESSAGE, ANNOUNCEMENT, COMPLAINT, CLASS_TEACHER, CIRCULAR
 }
+
 const val DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
 const val FETCH_INTERVAL = 20
 const val IMAGE_FORMAT = "image"
 const val PDF_FORMAT = "pdf"
 
-enum class CircularAction{
-    VIEW,DOWNLOAD
+enum class CircularAction {
+    VIEW, DOWNLOAD
+}
+
+enum class ViewFilesAction {
+    VIEW, DOWNLOAD, DELETE
 }

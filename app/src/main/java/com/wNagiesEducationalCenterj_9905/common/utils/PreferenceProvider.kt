@@ -46,7 +46,8 @@ class PreferenceProvider @Inject constructor(
             FetchType.MESSAGE -> context.getString(R.string.fetch_message)
             FetchType.ANNOUNCEMENT -> context.getString(R.string.fetch_announcement)
             FetchType.COMPLAINT -> context.getString(R.string.fetch_complaint)
-            FetchType.CLASSTEACHER -> context.getString(R.string.fetch_class_teacher)
+            FetchType.CLASS_TEACHER -> context.getString(R.string.fetch_class_teacher)
+            FetchType.CIRCULAR -> context.getString(R.string.fetch_circular)
         }
         val preferences = sharedPreferences.edit()
         val date = Date().toString(DATE_FORMAT)
@@ -92,8 +93,13 @@ class PreferenceProvider @Inject constructor(
                 val minutes = getDifferenceInTime(fetchDate)
                 (minutes > FETCH_INTERVAL && NetworkStateUtils.isOnline(context))
             }
-            FetchType.CLASSTEACHER -> {
+            FetchType.CLASS_TEACHER -> {
                 fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_class_teacher), null)
+                val minutes = getDifferenceInTime(fetchDate)
+                (minutes > FETCH_INTERVAL && NetworkStateUtils.isOnline(context))
+            }
+            FetchType.CIRCULAR -> {
+                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_circular), null)
                 val minutes = getDifferenceInTime(fetchDate)
                 (minutes > FETCH_INTERVAL && NetworkStateUtils.isOnline(context))
             }

@@ -1,6 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.common.DBEntities
@@ -226,6 +227,7 @@ class StudentViewModel @Inject constructor(
                     DBEntities.REPORT -> {
                         id?.let { it1 -> studentRepository.deleteReportById(it1) }
                     }
+                    DBEntities.CIRCULAR -> {}
                 }
                 path?.let { p ->
                     val file = File(p)
@@ -252,7 +254,7 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentReportImage(token)
     }
 
-    fun saveDownloadFilePathToDb(id: Int?,path: String?, entity: DBEntities) {
+    fun saveDownloadFilePathToDb(id: Int?, path: String?, entity: DBEntities) {
         disposable.addAll(
             Observable.fromCallable {
                 when (entity) {
@@ -260,8 +262,11 @@ class StudentViewModel @Inject constructor(
                         id?.let { path?.let { it1 -> studentRepository.updateStudentAssignmentFilePath(it, it1) } }
                     }
                     DBEntities.REPORT -> {
-                        Timber.i("report id $id")
                         id?.let { path?.let { it1 -> studentRepository.updateStudentReportFilePath(it, it1) } }
+                    }
+                    DBEntities.CIRCULAR -> {
+                        Timber.i("here $path")
+                        id?.let { path?.let { it1 -> studentRepository.updateCircularFilePath(it, it1) } }
                     }
                 }
             }
@@ -277,6 +282,10 @@ class StudentViewModel @Inject constructor(
 
     fun getClassTeacher(token: String): LiveData<Resource<List<StudentTeacherEntity>>> {
         return studentRepository.getClassTeacher(token)
+    }
+
+    fun getCircularInformation(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<CircularEntity>>> {
+        return studentRepository.fetchCircular(token, shouldFetch)
     }
 
 }

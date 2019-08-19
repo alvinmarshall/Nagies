@@ -98,6 +98,7 @@
     <string name="fetch_message">Message</string>
     <string name="fetch_class_teacher">ClassTeacher</string>
     <string name="label_msg_offline">Device is offline</string>
+    <string name="fetch_circular">Circular</string>
 
 
 </resources>

@@ -66,4 +66,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSendMessageTeacherFragment(): SendMessageTeacherFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeCircularFragment(): CircularFragment
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   app:cardElevation="5dp"
+                                                   app:cardUseCompatPadding="true"
+                                                   android:layout_height="match_parent">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+        <ImageView android:layout_width="match_parent"
+                   android:id="@+id/item_image"
+                   android:scaleType="fitXY"
+                   android:layout_height="match_parent"
+                   android:contentDescription="@string/des_icon"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                app:useCompatPadding="true"
+                app:srcCompat="@drawable/ic_file_download_black_24dp"
+                android:id="@+id/fab_download" />
+
+    </RelativeLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

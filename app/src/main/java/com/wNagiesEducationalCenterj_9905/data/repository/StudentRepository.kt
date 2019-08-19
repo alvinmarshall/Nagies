@@ -326,12 +326,12 @@ class StudentRepository @Inject constructor(
                         studentDao.deleteClassTeacher(token)
                         studentDao.insertStudentTeacher(item.studentTeachers)
                     }
-                    preferenceProvider.setFetchDate(FetchType.CLASSTEACHER)
+                    preferenceProvider.setFetchDate(FetchType.CLASS_TEACHER)
                 }
             }
 
             override fun shouldFetch(data: List<StudentTeacherEntity>?): Boolean {
-                val isOld = preferenceProvider.getFetchType(FetchType.CLASSTEACHER)
+                val isOld = preferenceProvider.getFetchType(FetchType.CLASS_TEACHER)
                 Timber.i("is old $isOld")
                 return data == null || data.isEmpty() || shouldFetch || isOld
             }
@@ -351,5 +351,46 @@ class StudentRepository @Inject constructor(
                 apiService.getClassTeacher(token)
         }.asLiveData()
 
+    }
+
+    fun fetchCircular(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<CircularEntity>>> {
+        return object : NetworkBoundResource<List<CircularEntity>, CircularResponse>(appExecutors) {
+            override fun saveCallResult(item: CircularResponse) {
+                if (item.status == 200) {
+                    item.circular.forEach { circular ->
+                        circular.token = token
+                        circular.path = circular.fileUrl
+                        circular.fileUrl = ServerPathUtil.setCorrectPath(circular.fileUrl)
+                    }
+                    db.runInTransaction {
+                        studentDao.deleteCircular(token)
+                        studentDao.insertCircular(item.circular)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.CIRCULAR)
+                }
+            }
+
+            override fun shouldFetch(data: List<CircularEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.CIRCULAR)
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<CircularEntity>> {
+                return Transformations.switchMap(studentDao.getCircular(token)) { circular ->
+                    if (circular.isEmpty()) {
+                        val data = MutableLiveData<List<CircularEntity>>()
+                        data.postValue(null)
+                        return@switchMap data
+                    }
+                    return@switchMap studentDao.getCircular(token)
+                }
+            }
+
+            override fun createCall(): LiveData<ApiResponse<CircularResponse>> = apiService.getCircular(token)
+        }.asLiveData()
+    }
+
+    fun updateCircularFilePath(id: Int, path: String): Int {
+        return studentDao.updateCircularImagePath(id,path)
     }
 }

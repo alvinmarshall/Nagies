@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 
 class App : DaggerApplication() {
+
     private val appComponent: AppComponent = DaggerAppComponent.builder().application(this).build()
     @Inject
     lateinit var appNotificationManager: AppNotificationManager

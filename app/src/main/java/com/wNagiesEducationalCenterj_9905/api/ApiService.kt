@@ -84,4 +84,7 @@ interface ApiService {
     @POST("teachers/send_message")
     fun sendTeacherMessage(@Header("Authorization") token: String, @Body teacherMessage: TeacherMessageRequest)
             : Single<TeacherMessageResponse>
+
+    @GET("students/circular")
+    fun getCircular(@Header("Authorization") token: String): LiveData<ApiResponse<CircularResponse>>
 }

@@ -2,19 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
+                android:id="@+id/root"
                 android:layout_height="match_parent"
                 tools:context=".ui.parent.fragment.CircularFragment">
 
+    <androidx.viewpager.widget.ViewPager
+            android:layout_width="match_parent"
+            android:id="@+id/view_pager"
+            android:layout_height="match_parent"/>
 
-    <ImageView android:layout_width="match_parent"
-               android:id="@+id/img_item"
-               android:scaleType="centerCrop"
-               android:src="@color/colorPrimary"
-               android:layout_height="match_parent" tools:ignore="ContentDescription"/>
     <ProgressBar
             android:layout_width="wrap_content"
             android:indeterminate="true"
             android:layout_centerInParent="true"
             android:layout_height="wrap_content"
             android:id="@+id/progressBar"/>
+
 </RelativeLayout>

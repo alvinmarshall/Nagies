@@ -3,6 +3,7 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 import android.os.Bundle
 import android.view.*
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
@@ -14,7 +15,9 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
+import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_create_message.*
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class CreateMessageFragment : BaseFragment() {
@@ -52,8 +55,10 @@ class CreateMessageFragment : BaseFragment() {
         configureViewModel()
     }
 
+
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel.getUserToken()
         subscribeObservers()
     }
 
@@ -81,6 +86,31 @@ class CreateMessageFragment : BaseFragment() {
             connectionErrorDialog(it)
             isBusy = false
         })
+        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
+            studentViewModel.getClassTeacher(token).observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        val teacherNames = ArrayList<String>()
+                        resource.data?.forEach { teacher ->
+                            teacherNames.add(teacher.teacherName)
+                        }
+                        if(teacherNames.isNotEmpty()){
+                            val classAdapter = ArrayAdapter(context!!, android.R.layout.select_dialog_singlechoice, teacherNames.toArray())
+                            spinner.adapter = classAdapter
+                            classAdapter.notifyDataSetChanged()
+                        }
+                        showLoadingDialog(false)
+
+                    }
+                    Status.ERROR -> {
+                        showLoadingDialog(false)
+                        toast("${resource.message}")}
+                    Status.LOADING -> {showLoadingDialog()}
+                }
+            })
+
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -124,7 +154,8 @@ class CreateMessageFragment : BaseFragment() {
             showMessage(getString(R.string.message_field_empty_error))
             return
         }
-        complaintRequest = ParentComplaintRequest(content)
+        val teacherName = spinner.selectedItem.toString()
+        complaintRequest = ParentComplaintRequest(content,teacherName)
         complaintRequest?.let {
             isBusy = true
             showLoadingDialog()

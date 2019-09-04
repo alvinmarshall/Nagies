@@ -1,7 +1,6 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.common.DBEntities
@@ -12,7 +11,6 @@ import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.data.repository.StudentRepository
 import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
-import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Profile
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Flowable
@@ -35,7 +33,6 @@ class StudentViewModel @Inject constructor(
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
-    val cachedFileName: MutableLiveData<String> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
 
 
@@ -182,29 +179,6 @@ class StudentViewModel @Inject constructor(
                 .subscribe({
                     cachedSavedComplaintById.value = it
                 }, {})
-        )
-    }
-
-    fun downloadFilesFromServer(filePath: DownloadRequest) {
-        disposable.addAll(
-            Observable.just(preferenceProvider.getUserToken())
-                .map {
-                    return@map it
-                }
-                .flatMap {
-                    return@flatMap studentRepository.fetchFileFromServer(it, filePath)
-                }
-
-
-                .doOnSubscribe { isSuccess.postValue(false) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    val headerFileName = it.headers().get("Content-Disposition")
-                    val filename = headerFileName?.replace("attachment; filename=", "")
-                    cachedFileName.value = filename
-                    Timber.i("row $it updated")
-                }, { Timber.i(it, "get assignment err") })
         )
     }
 

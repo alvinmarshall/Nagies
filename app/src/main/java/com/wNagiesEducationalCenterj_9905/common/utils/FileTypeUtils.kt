@@ -1,5 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.common.utils
 
+import com.wNagiesEducationalCenterj_9905.common.FileUploadFormat
+
 object FileTypeUtils {
     @Suppress("SpellCheckingInspection")
     fun getType(path: String): String? {
@@ -29,5 +31,13 @@ object FileTypeUtils {
             return "video/*"
         } else
             return "*/*"
+    }
+
+    fun getFileFormat(filename: String): FileUploadFormat? {
+        return when (getType(filename)) {
+            "application/pdf" -> FileUploadFormat.PDF
+            "image/jpeg" -> FileUploadFormat.IMAGE
+            else -> null
+        }
     }
 }

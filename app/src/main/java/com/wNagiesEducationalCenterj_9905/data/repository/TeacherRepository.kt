@@ -6,11 +6,10 @@ import androidx.lifecycle.Transformations
 import com.wNagiesEducationalCenterj_9905.AppExecutors
 import com.wNagiesEducationalCenterj_9905.api.ApiResponse
 import com.wNagiesEducationalCenterj_9905.api.ApiService
+import com.wNagiesEducationalCenterj_9905.api.request.ExplorerRequest
+import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
-import com.wNagiesEducationalCenterj_9905.api.response.AnnouncementResponse
-import com.wNagiesEducationalCenterj_9905.api.response.TeacherComplaintResponse
-import com.wNagiesEducationalCenterj_9905.api.response.TeacherMessageResponse
-import com.wNagiesEducationalCenterj_9905.api.response.TeacherProfileResponse
+import com.wNagiesEducationalCenterj_9905.api.response.*
 import com.wNagiesEducationalCenterj_9905.common.FetchType
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
@@ -19,14 +18,12 @@ import com.wNagiesEducationalCenterj_9905.data.db.DAO.AnnouncementDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.ComplaintDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.MessageDao
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.TeacherDao
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.AnnouncementEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherComplaintEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherProfileEntity
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.vo.Resource
-import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -119,13 +116,11 @@ class TeacherRepository @Inject constructor(
         return object : NetworkBoundResource<TeacherProfileEntity, TeacherProfileResponse>(appExecutors) {
             override fun saveCallResult(item: TeacherProfileResponse) {
                 if (item.status == 200) {
-                    item.teacherProfile.forEach { profile ->
-                        profile.token = token
-                        profile.imageUrl = ServerPathUtil.setCorrectPath(profile.imageUrl)
-                    }
+                    item.teacherProfile.token = token
+                    item.teacherProfile.imageUrl = ServerPathUtil.setCorrectPath(item.teacherProfile.imageUrl)
                     db.runInTransaction {
                         teacherDao.deleteTeacherProfile(token)
-                        teacherDao.insertTecherProfile(item.teacherProfile[0])
+                        teacherDao.insertTeacherProfile(item.teacherProfile)
                     }
                 }
             }
@@ -171,6 +166,76 @@ class TeacherRepository @Inject constructor(
 
     fun getSentMessages(token: String): Flowable<List<MessageEntity>> {
         return messageDao.getSentMessages(token)
+    }
+
+    fun uploadAssignmentPDF(token: String, request: MultipartBody.Part): Single<FileUploadResponse> {
+        return apiService.uploadAssignmentPDF(token, request)
+    }
+
+    fun uploadAssignmentIMAGE(token: String, request: MultipartBody.Part): Single<FileUploadResponse> {
+        return apiService.uploadAssignmentIMAGE(token, request)
+    }
+
+    fun fetchClassStudent(
+        token: String,
+        shouldFetch: Boolean = false,
+        searchName: String = ""
+    ): LiveData<Resource<List<ClassStudentEntity>>> {
+        return object : NetworkBoundResource<List<ClassStudentEntity>, ClassStudentResponse>(appExecutors) {
+            override fun saveCallResult(item: ClassStudentResponse) {
+                if (item.status == 200) {
+                    item.classStudent.forEach { student ->
+                        student.token = token
+                        student.imageUrl = ServerPathUtil.setCorrectPath(student.imageUrl)
+                    }
+                    db.runInTransaction {
+                        teacherDao.deleteClassStudent(token)
+                        teacherDao.insertClassStudent(item.classStudent)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.CLASS_STUDENT)
+                }
+            }
+
+            override fun shouldFetch(data: List<ClassStudentEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.COMPLAINT)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<ClassStudentEntity>> {
+                return teacherDao.searchClassStudent(token, "%$searchName%")
+            }
+
+            override fun createCall(): LiveData<ApiResponse<ClassStudentResponse>> {
+                return apiService.fetchClassStudents(token)
+            }
+        }.asLiveData()
+    }
+
+    fun uploadReportPDF(token: String, request: FileUploadRequest): Single<FileUploadResponse> {
+        return apiService.uploadReportPDF(
+            token,
+            request.requestBody,
+            request.studentInfo?.studentNo,
+            request.studentInfo?.studentName
+        )
+    }
+
+    fun uploadReportIMAGE(token: String, request: FileUploadRequest): Single<FileUploadResponse> {
+        return apiService.uploadReportIMAGE(
+            token,
+            request.requestBody,
+            request.studentInfo?.studentNo,
+            request.studentInfo?.studentName
+        )
+    }
+
+    fun fetchUploadData(token: String, request: ExplorerRequest): Observable<ExplorerResponse> {
+        return apiService.getUploadedFile(token, request.format, request.type)
+    }
+
+    fun deleteUploadData(token: String, request: ExplorerRequest): Single<ExplorerDeleteResponse> {
+        return apiService.deleteUploadedFile(token, request.id, request.path, request.format, request.type)
     }
 
 }

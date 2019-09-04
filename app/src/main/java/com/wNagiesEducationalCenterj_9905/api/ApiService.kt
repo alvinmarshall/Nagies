@@ -6,11 +6,10 @@ import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
 import com.wNagiesEducationalCenterj_9905.api.response.*
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
-import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import io.reactivex.Observable
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
-import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -25,19 +24,12 @@ interface ApiService {
     @GET("students/messages")
     fun getStudentMessages(@Header("Authorization") token: String): LiveData<ApiResponse<MessageResponse>>
 
-    @GET("students/profile")
+    @GET("users/profile")
     fun getStudentProfile(@Header("Authorization") token: String): LiveData<ApiResponse<StudentProfileResponse>>
 
     @POST("students/complaints")
     fun sendParentComplaint(@Header("Authorization") token: String, @Body parentComplaint: ParentComplaintRequest)
             : Single<ParentComplaintResponse>
-
-    @POST("students/download")
-    @Streaming
-    fun getFilesFromServer(
-        @Header("Authorization") token: String,
-        @Body fileUrl: DownloadRequest
-    ): Observable<Response<ResponseBody>>
 
     @GET("students/assignment_pdf")
     fun getStudentAssignmentPDF(
@@ -78,7 +70,7 @@ interface ApiService {
         @Body changePassRequest: ChangePasswordRequest
     ): Observable<ChangePasswordResponse>
 
-    @GET("teachers/profile")
+    @GET("users/profile")
     fun getTeacherProfile(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherProfileResponse>>
 
     @POST("teachers/send_message")
@@ -93,4 +85,52 @@ interface ApiService {
 
     @GET("students/announcement")
     fun getStudentAnnouncement(@Header("Authorization") token: String): LiveData<ApiResponse<AnnouncementResponse>>
+
+    @Multipart
+    @POST("teachers/upload_assignment_pdf")
+    fun uploadAssignmentPDF(
+        @Header("Authorization") token: String, @Part file: MultipartBody.Part
+    ): Single<FileUploadResponse>
+
+    @Multipart
+    @POST("teachers/upload_assignment_image")
+    fun uploadAssignmentIMAGE(
+        @Header("Authorization") token: String, @Part file: MultipartBody.Part
+    ): Single<FileUploadResponse>
+
+    @GET("teachers/class_student")
+    fun fetchClassStudents(@Header("Authorization") token: String): LiveData<ApiResponse<ClassStudentResponse>>
+
+    @Multipart
+    @POST("teachers/upload_report_pdf")
+    fun uploadReportPDF(
+        @Header("Authorization") token: String, @Part file: MultipartBody.Part?, @Part studentNo: MultipartBody.Part?, @Part studentName: MultipartBody.Part?
+    ): Single<FileUploadResponse>
+
+    @Multipart
+    @POST("teachers/upload_report_image")
+    fun uploadReportIMAGE(
+        @Header("Authorization") token: String, @Part file: MultipartBody.Part?, @Part studentNo: MultipartBody.Part?, @Part studentName: MultipartBody.Part?
+    ): Single<FileUploadResponse>
+
+    @GET("teachers/get_upload")
+    fun getUploadedFile(
+        @Header("Authorization") token: String,
+        @Query(
+            "format"
+        ) format: String?,
+        @Query("type") type: String?
+    ): Observable<ExplorerResponse>
+
+    @DELETE("teachers/delete_upload")
+    fun deleteUploadedFile(
+        @Header("Authorization") token: String,
+        @Query("id") id: String?,
+        @Query("path") path: String?,
+        @Query(
+            "format"
+        ) format: String?,
+        @Query("type") type: String?
+    ): Single<ExplorerDeleteResponse>
+
 }

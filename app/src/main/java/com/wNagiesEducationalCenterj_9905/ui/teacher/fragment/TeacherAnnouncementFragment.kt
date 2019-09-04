@@ -15,7 +15,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.MessageType
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
+import com.wNagiesEducationalCenterj_9905.common.showDataAvailableMessage
 import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -28,7 +30,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var adapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
-    private var snackBar:Snackbar? = null
+    private var snackBar: Snackbar? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,7 +44,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
         loadingIndicator = progressBar
         loadingIndicator?.visibility = View.GONE
         recyclerView = recycler_view
-        snackBar = Snackbar.make(root,getString(R.string.label_msg_offline),Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(root, getString(R.string.label_msg_offline), Snackbar.LENGTH_INDEFINITE)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -73,7 +75,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private fun configureViewModel() {
         teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
         getNetworkState()?.observe(viewLifecycleOwner, Observer {
-            if (!it){
+            if (!it) {
                 snackBar?.show()
                 return@Observer
             }
@@ -88,13 +90,14 @@ class TeacherAnnouncementFragment : BaseFragment() {
             teacherViewModel.getAnnouncementMessage(token).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        showLoadingDialog(false)
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
                         adapter?.submitList(resource?.data)
+                        showLoadingDialog(false)
                         Timber.i("data size: ${resource.data?.size}")
                     }
                     Status.ERROR -> {
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
                         showLoadingDialog(false)
-                        toast("${resource.message}")
                     }
                     Status.LOADING -> {
                         Timber.i("loading...")

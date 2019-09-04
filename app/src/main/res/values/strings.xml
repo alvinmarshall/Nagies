@@ -20,7 +20,7 @@
     <string name="error_role_select_message">Please select a role</string>
     <string name="action_search">Search</string>
     <string name="action_logout">Logout</string>
-    <string name="label_login_msg">Welcome to Nagies\'s Educational Center</string>
+    <string name="label_login_msg">Welcome to Nagie\'s Angels Educational Center</string>
     <string name="hint_input_username">username</string>
     <string name="hint_input_password">password</string>
     <string name="label_terms_and_conditions">terms and conditions</string>
@@ -40,8 +40,8 @@
     <string name="menu_file_management">File Management</string>
     <string name="menu_parent_complaints">Parent Complaints</string>
 
-    <string name="label_parent_login">Parent\'s Login</string>
-    <string name="label_teacher_login">Teacher\'s Login</string>
+    <string name="label_parent_login">Parent</string>
+    <string name="label_teacher_login">Teacher</string>
     <string name="title_activity_teacher_navigation">TeacherNavigationActivity</string>
 
     <string name="menu_home">Home</string>
@@ -51,7 +51,7 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
     <string name="label_login_page">Login Page</string>
-    <string name="label_corp_name">Powered by Infodas Ghana Limited</string>
+    <string name="label_corp_name">Powered by Infordas Ghana Limited</string>
     <string name="prompt_empty_field">invalid field</string>
     <string name="prompt_password_mismatch">password mismatch</string>
     <string name="label_admin_message">Message from administrator</string>
@@ -101,6 +101,24 @@
     <string name="label_msg_offline">Device is offline</string>
     <string name="fetch_circular">Circular</string>
     <string name="fetch_billing">Billing</string>
-
-
+    <string name="storage_msg_invalid_title">Invalid File Path</string>
+    <string name="storage_msg_invalid_path">Please select a storage media and choose a file from it</string>
+    <string name="upload_msg_title">Upload Alert</string>
+    <string name="upload_msg_body">Do you want to upload selected file ?</string>
+    <string name="upload_msg_success">file upload successful</string>
+    <string name="upload_msg_starting">preparing to upload</string>
+    <string name="btn_label_upload_report">upload report</string>
+    <string name="fetch_class_student">Class Student</string>
+    <string name="report_form_student_no">studentNo</string>
+    <string name="report_form_student_name">studentName</string>
+    <string name="upload_form_file">file</string>
+    <string name="btn_label_upload_assignment">upload assignment</string>
+    <string name="label_select_class_teacher">Select class teacher</string>
+    <string name="label_btn_assignment_pdf">assignment pdf</string>
+    <string name="label_btn_assignment_image">assignment image</string>
+    <string name="label_btn_report_pdf">report pdf</string>
+    <string name="label_btn_report_image">report image</string>
+    <string name="label_btn_delete">delete</string>
+    <string name="label_btn_download">download</string>
+    <string name="menu_label_refresh">refresh</string>
 </resources>

@@ -2,15 +2,20 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import com.wNagiesEducationalCenterj_9905.api.request.ExplorerRequest
+import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
+import com.wNagiesEducationalCenterj_9905.api.response.DataUpload
+import com.wNagiesEducationalCenterj_9905.api.response.ExplorerDeleteResponse
+import com.wNagiesEducationalCenterj_9905.common.FileUploadFormat
+import com.wNagiesEducationalCenterj_9905.common.UploadFileType
 import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.AnnouncementEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherComplaintEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherProfileEntity
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.data.repository.TeacherRepository
 import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Profile
@@ -34,6 +39,9 @@ class TeacherViewModel @Inject constructor(
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     val cachedSentMessage: MutableLiveData<Resource<List<MessageEntity>>> = MutableLiveData()
+    val searchString: MutableLiveData<String> = MutableLiveData()
+    var cachedUploadData: MutableLiveData<List<DataUpload>> = MutableLiveData()
+    var deleteUploadResponse: MutableLiveData<ExplorerDeleteResponse> = MutableLiveData()
 
     fun getTeacherProfile(token: String): LiveData<Resource<TeacherProfileEntity>> {
         return teacherRepository.fetchTeacherProfile(token)
@@ -51,8 +59,8 @@ class TeacherViewModel @Inject constructor(
         )
     }
 
-    fun getComplaintMessage(token: String,shouldFetch:Boolean): LiveData<Resource<List<TeacherComplaintEntity>>> {
-        return teacherRepository.fetchComplaint(token,shouldFetch)
+    fun getComplaintMessage(token: String, shouldFetch: Boolean): LiveData<Resource<List<TeacherComplaintEntity>>> {
+        return teacherRepository.fetchComplaint(token, shouldFetch)
     }
 
     fun getAnnouncementMessage(token: String): LiveData<Resource<List<AnnouncementEntity>>> {
@@ -139,14 +147,14 @@ class TeacherViewModel @Inject constructor(
 
     private fun savingMessageToDb(
         teacherMessageRequest: TeacherMessageRequest,
-        level: String
+        level: String?
     ) {
         disposable.addAll(Single.just(preferenceProvider.getUserToken())
             .map { return@map it }
             .flatMap { token ->
                 val date = getCurrentDateTime().toString("yyyy/MM/dd")
-                val message = MessageEntity("you", level, teacherMessageRequest.content, null, token,date)
-                return@flatMap teacherRepository.saveSentMessage(message)
+                val message = level?.let { MessageEntity("you", it, teacherMessageRequest.content, null, token, date) }
+                return@flatMap message?.let { teacherRepository.saveSentMessage(it) }
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -174,4 +182,101 @@ class TeacherViewModel @Inject constructor(
             }, { err -> Timber.i(err) })
         )
     }
+
+    fun uploadFile(
+        requestBody: FileUploadRequest,
+        format: FileUploadFormat?, uploadFileType: UploadFileType
+    ) {
+        disposable.addAll(Single.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { token ->
+                if (uploadFileType == UploadFileType.REPORT) {
+                    when (format) {
+                        FileUploadFormat.PDF -> {
+                            teacherRepository.uploadReportPDF(token, requestBody)
+                        }
+                        FileUploadFormat.IMAGE -> {
+                            teacherRepository.uploadReportIMAGE(token, requestBody)
+                        }
+                        null -> {
+                            return@flatMap null
+                        }
+                    }
+
+                } else {
+                    when (format) {
+                        FileUploadFormat.PDF -> {
+                            requestBody.requestBody?.let { teacherRepository.uploadAssignmentPDF(token, it) }
+                        }
+                        FileUploadFormat.IMAGE -> {
+                            requestBody.requestBody?.let { teacherRepository.uploadAssignmentIMAGE(token, it) }
+                        }
+                        null -> {
+                            return@flatMap null
+                        }
+                    }
+                }
+
+            }
+            .doOnSubscribe { isSuccess.postValue(false) }
+            .doOnSuccess { isSuccess.postValue(true) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Timber.i("upload success fileUrl:${it.data?.fileUrl}")
+            }, { err -> Timber.i(err, "upload error") })
+        )
+    }
+
+    fun getClassStudent(token: String, search: String = ""): LiveData<Resource<List<ClassStudentEntity>>> {
+        return teacherRepository.fetchClassStudent(token, searchName = search)
+    }
+
+    fun getUploadedFiles(request: ExplorerRequest) {
+        disposable.addAll(Observable.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { token ->
+                teacherRepository.fetchUploadData(token, request)
+            }
+            .map {
+                it.dataUpload.forEach { data ->
+                    data.fileUrl = ServerPathUtil.setCorrectPath(data.fileUrl)
+                    data.format = request.format
+                }
+                return@map it
+            }
+            .doOnError {
+                isSuccess.postValue(false)
+                cachedUploadData.postValue(null)
+            }
+            .doOnComplete { isSuccess.postValue(false) }
+            .doOnSubscribe { isSuccess.postValue(true) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                cachedUploadData.value = it.dataUpload
+                Timber.i("status: ${it.status} data size: ${it.count}")
+            }, { err -> Timber.i(err, "get upload file err") })
+        )
+    }
+
+    fun deleteUploadedFiles(request: ExplorerRequest) {
+        disposable.addAll(Single.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { token ->
+                teacherRepository.deleteUploadData(token, request)
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                deleteUploadResponse.value = it
+                if (it.status == 200) {
+                    getUploadedFiles(request)
+                }
+                Timber.i("status: ${it.status} message: ${it.message}")
+
+            }, { err -> Timber.i(err, "delete uploaded file err") })
+        )
+    }
+
 }

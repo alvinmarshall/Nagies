@@ -29,10 +29,8 @@ import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
-import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.ui.adapter.FileModelAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
-import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_report_pdf.*
 import org.jetbrains.anko.support.v4.toast
@@ -115,9 +113,6 @@ class ReportPdfFragment : BaseFragment() {
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
         })
-        studentViewModel.cachedFileName.observe(viewLifecycleOwner, Observer {
-            getFileName(it)
-        })
     }
 
     private fun initRecyclerView() {
@@ -164,21 +159,13 @@ class ReportPdfFragment : BaseFragment() {
         }
     }
 
-    private fun fetchFileNameFromServer(url: String?) {
-        studentViewModel.downloadFilesFromServer(DownloadRequest(url))
-    }
-
-
-    private fun getFileName(it: String?) {
+    private fun fetchFileFromServer(url: String?) {
         if (itemData?.first == ViewFilesAction.DOWNLOAD) {
-            val url = ServerPathUtil.setCorrectPath(itemData?.third)
-            url?.let { link ->
-                it?.let { filename ->
-                    downloadList = downloadWithManager(link, filename, itemData)
-                }
+            url?.let { fileUrl ->
+                val fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1, fileUrl.length)
+                downloadList = downloadWithManager(fileUrl, fileName, itemData)
             }
         }
-
     }
 
     private fun downloadWithManager(
@@ -259,7 +246,7 @@ class ReportPdfFragment : BaseFragment() {
 
                         }
                         ViewFilesAction.DOWNLOAD -> {
-                            fetchFileNameFromServer(itemData?.third)
+                            fetchFileFromServer(itemData?.third)
                         }
                         ViewFilesAction.DELETE -> {
                             showDeleteDialog()
@@ -309,7 +296,7 @@ class ReportPdfFragment : BaseFragment() {
 
                     }
                     ViewFilesAction.DOWNLOAD -> {
-                        fetchFileNameFromServer(itemData?.third)
+                        fetchFileFromServer(itemData?.third)
                     }
                     ViewFilesAction.DELETE -> {
                         showDeleteDialog()

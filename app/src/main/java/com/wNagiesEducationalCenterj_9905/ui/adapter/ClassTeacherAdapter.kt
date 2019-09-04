@@ -40,7 +40,7 @@ class TeacherVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .load(item?.imageUrl)
             .centerCrop().placeholder(R.drawable.default_user_avatar)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .into(itemView.img_item)
+            .into(itemView.item_img)
         itemView.btn_item_call.onClick {
             itemCallback?.onClick(Pair(ClassTeacherAction.CALL,item?.contact))
         }

@@ -11,7 +11,10 @@
     </fragment>
     <fragment android:id="@+id/fileManagementFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileManagementFragment"
-              android:label="File Management" tools:layout="@layout/fragment_file_management"/>
+              android:label="File Management" tools:layout="@layout/fragment_file_management">
+        <action android:id="@+id/action_fileManagementFragment_to_fileExplorerFragment"
+                app:destination="@id/fileExplorerFragment"/>
+    </fragment>
     <fragment android:id="@+id/parentComplaintFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.ParentComplaintFragment"
               android:label="Parent Complaint" tools:layout="@layout/fragment_parent_complaint">
@@ -20,7 +23,10 @@
     </fragment>
     <fragment android:id="@+id/attachmentFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.AttachmentFragment"
-              android:label="Attachment" tools:layout="@layout/fragment_attachment"/>
+              android:label="Attachment" tools:layout="@layout/fragment_attachment">
+        <action android:id="@+id/action_attachmentFragment_to_studentListFragment"
+                app:destination="@id/studentListFragment"/>
+    </fragment>
     <fragment android:id="@+id/changePasswordFragmentTeacher"
               android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment"
               android:label="Change Password" tools:layout="@layout/fragment_change_password"/>
@@ -46,5 +52,13 @@
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.AnnouncementDetailsFragment"
               android:label="Detail" tools:layout="@layout/fragment_announcement_details">
         <argument android:name="args_announcement_id" app:argType="integer"/>
+    </fragment>
+    <fragment android:id="@+id/studentListFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.StudentListFragment"
+              android:label="Class Students" tools:layout="@layout/fragment_student_list"/>
+    <fragment android:id="@+id/fileExplorerFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileExplorerFragment"
+              android:label="File Explorer" tools:layout="@layout/fragment_file_explorer">
+        <argument android:name="explorer_type" app:argType="string" app:nullable="true"/>
     </fragment>
 </navigation>

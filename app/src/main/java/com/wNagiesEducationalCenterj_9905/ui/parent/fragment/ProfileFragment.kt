@@ -104,7 +104,7 @@ class ProfileFragment : BaseFragment() {
                     .placeholder(R.drawable.default_user_avatar)
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(img_item)
+                    .into(item_img)
             }
         }
     }

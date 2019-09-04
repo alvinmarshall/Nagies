@@ -5,5 +5,6 @@ import com.wNagiesEducationalCenterj_9905.vo.IMessageRequestModel
 
 data class ParentComplaintRequest(
     @SerializedName("message")
-    override val content: String
+    override val content: String,
+    val teacherName:String
 ) : IMessageRequestModel

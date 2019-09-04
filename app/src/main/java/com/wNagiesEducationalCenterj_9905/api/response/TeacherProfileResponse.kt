@@ -7,6 +7,6 @@ data class TeacherProfileResponse(
     val type: String,
     val message: String,
     val count: Int,
-    val teacherProfile: List<TeacherProfileEntity>,
+    val teacherProfile: TeacherProfileEntity,
     val status: Int
 )

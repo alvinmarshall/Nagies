@@ -16,13 +16,9 @@ import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
-import com.wNagiesEducationalCenterj_9905.vo.DownloadRequest
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
-import okhttp3.ResponseBody
-import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -82,13 +78,11 @@ class StudentRepository @Inject constructor(
         return object : NetworkBoundResource<StudentProfileEntity, StudentProfileResponse>(appExecutors) {
             override fun saveCallResult(item: StudentProfileResponse) {
                 if (item.status == 200) {
-                    item.studentProfile.forEach { profile ->
-                        profile.token = token
-                        profile.imageUrl = ServerPathUtil.setCorrectPath(profile.imageUrl)
-                    }
+                    item.studentProfile.token = token
+                    item.studentProfile.imageUrl = ServerPathUtil.setCorrectPath(item.studentProfile.imageUrl)
                     db.runInTransaction {
                         studentDao.deleteProfile(token)
-                        studentDao.insertStudentProfile(item.studentProfile[0])
+                        studentDao.insertStudentProfile(item.studentProfile)
                     }
                 }
             }
@@ -133,10 +127,6 @@ class StudentRepository @Inject constructor(
         return complaintDao.getSavedComplaintMessageById(id)
     }
 
-    fun fetchFileFromServer(token: String, url: DownloadRequest): Observable<Response<ResponseBody>> {
-        return apiService.getFilesFromServer(token, url)
-    }
-
     fun fetchStudentAssignmentPDF(
         token: String,
         shouldFetch: Boolean = false
@@ -147,6 +137,7 @@ class StudentRepository @Inject constructor(
                     item.assignment.forEach { pdf ->
                         pdf.format = "pdf"
                         pdf.token = token
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentPDF(token)
@@ -189,6 +180,7 @@ class StudentRepository @Inject constructor(
                     item.assignment.forEach { image ->
                         image.token = token
                         image.format = "image"
+                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
                     }
                     db.runInTransaction {
                         assignmentDao.deleteAssignmentImage(token)
@@ -240,6 +232,7 @@ class StudentRepository @Inject constructor(
                     item.report.forEach { pdf ->
                         pdf.format = PDF_FORMAT
                         pdf.token = token
+                        pdf.fileUrl = ServerPathUtil.setCorrectPath(pdf.fileUrl)
                     }
                     db.runInTransaction {
                         reportDao.deleteReportPDF(token)
@@ -279,6 +272,7 @@ class StudentRepository @Inject constructor(
                     item.report.forEach { image ->
                         image.token = token
                         image.format = IMAGE_FORMAT
+                        image.fileUrl = ServerPathUtil.setCorrectPath(image.fileUrl)
                     }
                     db.runInTransaction {
                         reportDao.deleteReportImage(token)
@@ -402,6 +396,7 @@ class StudentRepository @Inject constructor(
                     item.billing.forEach { bill ->
                         bill.token = token
                         bill.format = IMAGE_FORMAT
+                        bill.fileUrl = ServerPathUtil.setCorrectPath(bill.fileUrl)
                     }
                     db.runInTransaction {
                         studentDao.deleteStudentBill(token)
@@ -440,7 +435,10 @@ class StudentRepository @Inject constructor(
         return studentDao.deleteBillingById(id)
     }
 
-    fun fetchStudentAnnouncement(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<AnnouncementEntity>>> {
+    fun fetchStudentAnnouncement(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AnnouncementEntity>>> {
         return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
             override fun saveCallResult(item: AnnouncementResponse) {
                 if (item.status == 200) {

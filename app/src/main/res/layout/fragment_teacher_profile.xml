@@ -11,7 +11,7 @@
                     android:layout_height="wrap_content">
         <ImageView android:layout_width="match_parent"
                    android:scaleType="centerCrop"
-                   android:id="@+id/img_item"
+                   android:id="@+id/item_img"
                    android:layout_height="400dp" tools:ignore="ContentDescription"/>
 
 
@@ -20,7 +20,7 @@
                 android:nestedScrollingEnabled="false"
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_below="@id/img_item"
+                android:layout_below="@id/item_img"
                 tools:listitem="@layout/list_profile"
                 android:layout_height="match_parent">
         </androidx.recyclerview.widget.RecyclerView>

@@ -76,7 +76,7 @@ class AuthRepository @Inject constructor(
         val entity = UserEntity(username, password)
         entity.role = item.role
         entity.photo = ServerPathUtil.setCorrectPath(item.image)
-        entity.token = "Bearer ${item.Token}"
+        entity.token = item.Token
         entity.uid = item.Id
         userDao.insertUser(entity)
         preferenceProvider.setUserLogin(true, entity.token)

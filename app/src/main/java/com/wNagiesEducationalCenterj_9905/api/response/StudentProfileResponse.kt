@@ -8,5 +8,5 @@ data class StudentProfileResponse(
     val status: Int,
     val message: String,
     val count: Int,
-    val studentProfile: List<StudentProfileEntity>
+    val studentProfile: StudentProfileEntity
 )

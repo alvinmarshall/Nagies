@@ -33,16 +33,31 @@ class TeacherComplaintAdapter : ListAdapter<TeacherComplaintEntity, TComplaintVH
 
 class TComplaintVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: TeacherComplaintEntity?, itemCallback: ItemCallback<Pair<ComplaintAction, String?>>?) {
-        val sender = "guardian: ${item?.guardianName}"
-        val child = "child: ${item?.studentName}"
-        val date = "date: ${item?.date}"
-        itemView.tv_guardian_name.text = sender
+        val sender = "Guardian: ${item?.guardianName}"
+        val child = "Child: ${item?.studentName}"
+        val date = "Date: ${item?.date}"
+        val content = "Content: ${item?.message}"
+        itemView.tv_guardian_name.text = date
         itemView.tv_student_name.text = child
-        itemView.tv_msg_content.text = item?.message
-        itemView.tv_msg_date.text = date
-        itemView.btn_item_call.setOnClickListener { itemCallback?.onClick(Pair(ComplaintAction.CALL, item?.guardianContact)) }
-        itemView.btn_item_message.setOnClickListener { itemCallback?.onClick(Pair(ComplaintAction.MESSAGE, item?.guardianContact)) }
-        itemView.setOnClickListener { itemCallback?.onClick(Pair(ComplaintAction.DETAILS,item?.id.toString())) }
+        itemView.tv_msg_content.text = content
+        itemView.tv_msg_date.text = sender
+        itemView.btn_item_call.setOnClickListener {
+            itemCallback?.onClick(
+                Pair(
+                    ComplaintAction.CALL,
+                    item?.guardianContact
+                )
+            )
+        }
+        itemView.btn_item_message.setOnClickListener {
+            itemCallback?.onClick(
+                Pair(
+                    ComplaintAction.MESSAGE,
+                    item?.guardianContact
+                )
+            )
+        }
+        itemView.setOnClickListener { itemCallback?.onClick(Pair(ComplaintAction.DETAILS, item?.id.toString())) }
     }
 }
 

@@ -54,7 +54,7 @@
     <string name="label_corp_name">Powered by Infordas Ghana Limited</string>
     <string name="prompt_empty_field">invalid field</string>
     <string name="prompt_password_mismatch">password mismatch</string>
-    <string name="label_admin_message">Message from administrator</string>
+    <string name="label_admin_message">Available Messages</string>
     <string name="des_profile_image">profile image</string>
     <string name="errorConnection">Connection failed. Please try again later</string>
     <string name="permission_denied">Permission Denied</string>

@@ -17,7 +17,6 @@
         <TextView android:layout_width="match_parent"
                   android:id="@+id/tv_msg_date"
                   android:padding="2dp"
-                  android:fontFamily="sans-serif-condensed-medium"
                   tools:text="@string/label_teacher_login"
                   android:layout_height="wrap_content"
         />
@@ -25,10 +24,8 @@
         <TextView android:layout_width="match_parent"
                   android:id="@+id/tv_msg_content"
                   android:maxLines="2"
-                  android:fontFamily="sans-serif-condensed-light"
                   android:padding="2dp"
                   tools:text="@string/label_teacher_login"
-                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                   android:layout_below="@id/tv_msg_date"
                   android:ellipsize="end"
                   android:layout_height="wrap_content"
@@ -37,20 +34,16 @@
         <TextView android:layout_width="match_parent"
                   android:padding="2dp"
                   android:id="@+id/tv_msg_sender"
-                  android:fontFamily="sans-serif-light"
                   tools:text="@string/label_teacher_login"
                   android:layout_below="@id/tv_msg_content"
-                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                   android:layout_height="wrap_content"
         />
 
         <TextView android:layout_width="match_parent"
                   android:padding="2dp"
                   android:id="@+id/tv_msg_level"
-                  android:fontFamily="sans-serif-light"
                   tools:text="@string/label_teacher_login"
                   android:layout_below="@id/tv_msg_sender"
-                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
                   android:layout_height="wrap_content"
         />
 

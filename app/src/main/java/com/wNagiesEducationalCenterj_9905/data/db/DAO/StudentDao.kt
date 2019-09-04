@@ -24,8 +24,8 @@ interface StudentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStudentTeacher(studentTeacherEntityList: List<StudentTeacherEntity>)
 
-    @Query("SELECT * FROM student_teacher WHERE token = :token")
-    fun getClassTeacher(token: String): LiveData<List<StudentTeacherEntity>>
+    @Query("SELECT * FROM student_teacher WHERE token = :token AND teacherName LIKE :search")
+    fun getClassTeacher(token: String,search:String): LiveData<List<StudentTeacherEntity>>
 
     @Query("DELETE FROM student_teacher WHERE token = :token")
     fun deleteClassTeacher(token: String)

@@ -14,8 +14,8 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessages(messageEntity: List<MessageEntity>)
 
-    @Query("SELECT * FROM messages WHERE token = :token")
-    fun getMessages(token: String):LiveData<List<MessageEntity>>
+    @Query("SELECT * FROM messages WHERE token = :token AND content LIKE :search")
+    fun getMessages(token: String,search:String):LiveData<List<MessageEntity>>
 
     @Query("SELECT * FROM messages WHERE token = :token LIMIT 1")
     fun isMessageResent(token:String):Flowable<List<MessageEntity>>

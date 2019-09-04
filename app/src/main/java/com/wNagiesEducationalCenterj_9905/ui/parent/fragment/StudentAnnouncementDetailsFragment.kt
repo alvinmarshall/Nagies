@@ -38,8 +38,8 @@ class StudentAnnouncementDetailsFragment : BaseFragment() {
     private fun subscribeObservers() {
 
         studentViewModel.cachedAnnouncement.observe(viewLifecycleOwner, Observer { msg ->
-            val title = "from: ${msg.level}"
-            val sender = "name: ${msg.sender}"
+            val title = "From: ${msg.level}"
+            val sender = "Name: ${msg.sender}"
             item_title.text = title
             item_sender.text = sender
             item_content.text = msg.content

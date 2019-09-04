@@ -4,10 +4,9 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
+import android.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -21,7 +20,6 @@ import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_parent_complaint.*
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,6 +31,12 @@ class ParentComplaintFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var shouldFetch: Boolean = false
     private lateinit var sharedViewModel: SharedViewModel
+    private var searchView: SearchView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +59,24 @@ class ParentComplaintFragment : BaseFragment() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_dashboard, menu)
+        searchView = menu.findItem(R.id.action_search).actionView as? SearchView
+        searchView?.isSubmitButtonEnabled
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                teacherViewModel.searchString.postValue(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                teacherViewModel.searchString.postValue(newText)
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     private fun initRecyclerView() {
         recyclerView?.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         recyclerView?.hasFixedSize()
@@ -63,7 +85,6 @@ class ParentComplaintFragment : BaseFragment() {
             override fun onClick(data: Pair<ComplaintAction, String?>?) {
                 when (data?.first) {
                     ComplaintAction.DETAILS -> {
-                        toast("${data.second}")
                         val action = data.second?.toInt()?.let { id ->
                             ParentComplaintFragmentDirections
                                 .actionParentComplaintFragmentToParentComplaintDetailsFragment(id)
@@ -104,33 +125,34 @@ class ParentComplaintFragment : BaseFragment() {
         }
     }
 
-    private fun subscribeObservers() {
-        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
-            teacherViewModel.getComplaintMessage(token, shouldFetch).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                        adapter?.submitList(resource?.data)
-                        showLoadingDialog(false)
-                        Timber.i("data size: ${resource.data?.size}")
+    private fun subscribeObservers(token: String) {
+        teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
+            teacherViewModel.getComplaintMessage(token, shouldFetch, search)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                            adapter?.submitList(resource?.data)
+                            showLoadingDialog(false)
+                            Timber.i("data size: ${resource.data?.size}")
+                        }
+                        Status.ERROR -> {
+                            showLoadingDialog(false)
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                            Timber.i(resource?.message)
+                        }
+                        Status.LOADING -> {
+                            Timber.i("loading")
+                            showLoadingDialog()
+                        }
                     }
-                    Status.ERROR -> {
-                        showLoadingDialog(false)
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                        Timber.i(resource?.message)
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading")
-                        showLoadingDialog()
-                    }
-                }
 
-            })
+                })
         })
 
         getFetchComplaint().observe(viewLifecycleOwner, Observer {
             if (it) {
-                toast("complaint notification received")
+                Timber.i("complaint notification received")
                 shouldFetch = it
             }
         })
@@ -139,7 +161,7 @@ class ParentComplaintFragment : BaseFragment() {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchComplaint.observe(it, Observer { fetch ->
                 if (fetch) {
-                    toast("complaint received from activity")
+                    Timber.i("complaint received from activity")
                     shouldFetch = fetch
                 }
             })
@@ -148,8 +170,11 @@ class ParentComplaintFragment : BaseFragment() {
 
     private fun configureViewModel() {
         teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel.searchString.postValue("")
         teacherViewModel.getUserToken()
-        subscribeObservers()
+        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
+            subscribeObservers(token)
+        })
     }
 
     override fun onStop() {

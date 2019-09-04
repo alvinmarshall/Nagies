@@ -4,10 +4,9 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
+import android.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +25,12 @@ class ClassTeacherFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var adapter: ClassTeacherAdapter? = null
     private var recyclerView: RecyclerView? = null
+    private var searchView: SearchView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +49,24 @@ class ClassTeacherFragment : BaseFragment() {
         super.onActivityCreated(savedInstanceState)
         initRecyclerView()
         configureViewModel()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_dashboard, menu)
+        searchView = menu.findItem(R.id.action_search).actionView as? SearchView
+        searchView?.isSubmitButtonEnabled
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                studentViewModel.searchString.postValue(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                studentViewModel.searchString.postValue(newText)
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun initRecyclerView() {
@@ -79,23 +102,26 @@ class ClassTeacherFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel.searchString.postValue("")
         studentViewModel.getUserToken()
-        subscribeObservers()
+        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
+            subscribeObservers(token)
+        })
     }
 
-    private fun subscribeObservers() {
-        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getClassTeacher(token).observe(viewLifecycleOwner, Observer { resource ->
+    private fun subscribeObservers(token: String) {
+        studentViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
+            studentViewModel.getClassTeacher(token, search).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         Timber.i("fetch data size ${resource.data?.size}")
-                        showDataAvailableMessage(label_msg_title,resource.data, MessageType.TEACHERS)
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.TEACHERS)
                         adapter?.submitList(resource.data)
                         showLoadingDialog(false)
                     }
                     Status.ERROR -> {
                         Timber.i(resource.message)
-                        showDataAvailableMessage(label_msg_title,resource.data, MessageType.TEACHERS)
+                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.TEACHERS)
                         showLoadingDialog(false)
                         toast("${resource.message}")
                     }
@@ -105,8 +131,8 @@ class ClassTeacherFragment : BaseFragment() {
                     }
                 }
             })
-
         })
+
     }
 
     private fun showLoadingDialog(show: Boolean = true) {

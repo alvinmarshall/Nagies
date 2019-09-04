@@ -20,7 +20,6 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_send_message_teacher.*
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class SendMessageTeacherFragment : BaseFragment() {
@@ -61,7 +60,6 @@ class SendMessageTeacherFragment : BaseFragment() {
         adapter = MessageAdapter()
         adapter?.setItemCallback(object : ItemCallback<Int> {
             override fun onClick(data: Int?) {
-                toast("$data")
             }
 
             override fun onHold(data: Int?) {
@@ -86,7 +84,7 @@ class SendMessageTeacherFragment : BaseFragment() {
                 }
                 Status.ERROR -> {
                     showLoadingDialog(false)
-                    toast("${resources.message}")
+                    Timber.i(resources.message)
                 }
                 Status.LOADING -> {
                     showLoadingDialog()

@@ -2,10 +2,9 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ProgressBar
+import android.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -22,7 +21,6 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_teacher_announcement.*
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class TeacherAnnouncementFragment : BaseFragment() {
@@ -31,6 +29,13 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private var adapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var snackBar: Snackbar? = null
+    private var searchView: SearchView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,6 +56,24 @@ class TeacherAnnouncementFragment : BaseFragment() {
         super.onActivityCreated(savedInstanceState)
         initRecyclerView()
         configureViewModel()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_dashboard, menu)
+        searchView = menu.findItem(R.id.action_search).actionView as? SearchView
+        searchView?.isSubmitButtonEnabled
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                teacherViewModel.searchString.postValue(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                teacherViewModel.searchString.postValue(newText)
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun initRecyclerView() {
@@ -74,6 +97,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
 
     private fun configureViewModel() {
         teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel.searchString.postValue("")
         getNetworkState()?.observe(viewLifecycleOwner, Observer {
             if (!it) {
                 snackBar?.show()
@@ -82,12 +106,14 @@ class TeacherAnnouncementFragment : BaseFragment() {
             snackBar?.dismiss()
         })
         teacherViewModel.getUserToken()
-        subscribeObservers()
+        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
+            subscribeObservers(token)
+        })
     }
 
-    private fun subscribeObservers() {
-        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
-            teacherViewModel.getAnnouncementMessage(token).observe(viewLifecycleOwner, Observer { resource ->
+    private fun subscribeObservers(token: String) {
+        teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
+            teacherViewModel.getAnnouncementMessage(token, search).observe(viewLifecycleOwner, Observer { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)

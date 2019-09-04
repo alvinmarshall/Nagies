@@ -16,8 +16,6 @@
                 android:padding="5dp"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-condensed-light"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_guardian_name"/>
@@ -25,9 +23,7 @@
         <TextView android:layout_width="match_parent"
                   android:id="@+id/tv_student_name"
                   android:padding="5dp"
-                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
                   android:maxLines="1"
-                  android:fontFamily="sans-serif-thin"
                   android:ellipsize="end"
                   tools:text="student name"
                   android:layout_below="@id/tv_guardian_name"

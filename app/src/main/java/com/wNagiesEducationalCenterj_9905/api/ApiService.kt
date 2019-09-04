@@ -49,7 +49,7 @@ interface ApiService {
     @GET("students/report_image")
     fun getStudentReportImage(@Header("Authorization") token: String): LiveData<ApiResponse<ReportResponse>>
 
-    @POST("students/change_password")
+    @POST("users/change_password")
     fun requestParentAccountPasswordChange(
         @Header("Authorization") token: String,
         @Body changePassRequest: ChangePasswordRequest
@@ -64,7 +64,7 @@ interface ApiService {
     @GET("teachers/complaints")
     fun getTeacherComplaint(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherComplaintResponse>>
 
-    @POST("teachers/change_password")
+    @POST("users/change_password")
     fun requestTeacherAccountPasswordChange(
         @Header("Authorization") token: String,
         @Body changePassRequest: ChangePasswordRequest

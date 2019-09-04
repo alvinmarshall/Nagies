@@ -119,7 +119,7 @@ class AssignmentPdfFragment : BaseFragment() {
         })
         getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
             if (fetch) {
-                toast("assignment received")
+                Timber.i("assignment received")
                 shouldFetch = fetch
             }
         })
@@ -127,7 +127,7 @@ class AssignmentPdfFragment : BaseFragment() {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchAssignmentPDF.observe(it, Observer { fetch ->
                 if (fetch) {
-                    toast("assignment pdf received from activity")
+                    Timber.i("assignment pdf received from activity")
                     shouldFetch = fetch
                 }
             })

@@ -48,8 +48,8 @@ class ParentComplaintDetailsFragment : BaseFragment() {
 
     private fun subscribeObservers() {
         teacherViewModel.cachedComplaint.observe(viewLifecycleOwner, Observer { complaint ->
-            val sender = "guardian: ${complaint.guardianName}"
-            val child = "child ${complaint.studentName}"
+            val sender = "Guardian: ${complaint.guardianName}"
+            val child = "Child ${complaint.studentName}"
             itemTitle?.text = sender
             itemDate?.text = child
             itemContent?.text = complaint.message

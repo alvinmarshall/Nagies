@@ -24,7 +24,7 @@ class ComplaintAdapter : ListAdapter<ComplaintEntity, ComplaintVH>(DiffUtil()) {
         holder.bind(getItem(position),itemCallback)
     }
 
-    fun setItemCallbak(callback: ItemCallback<Int>?){
+    fun setItemCallback(callback: ItemCallback<Int>?){
         itemCallback = callback
     }
 

@@ -4,6 +4,7 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 import android.os.Bundle
 import android.view.*
 import android.widget.ProgressBar
+import android.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -31,7 +32,8 @@ class DashboardFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var shouldFetch: Boolean = false
     private lateinit var sharedViewModel: SharedViewModel
-    private var snackBar:Snackbar? = null
+    private var snackBar: Snackbar? = null
+    private var searchView: SearchView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +43,9 @@ class DashboardFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel.searchString.postValue("")
         getNetworkState()?.observe(viewLifecycleOwner, Observer {
-            if (!it){
+            if (!it) {
                 snackBar?.show()
                 return@Observer
             }
@@ -72,11 +75,24 @@ class DashboardFragment : BaseFragment() {
         loadingIndicator?.visibility = View.GONE
         recyclerView = recycler_view
         initRecyclerView()
-        snackBar = Snackbar.make(root,getString(R.string.label_msg_offline),Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(root, getString(R.string.label_msg_offline), Snackbar.LENGTH_INDEFINITE)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_dashboard, menu)
+        searchView = menu.findItem(R.id.action_search).actionView as? SearchView
+        searchView?.isSubmitButtonEnabled
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                studentViewModel.searchString.postValue(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                studentViewModel.searchString.postValue(newText)
+                return true
+            }
+        })
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -98,29 +114,32 @@ class DashboardFragment : BaseFragment() {
     }
 
     private fun subscribeObserver(token: String?) {
-        token?.let {
-            studentViewModel.getStudentMessages(it, shouldFetch).observe(viewLifecycleOwner, Observer { r ->
-                when (r.status) {
-                    Status.SUCCESS -> {
-                        messageAdapter?.submitList(r.data)
-                        showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
-                        showLoadingDialog(false)
-                        Timber.i("message data size: ${r.data?.size}")
+        studentViewModel.searchString.observe(viewLifecycleOwner, Observer { search->
+            token?.let {
+                studentViewModel.getStudentMessages(it, shouldFetch,search).observe(viewLifecycleOwner, Observer { r ->
+                    when (r.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
+                            messageAdapter?.submitList(r.data)
+                            showLoadingDialog(false)
+                            Timber.i("message data size: ${r.data?.size}")
+                        }
+                        Status.ERROR -> {
+                            showLoadingDialog(false)
+                            showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
+                            Timber.i(r.message)
+                        }
+                        Status.LOADING -> {
+                            showLoadingDialog()
+                        }
                     }
-                    Status.ERROR -> {
-                        showLoadingDialog(false)
-                        showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
-                        Timber.i(r.message)
-                    }
-                    Status.LOADING -> {
-                        showLoadingDialog()
-                    }
-                }
-            })
-        }
+                })
+            }
+        })
+
         getFetchMessage().observe(viewLifecycleOwner, Observer {
             if (it) {
-                toast("notification received")
+                Timber.i("notification received")
                 shouldFetch = it
             }
         })
@@ -129,7 +148,7 @@ class DashboardFragment : BaseFragment() {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchMessage.observe(it, Observer { fetch ->
                 if (fetch) {
-                    toast("notification received from activity")
+                    Timber.i("notification received from activity")
                     shouldFetch = fetch
                 }
             })

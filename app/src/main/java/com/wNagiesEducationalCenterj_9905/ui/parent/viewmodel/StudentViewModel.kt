@@ -34,10 +34,15 @@ class StudentViewModel @Inject constructor(
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
+    val searchString: MutableLiveData<String> = MutableLiveData()
 
 
-    fun getStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
-        return studentRepository.fetchStudentMessages(token, shouldFetch)
+    fun getStudentMessages(
+        token: String,
+        shouldFetch: Boolean = false,
+        search: String = ""
+    ): LiveData<Resource<List<MessageEntity>>> {
+        return studentRepository.fetchStudentMessages(token, shouldFetch, search)
     }
 
     fun getUserToken() {
@@ -203,7 +208,8 @@ class StudentViewModel @Inject constructor(
                     DBEntities.REPORT -> {
                         id?.let { it1 -> studentRepository.deleteReportById(it1) }
                     }
-                    DBEntities.CIRCULAR -> {}
+                    DBEntities.CIRCULAR -> {
+                    }
                     DBEntities.BILLING -> {
                         id?.let { it1 -> studentRepository.deleteBillingById(it1) }
                     }
@@ -261,8 +267,8 @@ class StudentViewModel @Inject constructor(
 
     }
 
-    fun getClassTeacher(token: String): LiveData<Resource<List<StudentTeacherEntity>>> {
-        return studentRepository.getClassTeacher(token)
+    fun getClassTeacher(token: String, searchName: String = ""): LiveData<Resource<List<StudentTeacherEntity>>> {
+        return studentRepository.getClassTeacher(token, search = searchName)
     }
 
     fun getCircularInformation(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<CircularEntity>>> {
@@ -273,8 +279,11 @@ class StudentViewModel @Inject constructor(
         return studentRepository.fetchStudentBills(token, shouldFetch)
     }
 
-    fun getAnnouncementMessage(token: String): LiveData<Resource<List<AnnouncementEntity>>> {
-        return studentRepository.fetchStudentAnnouncement(token)
+    fun getAnnouncementMessage(
+        token: String,
+        searchContent: String = ""
+    ): LiveData<Resource<List<AnnouncementEntity>>> {
+        return studentRepository.fetchStudentAnnouncement(token, searchContent = searchContent)
     }
 
     fun getAnnouncementById(id: Int) {
@@ -288,7 +297,6 @@ class StudentViewModel @Inject constructor(
         )
 
     }
-
 
 
 }

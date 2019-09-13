@@ -54,7 +54,7 @@
     <string name="label_corp_name">Powered by Infordas Ghana Limited</string>
     <string name="prompt_empty_field">invalid field</string>
     <string name="prompt_password_mismatch">password mismatch</string>
-    <string name="label_admin_message">Message from administrator</string>
+    <string name="label_admin_message">Available Messages</string>
     <string name="des_profile_image">profile image</string>
     <string name="errorConnection">Connection failed. Please try again later</string>
     <string name="permission_denied">Permission Denied</string>
@@ -121,4 +121,37 @@
     <string name="label_btn_delete">delete</string>
     <string name="label_btn_download">download</string>
     <string name="menu_label_refresh">refresh</string>
+    <string name="file_explorer_delete_msg">This file will be permanently deleted, Do you want to proceed ?</string>
+
+    <!--preference strings-->
+    <string name="pref_fetch_option_label">Update interval</string>
+    <string name="pref_fetch_option_key">pref_fetch_option_key</string>
+    <string name="pref_fetch_option_20_min_label">Every 20 Minutes</string>
+    <string name="pref_fetch_option_40_min_label">Every 40 Minutes</string>
+    <string name="pref_fetch_option_60_min_label">Every 1 Hour</string>
+
+    <string name="pref_fetch_option_20_min_value">20</string>
+    <string name="pref_fetch_option_40_min_value">40</string>
+    <string name="pref_fetch_option_60_min_value">60</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="pref_app_version">version 1.0.1</string>
+    <string name="pref_contact_us">Contact Us</string>
+    <string name="pref_about_us">About Us</string>
+    <string name="pref_about_us_url">http://infordasgh.com/AboutUs.html</string>
+    <string name="pref_contact_us_url">http://infordasgh.com/contact.html</string>
+
 </resources>

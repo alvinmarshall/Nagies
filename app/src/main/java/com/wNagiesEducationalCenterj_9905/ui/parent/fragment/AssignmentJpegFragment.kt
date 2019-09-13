@@ -119,7 +119,7 @@ class AssignmentJpegFragment : BaseFragment() {
         })
         getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
             if (fetch) {
-                toast("assignment image received")
+                Timber.i("assignment image received")
                 shouldFetch = fetch
             }
         })
@@ -127,7 +127,7 @@ class AssignmentJpegFragment : BaseFragment() {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchAssignmentJPEG.observe(it, Observer { fetch ->
                 if (fetch) {
-                    toast("assignment received from activity")
+                    Timber.i("assignment received from activity")
                     shouldFetch = fetch
                 }
             })

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -22,7 +21,6 @@ import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_send_message.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 
@@ -62,7 +60,7 @@ class SendMessageFragment : BaseFragment() {
         recyclerView?.hasFixedSize()
         recyclerView?.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
         complaintAdapter = ComplaintAdapter()
-        complaintAdapter?.setItemCallbak(object : ItemCallback<Int> {
+        complaintAdapter?.setItemCallback(object : ItemCallback<Int> {
             override fun onClick(data: Int?) {
                 val action = data?.let {
                     SendMessageFragmentDirections.actionSendMessageFragmentToComplaintDetailFragment(it)

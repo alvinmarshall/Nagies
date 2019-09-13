@@ -34,17 +34,14 @@ class StudentRepository @Inject constructor(
     private val preferenceProvider: PreferenceProvider,
     private val announcementDao: AnnouncementDao
 ) {
-    fun fetchStudentMessages(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<MessageEntity>>> {
+    fun fetchStudentMessages(
+        token: String,
+        shouldFetch: Boolean = false,
+        searchContent: String = ""
+    ): LiveData<Resource<List<MessageEntity>>> {
         return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
             override fun loadFromDb(): LiveData<List<MessageEntity>> {
-                return Transformations.switchMap(messageDao.getMessages(token)) { msg ->
-                    if (msg == null) {
-                        val data = MutableLiveData<List<MessageEntity>>()
-                        data.postValue(null)
-                        return@switchMap data
-                    }
-                    return@switchMap messageDao.getMessages(token)
-                }
+                return messageDao.getMessages(token, "%$searchContent%")
             }
 
             override fun saveCallResult(item: MessageResponse) {
@@ -309,7 +306,7 @@ class StudentRepository @Inject constructor(
         return reportDao.updateReportPath(path, id)
     }
 
-    fun getClassTeacher(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<StudentTeacherEntity>>> {
+    fun getClassTeacher(token: String, shouldFetch: Boolean = false,search:String=""): LiveData<Resource<List<StudentTeacherEntity>>> {
         return object : NetworkBoundResource<List<StudentTeacherEntity>, StudentTeachersResponse>(appExecutors) {
             override fun saveCallResult(item: StudentTeachersResponse) {
                 if (item.status == 200) {
@@ -332,14 +329,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<StudentTeacherEntity>> {
-                return Transformations.switchMap(studentDao.getClassTeacher(token)) { teacher ->
-                    if (teacher == null) {
-                        val data: MutableLiveData<List<StudentTeacherEntity>> = MutableLiveData()
-                        data.postValue(null)
-                        return@switchMap data
-                    }
-                    return@switchMap studentDao.getClassTeacher(token)
-                }
+                return studentDao.getClassTeacher(token,"%$search%")
             }
 
             override fun createCall(): LiveData<ApiResponse<StudentTeachersResponse>> =
@@ -437,7 +427,7 @@ class StudentRepository @Inject constructor(
 
     fun fetchStudentAnnouncement(
         token: String,
-        shouldFetch: Boolean = false
+        shouldFetch: Boolean = false,searchContent: String=""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
         return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
             override fun saveCallResult(item: AnnouncementResponse) {
@@ -461,14 +451,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<AnnouncementEntity>> {
-                return Transformations.switchMap(announcementDao.getAnnouncement(token)) { msg ->
-                    if (msg.isEmpty()) {
-                        val data = MutableLiveData<List<AnnouncementEntity>>()
-                        data.postValue(null)
-                        return@switchMap data
-                    }
-                    return@switchMap announcementDao.getAnnouncement(token)
-                }
+                return announcementDao.getAnnouncement(token,searchContent)
             }
 
             override fun createCall(): LiveData<ApiResponse<AnnouncementResponse>> =

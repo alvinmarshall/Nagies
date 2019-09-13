@@ -37,7 +37,7 @@ class TeacherRepository @Inject constructor(
     private val messageDao: MessageDao,
     private val preferenceProvider: PreferenceProvider
 ) {
-    fun fetchAnnouncement(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<AnnouncementEntity>>> {
+    fun fetchAnnouncement(token: String, shouldFetch: Boolean = false,searchContent: String=""): LiveData<Resource<List<AnnouncementEntity>>> {
         return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
             override fun saveCallResult(item: AnnouncementResponse) {
                 if (item.status == 200) {
@@ -60,14 +60,7 @@ class TeacherRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<AnnouncementEntity>> {
-                return Transformations.switchMap(announcementDao.getAnnouncement(token)) { msg ->
-                    if (msg.isEmpty()) {
-                        val data = MutableLiveData<List<AnnouncementEntity>>()
-                        data.postValue(null)
-                        return@switchMap data
-                    }
-                    return@switchMap announcementDao.getAnnouncement(token)
-                }
+                return announcementDao.getAnnouncement(token,"%$searchContent%")
             }
 
             override fun createCall(): LiveData<ApiResponse<AnnouncementResponse>> =
@@ -75,7 +68,11 @@ class TeacherRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun fetchComplaint(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<TeacherComplaintEntity>>> {
+    fun fetchComplaint(
+        token: String,
+        shouldFetch: Boolean = false,
+        searchContent: String = ""
+    ): LiveData<Resource<List<TeacherComplaintEntity>>> {
         return object : NetworkBoundResource<List<TeacherComplaintEntity>, TeacherComplaintResponse>(appExecutors) {
             override fun saveCallResult(item: TeacherComplaintResponse) {
                 if (item.status == 200) {
@@ -97,14 +94,7 @@ class TeacherRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<TeacherComplaintEntity>> {
-                return Transformations.switchMap(complaintDao.getTeacherComplaintMessage(token)) { complaint ->
-                    if (complaint.isEmpty()) {
-                        val data = MutableLiveData<List<TeacherComplaintEntity>>()
-                        data.postValue(null)
-                        return@switchMap data
-                    }
-                    return@switchMap complaintDao.getTeacherComplaintMessage(token)
-                }
+                return complaintDao.getTeacherComplaintMessage(token, "%$searchContent%")
             }
 
             override fun createCall(): LiveData<ApiResponse<TeacherComplaintResponse>> =

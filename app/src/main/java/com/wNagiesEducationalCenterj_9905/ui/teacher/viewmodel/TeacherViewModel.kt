@@ -59,12 +59,19 @@ class TeacherViewModel @Inject constructor(
         )
     }
 
-    fun getComplaintMessage(token: String, shouldFetch: Boolean): LiveData<Resource<List<TeacherComplaintEntity>>> {
-        return teacherRepository.fetchComplaint(token, shouldFetch)
+    fun getComplaintMessage(
+        token: String,
+        shouldFetch: Boolean,
+        searchContent: String = ""
+    ): LiveData<Resource<List<TeacherComplaintEntity>>> {
+        return teacherRepository.fetchComplaint(token, shouldFetch, searchContent)
     }
 
-    fun getAnnouncementMessage(token: String): LiveData<Resource<List<AnnouncementEntity>>> {
-        return teacherRepository.fetchAnnouncement(token)
+    fun getAnnouncementMessage(
+        token: String,
+        searchContent: String = ""
+    ): LiveData<Resource<List<AnnouncementEntity>>> {
+        return teacherRepository.fetchAnnouncement(token, searchContent = searchContent)
     }
 
     fun getComplaintMessageById(id: Int) {
@@ -240,7 +247,6 @@ class TeacherViewModel @Inject constructor(
             }
             .map {
                 it.dataUpload.forEach { data ->
-                    data.fileUrl = ServerPathUtil.setCorrectPath(data.fileUrl)
                     data.format = request.format
                 }
                 return@map it

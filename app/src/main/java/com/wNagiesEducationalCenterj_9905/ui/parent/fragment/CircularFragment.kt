@@ -151,7 +151,6 @@ class CircularFragment : BaseFragment() {
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
-                        toast("${resource.message}")
                     }
                     Status.LOADING -> {
                         showLoadingDialog()

@@ -19,11 +19,13 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
+import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
 import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.nav_header_teacher_navigation.view.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
+import org.jetbrains.anko.startActivity
 import timber.log.Timber
 
 class TeacherNavigationActivity : BaseActivity() {
@@ -108,7 +110,10 @@ class TeacherNavigationActivity : BaseActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                startActivity<SettingsActivity>()
+                true
+            }
             R.id.action_logout -> {
                 preferenceProvider.setUserLogin(false, null)
                 startActivity(intentFor<RoleActivity>().newTask().clearTask())

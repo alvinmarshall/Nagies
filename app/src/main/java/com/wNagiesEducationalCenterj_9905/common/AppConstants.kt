@@ -45,7 +45,6 @@ enum class FetchType {
 }
 
 const val DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
-const val FETCH_INTERVAL = 120
 const val IMAGE_FORMAT = "image"
 const val PDF_FORMAT = "pdf"
 

@@ -17,7 +17,6 @@ import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_create_message.*
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class CreateMessageFragment : BaseFragment() {
@@ -94,8 +93,12 @@ class CreateMessageFragment : BaseFragment() {
                         resource.data?.forEach { teacher ->
                             teacherNames.add(teacher.teacherName)
                         }
-                        if(teacherNames.isNotEmpty()){
-                            val classAdapter = ArrayAdapter(context!!, android.R.layout.select_dialog_singlechoice, teacherNames.toArray())
+                        if (teacherNames.isNotEmpty()) {
+                            val classAdapter = ArrayAdapter(
+                                context!!,
+                                android.R.layout.select_dialog_singlechoice,
+                                teacherNames.toArray()
+                            )
                             spinner.adapter = classAdapter
                             classAdapter.notifyDataSetChanged()
                         }
@@ -104,8 +107,11 @@ class CreateMessageFragment : BaseFragment() {
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
-                        toast("${resource.message}")}
-                    Status.LOADING -> {showLoadingDialog()}
+                        Timber.i(resource.message)
+                    }
+                    Status.LOADING -> {
+                        showLoadingDialog()
+                    }
                 }
             })
 
@@ -155,7 +161,7 @@ class CreateMessageFragment : BaseFragment() {
             return
         }
         val teacherName = spinner.selectedItem.toString()
-        complaintRequest = ParentComplaintRequest(content,teacherName)
+        complaintRequest = ParentComplaintRequest(content, teacherName)
         complaintRequest?.let {
             isBusy = true
             showLoadingDialog()

@@ -8,6 +8,7 @@
                                                    android:layout_height="wrap_content">
 
     <RelativeLayout android:layout_width="match_parent"
+                    android:background="@drawable/bg_list"
                     android:layout_height="wrap_content">
         <ImageView android:layout_width="match_parent"
                    tools:src="@color/colorPrimary"

@@ -20,7 +20,6 @@ import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_teacher_profile.*
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 
@@ -69,7 +68,7 @@ class TeacherProfileFragment : BaseFragment() {
                 when (resource.status) {
                     Status.SUCCESS -> {
                         teacherViewModel.setProfileLabels(resource.data)
-                        teacherViewModel.cachedLabels.observe(viewLifecycleOwner, Observer { labels->
+                        teacherViewModel.cachedLabels.observe(viewLifecycleOwner, Observer { labels ->
                             profileAdapter?.setProfileData(labels)
                             recyclerView?.adapter = profileAdapter
                             setProfileImage(resource.data?.imageUrl)
@@ -80,7 +79,7 @@ class TeacherProfileFragment : BaseFragment() {
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
-                        toast("${resource.message}")
+                        Timber.i(resource.message)
                     }
                     Status.LOADING -> {
                         Timber.i("loading...")
@@ -91,8 +90,8 @@ class TeacherProfileFragment : BaseFragment() {
         })
     }
 
-    private fun setProfileImage(imageUrl: String?) =launch {
-        if (imageUrl != null){
+    private fun setProfileImage(imageUrl: String?) = launch {
+        if (imageUrl != null) {
             context?.let {
                 GlideApp.with(it).load(imageUrl)
                     .placeholder(R.drawable.default_user_avatar)
@@ -102,6 +101,7 @@ class TeacherProfileFragment : BaseFragment() {
             }
         }
     }
+
     private fun showLoadingDialog(show: Boolean = true) {
         if (show) {
             progressBar.visibility = View.VISIBLE

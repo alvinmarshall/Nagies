@@ -37,10 +37,11 @@ class MessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val level = "Class: ${entity?.level}"
         val from = "From: ${entity?.sender}"
         val date = "date: ${entity?.date}"
+        val content = "content: ${entity?.content}"
         itemView.tv_msg_date.text = date
-        itemView.tv_msg_content.text = "${entity?.content}"
-        itemView.tv_msg_sender.text = from
-        itemView.tv_msg_level.text = level
+        itemView.tv_msg_content.text = from
+        itemView.tv_msg_sender.text = level
+        itemView.tv_msg_level.text = content
         itemView.setOnClickListener { itemCallback?.onClick(entity?.id) }
     }
 }

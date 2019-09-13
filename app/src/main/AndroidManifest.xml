@@ -3,16 +3,16 @@
           xmlns:dist="http://schemas.android.com/apk/distribution"
           xmlns:tools="http://schemas.android.com/tools"
           package="com.wNagiesEducationalCenterj_9905">
+
     <dist:module dist:instant="true"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-
     <application
             android:name=".App"
-            android:usesCleartextTraffic="true"
             android:allowBackup="false"
             android:fullBackupContent="true"
             android:icon="@mipmap/ic_launcher"
@@ -20,28 +20,31 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            tools:ignore="GoogleAppIndexingWarning" tools:targetApi="n">
+            android:usesCleartextTraffic="true"
+            tools:ignore="GoogleAppIndexingWarning"
+            tools:targetApi="n">
+        <activity
+                android:name=".ui.settings.SettingsActivity"
+                android:label="@string/title_activity_settings">
+        </activity>
+
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
-                android:resource="@drawable/ic_business_black_24dp" />
-
+                android:resource="@drawable/ic_business_black_24dp"/>
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_color"
-                android:resource="@color/colorAccent" />
-
+                android:resource="@color/colorAccent"/>
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="@string/announcement_channel_id" />
-
+                android:value="@string/announcement_channel_id"/>
         <meta-data
                 android:name="firebase_messaging_auto_init_enabled"
-                android:value="false" />
+                android:value="false"/>
         <meta-data
                 android:name="firebase_analytics_collection_enabled"
-                android:value="false" />
+                android:value="false"/>
+
         <activity android:name=".ui.auth.RoleActivity">
-        </activity>
-        <activity android:name=".ui.settings.SettingsActivity">
         </activity>
         <activity
                 android:name=".ui.parent.ParentNavigationActivity"
@@ -67,15 +70,17 @@
             </intent-filter>
         </activity>
 
-        <provider android:authorities="@string/file_provider_authority"
-                  android:name="androidx.core.content.FileProvider"
-                  android:exported="false" android:grantUriPermissions="true">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_provider_path"/>
-
+        <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="@string/file_provider_authority"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_provider_path"/>
         </provider>
 
         <service android:name=".notification.FirebaseMessageService">
-
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

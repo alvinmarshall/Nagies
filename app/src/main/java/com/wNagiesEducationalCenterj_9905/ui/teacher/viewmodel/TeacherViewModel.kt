@@ -247,7 +247,6 @@ class TeacherViewModel @Inject constructor(
             }
             .map {
                 it.dataUpload.forEach { data ->
-                    data.fileUrl = ServerPathUtil.setCorrectPath(data.fileUrl)
                     data.format = request.format
                 }
                 return@map it

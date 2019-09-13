@@ -10,6 +10,7 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.response.DataUpload
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
 import com.wNagiesEducationalCenterj_9905.common.ViewFilesAction
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import kotlinx.android.synthetic.main.list_upload_files.view.*
 
 class UploadFileAdapter : ListAdapter<DataUpload, UploadFileVH>(UploadFileDiff()) {
@@ -48,7 +49,13 @@ class UploadFileVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.tv_item_name.text = sender
         itemView.tv_item_date.text = date
         itemView.btn_download.setOnClickListener {
-            itemCallback?.onClick(Triple(ViewFilesAction.DOWNLOAD, item?.id, item?.fileUrl))
+            itemCallback?.onClick(
+                Triple(
+                    ViewFilesAction.DOWNLOAD,
+                    item?.id,
+                    ServerPathUtil.setCorrectPath(item?.fileUrl)
+                )
+            )
         }
         itemView.btn_delete.setOnClickListener {
             itemCallback?.onClick(Triple(ViewFilesAction.DELETE, item?.id, item?.fileUrl))

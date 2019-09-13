@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/teacher_navigation"
-            app:startDestination="@id/teacherAnnouncementFragment">
+            app:startDestination="@id/teacherProfileFragment">
     <fragment android:id="@+id/sendMessageTeacherFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.SendMessageTeacherFragment"
               android:label="Sent Message" tools:layout="@layout/fragment_send_message_teacher">

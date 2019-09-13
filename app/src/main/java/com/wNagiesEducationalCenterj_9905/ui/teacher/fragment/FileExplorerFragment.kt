@@ -93,7 +93,7 @@ class FileExplorerFragment : BaseFragment() {
             return
         }
         alertDialog?.setTitle("Delete Alert")
-        alertDialog?.setMessage("Do you want to delete this file ?")
+        alertDialog?.setMessage(getString(R.string.file_explorer_delete_msg))
         alertDialog?.setPositiveButton("yes") { dialog, _ ->
             val req = getExplorerRequest()
             req.path = itemData?.third

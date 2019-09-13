@@ -10,6 +10,7 @@
 >
 
     <RelativeLayout android:layout_width="match_parent"
+                    android:background="@drawable/bg_list"
                     android:layout_height="wrap_content">
         <TextView
                 tools:text="sender guardian name"

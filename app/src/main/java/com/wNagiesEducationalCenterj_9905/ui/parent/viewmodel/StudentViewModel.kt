@@ -255,6 +255,9 @@ class StudentViewModel @Inject constructor(
                     DBEntities.BILLING -> {
                         id?.let { path?.let { it1 -> studentRepository.updateBillingFilePath(it, it1) } }
                     }
+                    DBEntities.TIME_TABLE -> {
+                        id?.let { path?.let { it1 -> studentRepository.updateTimetableFilePath(it, it1) } }
+                    }
                 }
             }
                 .doOnComplete { isSuccess.postValue(true) }
@@ -296,6 +299,10 @@ class StudentViewModel @Inject constructor(
                 }, { err -> Timber.i(err) })
         )
 
+    }
+
+    fun getTimetable(token: String): LiveData<Resource<List<TimeTableEntity>>> {
+        return studentRepository.fetchStudentTimetable(token)
     }
 
 

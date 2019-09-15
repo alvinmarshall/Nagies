@@ -87,4 +87,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeFileExplorerFragment(): FileExplorerFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeStudentTimetableFragment(): StudentTimetableFragment
 }

@@ -14,7 +14,7 @@ const val PERMISSION_PREF = "permission_pref"
 const val REQUEST_EXTERNAL_STORAGE = 100
 
 enum class DBEntities {
-    ASSIGNMENT, REPORT, CIRCULAR,BILLING
+    ASSIGNMENT, REPORT, CIRCULAR, BILLING, TIME_TABLE
 }
 
 enum class MessageType {
@@ -41,7 +41,9 @@ const val NOTIFICATION_EXTRA_ASSIGNMENT = "notification_assignment_extra"
 const val NOTIFICATION_EXTRA_COMPLAINT = "notification_complaint_extra"
 
 enum class FetchType {
-    ASSIGNMENT_PDF, ASSIGNMENT_IMAGE, REPORT_PDF, REPORT_IMAGE, MESSAGE, ANNOUNCEMENT, COMPLAINT, CLASS_TEACHER, CIRCULAR,BILLING,CLASS_STUDENT
+    ASSIGNMENT_PDF, ASSIGNMENT_IMAGE, REPORT_PDF, REPORT_IMAGE, MESSAGE,
+    ANNOUNCEMENT, COMPLAINT, CLASS_TEACHER, CIRCULAR, BILLING, CLASS_STUDENT,
+    TIME_TABLE
 }
 
 const val DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
@@ -56,11 +58,12 @@ enum class ViewFilesAction {
     VIEW, DOWNLOAD, DELETE
 }
 
-enum class FileUploadFormat{
-    PDF,IMAGE
+enum class FileUploadFormat {
+    PDF, IMAGE
 }
 
 const val FILE_CHOOSER_RESULT = 22
-enum class UploadFileType{
-    NORMAL,REPORT
+
+enum class UploadFileType {
+    NORMAL, REPORT
 }

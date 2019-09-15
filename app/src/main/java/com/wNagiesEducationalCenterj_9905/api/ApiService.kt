@@ -133,4 +133,9 @@ interface ApiService {
         @Query("type") type: String?
     ): Single<ExplorerDeleteResponse>
 
+    @GET("students/timetable")
+    fun fetchStudentTimetable(
+        @Header("Authorization") token: String
+    ): LiveData<ApiResponse<TimetableResponse>>
+
 }

@@ -5,10 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.BillingEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.CircularEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentProfileEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.StudentTeacherEntity
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 
 @Dao
 interface StudentDao {
@@ -25,7 +22,7 @@ interface StudentDao {
     fun insertStudentTeacher(studentTeacherEntityList: List<StudentTeacherEntity>)
 
     @Query("SELECT * FROM student_teacher WHERE token = :token AND teacherName LIKE :search")
-    fun getClassTeacher(token: String,search:String): LiveData<List<StudentTeacherEntity>>
+    fun getClassTeacher(token: String, search: String): LiveData<List<StudentTeacherEntity>>
 
     @Query("DELETE FROM student_teacher WHERE token = :token")
     fun deleteClassTeacher(token: String)
@@ -62,5 +59,20 @@ interface StudentDao {
 
     @Query("DELETE FROM billing WHERE id = :id")
     fun deleteBillingById(id: Int)
+    //endregion
+
+    //region timetable
+    @Insert
+    fun insertTimetable(timeTableEntity: List<TimeTableEntity>)
+
+    @Query("SELECT * FROM timetable WHERE token = :token")
+    fun getStudentTimetable(token: String): LiveData<List<TimeTableEntity>>
+
+    @Query("DELETE FROM timetable WHERE token = :token")
+    fun deleteTimetableById(token: String)
+
+    @Query("UPDATE timetable SET path = :file WHERE id = :id")
+    fun updateTimetableImagePath(id: Int, file: String): Int
+
     //endregion
 }

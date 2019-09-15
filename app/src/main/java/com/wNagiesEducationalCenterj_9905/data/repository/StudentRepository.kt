@@ -306,7 +306,11 @@ class StudentRepository @Inject constructor(
         return reportDao.updateReportPath(path, id)
     }
 
-    fun getClassTeacher(token: String, shouldFetch: Boolean = false,search:String=""): LiveData<Resource<List<StudentTeacherEntity>>> {
+    fun getClassTeacher(
+        token: String,
+        shouldFetch: Boolean = false,
+        search: String = ""
+    ): LiveData<Resource<List<StudentTeacherEntity>>> {
         return object : NetworkBoundResource<List<StudentTeacherEntity>, StudentTeachersResponse>(appExecutors) {
             override fun saveCallResult(item: StudentTeachersResponse) {
                 if (item.status == 200) {
@@ -329,7 +333,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<StudentTeacherEntity>> {
-                return studentDao.getClassTeacher(token,"%$search%")
+                return studentDao.getClassTeacher(token, "%$search%")
             }
 
             override fun createCall(): LiveData<ApiResponse<StudentTeachersResponse>> =
@@ -421,13 +425,17 @@ class StudentRepository @Inject constructor(
         return studentDao.updateBillingImagePath(id, path)
     }
 
+    fun updateTimetableFilePath(id: Int, path: String): Int {
+        return studentDao.updateBillingImagePath(id, path)
+    }
+
     fun deleteBillingById(id: Int) {
         return studentDao.deleteBillingById(id)
     }
 
     fun fetchStudentAnnouncement(
         token: String,
-        shouldFetch: Boolean = false,searchContent: String=""
+        shouldFetch: Boolean = false, searchContent: String = ""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
         return object : NetworkBoundResource<List<AnnouncementEntity>, AnnouncementResponse>(appExecutors) {
             override fun saveCallResult(item: AnnouncementResponse) {
@@ -451,7 +459,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<AnnouncementEntity>> {
-                return announcementDao.getAnnouncement(token,searchContent)
+                return announcementDao.getAnnouncement(token, searchContent)
             }
 
             override fun createCall(): LiveData<ApiResponse<AnnouncementResponse>> =
@@ -461,5 +469,37 @@ class StudentRepository @Inject constructor(
 
     fun getAnnouncementById(id: Int): Single<AnnouncementEntity> {
         return announcementDao.getAnnouncementById(id)
+    }
+
+    fun fetchStudentTimetable(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<TimeTableEntity>>> {
+        return object : NetworkBoundResource<List<TimeTableEntity>, TimetableResponse>(appExecutors) {
+            override fun saveCallResult(item: TimetableResponse) {
+                if (item.status == 200) {
+                    item.timeTable.forEach { table ->
+                        table.token = token
+                        table.fileUrl = ServerPathUtil.setCorrectPath(table.fileUrl)
+                    }
+                    db.runInTransaction {
+                        studentDao.deleteTimetableById(token)
+                        studentDao.insertTimetable(item.timeTable)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.TIME_TABLE)
+                }
+            }
+
+            override fun shouldFetch(data: List<TimeTableEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.TIME_TABLE)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<TimeTableEntity>> {
+                return studentDao.getStudentTimetable(token)
+            }
+
+            override fun createCall(): LiveData<ApiResponse<TimetableResponse>> {
+                return apiService.fetchStudentTimetable(token)
+            }
+        }.asLiveData()
     }
 }

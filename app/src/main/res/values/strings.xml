@@ -109,6 +109,7 @@
     <string name="upload_msg_starting">preparing to upload</string>
     <string name="btn_label_upload_report">upload report</string>
     <string name="fetch_class_student">Class Student</string>
+    <string name="fetch_timetable">Class Student</string>
     <string name="report_form_student_no">studentNo</string>
     <string name="report_form_student_name">studentName</string>
     <string name="upload_form_file">file</string>
@@ -153,5 +154,6 @@
     <string name="pref_about_us">About Us</string>
     <string name="pref_about_us_url">http://infordasgh.com/AboutUs.html</string>
     <string name="pref_contact_us_url">http://infordasgh.com/contact.html</string>
+    <string name="menu_view_time_table">TimeTable</string>
 
 </resources>

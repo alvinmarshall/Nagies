@@ -69,4 +69,7 @@
               android:label="Detail">
         <argument android:name="args_announcement_id" app:argType="integer"/>
     </fragment>
+    <fragment android:id="@+id/studentTimetableFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.StudentTimetableFragment"
+              android:label="Time Table" tools:layout="@layout/fragment_student_timetable"/>
 </navigation>

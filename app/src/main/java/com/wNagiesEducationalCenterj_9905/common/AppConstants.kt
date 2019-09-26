@@ -3,16 +3,17 @@ package com.wNagiesEducationalCenterj_9905.common
 val LOGIN_ROLE_OPTIONS = arrayListOf("Parent", "Teacher")
 const val SELECTED_ROLE = "SELECTED_ROLE"
 const val INFORDAS_BASE_URL =
-    "https://infodasgh.com/api/"//"http://192.168.8.101:81/api/ --- http://nagiesportal.000webhostapp.com/api/"
+    "https://infodasgh.com/api/v1/" //https://infodasgh.com/api/
 const val DATABASE_NAME = "app_db"
 const val LOGIN_PREF = "login_in_status"
 const val USER_TOKEN = "user_token"
 const val SERVER_URL =
-    "https://infodasgh.com/api/download?path="//"http://192.168.8.101:81  --- http://nagiesportal.000webhostapp.com" ===https://nagies-portal.herokuapp.com
+    "https://infodasgh.com/api/v1/file/download?path=" //https://infodasgh.com/api/download?path=
 const val USER_INFO = "user_info"
 const val PERMISSION_PREF = "permission_pref"
 const val REQUEST_EXTERNAL_STORAGE = 100
-
+const val USER_FULL_NAME = "full_name"
+const val USER_LEVEL_NAME = "level_name"
 enum class DBEntities {
     ASSIGNMENT, REPORT, CIRCULAR, BILLING, TIME_TABLE
 }

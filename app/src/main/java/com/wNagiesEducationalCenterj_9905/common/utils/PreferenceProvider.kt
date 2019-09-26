@@ -24,6 +24,16 @@ class PreferenceProvider @Inject constructor(
         preferences.putString(SELECTED_ROLE, role)
         preferences.apply()
     }
+    fun setUserBasicInfo(name:String?, level:String?){
+        val preferences = sharedPreferences.edit()
+        preferences.putString(USER_FULL_NAME,name)
+        preferences.putString(USER_LEVEL_NAME,level)
+        preferences.apply()
+    }
+
+    fun getUserFullname():String?{
+        return sharedPreferences.getString(USER_FULL_NAME, null)
+    }
 
     fun getUserLoginStatus(): Boolean {
         return sharedPreferences.getBoolean(LOGIN_PREF, false)

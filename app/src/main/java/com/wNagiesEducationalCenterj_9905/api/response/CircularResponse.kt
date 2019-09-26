@@ -8,7 +8,7 @@ data class CircularResponse(
     val type: String,
     val message: String,
     val count: Int,
-    @SerializedName("Circular")
+    @SerializedName("data")
     val circular: List<CircularEntity>,
     val status: Int
 )

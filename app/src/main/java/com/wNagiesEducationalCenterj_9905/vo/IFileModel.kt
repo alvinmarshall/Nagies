@@ -1,6 +1,7 @@
 package com.wNagiesEducationalCenterj_9905.vo
 
 interface IFileModel {
+    val studentNo:String?
     val studentName: String
     val teacherEmail: String
     var fileUrl: String?

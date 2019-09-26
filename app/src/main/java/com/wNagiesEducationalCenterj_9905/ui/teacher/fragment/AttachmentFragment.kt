@@ -33,6 +33,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
+import timber.log.Timber
 import java.io.File
 
 
@@ -149,7 +150,7 @@ class AttachmentFragment : BaseFragment() {
                 requestBody = MultipartBody.Part.createFormData(
                     "file",
                     file.name,
-                    RequestBody.create(MediaType.parse("image/*"), file)
+                    RequestBody.create(MediaType.parse("image/jpeg"), file)
                 )
             }
             null -> {

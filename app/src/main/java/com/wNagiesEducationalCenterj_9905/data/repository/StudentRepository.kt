@@ -265,6 +265,7 @@ class StudentRepository @Inject constructor(
     fun fetchStudentReportImage(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
         return object : NetworkBoundResource<List<ReportEntity>, ReportResponse>(appExecutors) {
             override fun saveCallResult(item: ReportResponse) {
+                Timber.i("data: ${item.count}")
                 if (item.status == 200) {
                     item.report.forEach { image ->
                         image.token = token
@@ -475,13 +476,13 @@ class StudentRepository @Inject constructor(
         return object : NetworkBoundResource<List<TimeTableEntity>, TimetableResponse>(appExecutors) {
             override fun saveCallResult(item: TimetableResponse) {
                 if (item.status == 200) {
-                    item.timeTable.forEach { table ->
+                    item.timetable.forEach { table ->
                         table.token = token
                         table.fileUrl = ServerPathUtil.setCorrectPath(table.fileUrl)
                     }
                     db.runInTransaction {
-                        studentDao.deleteTimetableById(token)
-                        studentDao.insertTimetable(item.timeTable)
+                        studentDao.deleteTimetable(token)
+                        studentDao.insertTimetable(item.timetable)
                     }
                     preferenceProvider.setFetchDate(FetchType.TIME_TABLE)
                 }

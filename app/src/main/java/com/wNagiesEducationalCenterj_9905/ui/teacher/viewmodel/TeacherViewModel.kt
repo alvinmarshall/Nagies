@@ -2,11 +2,9 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import com.wNagiesEducationalCenterj_9905.api.request.ExplorerRequest
 import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
-import com.wNagiesEducationalCenterj_9905.api.response.DataUpload
 import com.wNagiesEducationalCenterj_9905.api.response.ExplorerDeleteResponse
 import com.wNagiesEducationalCenterj_9905.common.FileUploadFormat
 import com.wNagiesEducationalCenterj_9905.common.UploadFileType
@@ -14,10 +12,10 @@ import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
-import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.data.repository.TeacherRepository
 import com.wNagiesEducationalCenterj_9905.viewmodel.BaseViewModel
+import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 import com.wNagiesEducationalCenterj_9905.vo.Profile
 import com.wNagiesEducationalCenterj_9905.vo.Resource
 import io.reactivex.Flowable
@@ -40,7 +38,7 @@ class TeacherViewModel @Inject constructor(
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     val cachedSentMessage: MutableLiveData<Resource<List<MessageEntity>>> = MutableLiveData()
     val searchString: MutableLiveData<String> = MutableLiveData()
-    var cachedUploadData: MutableLiveData<List<DataUpload>> = MutableLiveData()
+    var cachedUploadData: MutableLiveData<List<IFileModel>> = MutableLiveData()
     var deleteUploadResponse: MutableLiveData<ExplorerDeleteResponse> = MutableLiveData()
 
     fun getTeacherProfile(token: String): LiveData<Resource<TeacherProfileEntity>> {
@@ -124,6 +122,9 @@ class TeacherViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedLabels.value = it
+                    if (data !== null) {
+                        preferenceProvider.setUserBasicInfo(data.name,data.level)
+                    }
                 }, {})
         )
     }
@@ -230,7 +231,7 @@ class TeacherViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                Timber.i("upload success fileUrl:${it.data?.fileUrl}")
+                Timber.i("upload success message:${it.message}")
             }, { err -> Timber.i(err, "upload error") })
         )
     }
@@ -245,12 +246,7 @@ class TeacherViewModel @Inject constructor(
             .flatMap { token ->
                 teacherRepository.fetchUploadData(token, request)
             }
-            .map {
-                it.dataUpload.forEach { data ->
-                    data.format = request.format
-                }
-                return@map it
-            }
+
             .doOnError {
                 isSuccess.postValue(false)
                 cachedUploadData.postValue(null)
@@ -260,6 +256,7 @@ class TeacherViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
+                Timber.i("resp $it")
                 cachedUploadData.value = it.dataUpload
                 Timber.i("status: ${it.status} data size: ${it.count}")
             }, { err -> Timber.i(err, "get upload file err") })

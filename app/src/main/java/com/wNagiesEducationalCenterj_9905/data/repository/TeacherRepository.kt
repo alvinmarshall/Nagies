@@ -221,11 +221,11 @@ class TeacherRepository @Inject constructor(
     }
 
     fun fetchUploadData(token: String, request: ExplorerRequest): Observable<ExplorerResponse> {
-        return apiService.getUploadedFile(token, request.format, request.type)
+        return apiService.getUploadedFile(token,request.type,request.format)
     }
 
     fun deleteUploadData(token: String, request: ExplorerRequest): Single<ExplorerDeleteResponse> {
-        return apiService.deleteUploadedFile(token, request.id, request.path, request.format, request.type)
+        return apiService.deleteUploadedFile(token, request.id,request.type,request.format,request.path)
     }
 
 }

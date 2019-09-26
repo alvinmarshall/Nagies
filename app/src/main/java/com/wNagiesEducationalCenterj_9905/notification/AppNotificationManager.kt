@@ -1,13 +1,10 @@
 package com.wNagiesEducationalCenterj_9905.notification
 
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Intent
-import android.media.RingtoneManager
-import android.net.Uri
+import android.media.AudioAttributes
 import android.os.Build
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.wNagiesEducationalCenterj_9905.R
@@ -19,13 +16,15 @@ import javax.inject.Singleton
 
 @Singleton
 class AppNotificationManager @Inject constructor(val context: Application) {
-    private val defaultSoundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
     fun registerNotificationChannel(channelId: String, channelName: String, channelDescription: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val sound = Settings.System.DEFAULT_NOTIFICATION_URI
+            val attribute = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
             val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
             notificationChannel.description = channelDescription
             notificationChannel.canShowBadge()
+            notificationChannel.setSound(sound,attribute)
             val notificationManager = context.getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(notificationChannel)
         }
@@ -47,10 +46,9 @@ class AppNotificationManager @Inject constructor(val context: Application) {
             NotificationCompat.Builder(context, context.getString(R.string.announcement_channel_id))
                 .setSmallIcon(R.drawable.ic_business_black_24dp)
                 .setContentText(title)
-                .setContentTitle(msg)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(msg))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
-                .setSound(defaultSoundUri)
                 .setAutoCancel(true)
                 .build()
         val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -74,7 +72,6 @@ class AppNotificationManager @Inject constructor(val context: Application) {
                 .setContentText(title)
                 .setContentTitle(msg)
                 .setPriority(priority)
-                .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()

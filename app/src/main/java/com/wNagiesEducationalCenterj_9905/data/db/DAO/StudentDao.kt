@@ -69,7 +69,7 @@ interface StudentDao {
     fun getStudentTimetable(token: String): LiveData<List<TimeTableEntity>>
 
     @Query("DELETE FROM timetable WHERE token = :token")
-    fun deleteTimetableById(token: String)
+    fun deleteTimetable(token: String)
 
     @Query("UPDATE timetable SET path = :file WHERE id = :id")
     fun updateTimetableImagePath(id: Int, file: String): Int

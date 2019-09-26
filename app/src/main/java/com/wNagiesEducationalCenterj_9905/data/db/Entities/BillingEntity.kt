@@ -14,9 +14,10 @@ data class BillingEntity(
     override val date: String,
     override var format: String?,
     override var token: String?,
-    override var path: String?
+    override var path: String?,
+    override val studentNo: String
 
-) :IFileModel{
+) : IFileModel {
     @PrimaryKey(autoGenerate = true)
     override var id: Int = 0
 }

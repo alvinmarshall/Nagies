@@ -25,12 +25,8 @@ class AuthViewModel @Inject constructor(
     val account: MutableLiveData<UserAccount> = MutableLiveData()
     val cachedUser: MutableLiveData<Resource<UserEntity>> = MutableLiveData()
 
-    fun authenticatingParent(username: String, password: String): LiveData<Resource<UserEntity>> {
-        return authRepository.authenticateParent(username, password)
-    }
-
-    fun authenticatingTeacher(username: String, password: String): LiveData<Resource<UserEntity>> {
-        return authRepository.authenticateTeacher(username, password)
+    fun authenticatingUser(role: String, username: String, password: String): LiveData<Resource<UserEntity>> {
+        return authRepository.authenticateUser(role, username, password)
     }
 
     fun changeAccountPassword(changePasswordRequest: ChangePasswordRequest, userAccount: UserAccount) {

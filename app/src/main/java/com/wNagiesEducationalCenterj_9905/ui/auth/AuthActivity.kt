@@ -76,14 +76,16 @@ class AuthActivity : BaseActivity() {
     ) {
         when (userAccount) {
             UserAccount.PARENT -> {
-                authViewModel.authenticatingParent(username, password).observe(this, Observer { resource ->
-                    loadDashboard(resource, userAccount)
-                })
+                authViewModel.authenticatingUser(LOGIN_ROLE_OPTIONS[0].toLowerCase(), username, password)
+                    .observe(this, Observer { resource ->
+                        loadDashboard(resource, userAccount)
+                    })
             }
             UserAccount.TEACHER -> {
-                authViewModel.authenticatingTeacher(username, password).observe(this, Observer { resource ->
-                    loadDashboard(resource, userAccount)
-                })
+                authViewModel.authenticatingUser(LOGIN_ROLE_OPTIONS[1].toLowerCase(), username, password)
+                    .observe(this, Observer { resource ->
+                        loadDashboard(resource, userAccount)
+                    })
             }
             null -> {
                 throw NullPointerException("login role option cannot be null")
@@ -100,20 +102,20 @@ class AuthActivity : BaseActivity() {
                 showLoadingDialog(false)
                 when (userAccount) {
                     UserAccount.PARENT -> {
-                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[0].toLowerCase()){
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[0].toLowerCase()) {
                             showErrorMessage(true)
                             return
                         }
-                        setPreference(LOGIN_ROLE_OPTIONS[0],resource.data)
+                        setPreference(LOGIN_ROLE_OPTIONS[0], resource.data)
                         startActivity(intentFor<ParentNavigationActivity>().newTask().clearTask())
                         finish()
                     }
                     UserAccount.TEACHER -> {
-                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[1].toLowerCase()){
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[1].toLowerCase()) {
                             showErrorMessage(true)
                             return
                         }
-                        setPreference(LOGIN_ROLE_OPTIONS[1],resource.data)
+                        setPreference(LOGIN_ROLE_OPTIONS[1], resource.data)
                         startActivity(intentFor<TeacherNavigationActivity>().newTask().clearTask())
                         finish()
                     }
@@ -122,10 +124,10 @@ class AuthActivity : BaseActivity() {
             Status.ERROR -> {
                 showLoadingDialog(false)
                 resource.message?.let {
-                    if (it.toLowerCase().contains("unable to resolve host")){
-                        showErrorMessage(true,getString(R.string.network_state_no_connection))
+                    if (it.toLowerCase().contains("unable to resolve host")) {
+                        showErrorMessage(true, getString(R.string.network_state_no_connection))
                     }
-                    if (it.toLowerCase().contains("status")){
+                    if (it.toLowerCase().contains("status")) {
                         showErrorMessage(true)
                     }
                 }
@@ -139,13 +141,13 @@ class AuthActivity : BaseActivity() {
         }
     }
 
-    private fun setPreference(role:String,data: UserEntity) {
+    private fun setPreference(role: String, data: UserEntity) {
         preferenceProvider.setUserLoginRole(role)
         preferenceProvider.setUserLogin(true, data.token)
         Timber.i("user authenticated with id: ${data.id}")
     }
 
-    private fun showErrorMessage(show: Boolean = false,msg:String?=null) {
+    private fun showErrorMessage(show: Boolean = false, msg: String? = null) {
         if (show) {
             label_msg_error.visibility = View.VISIBLE
             label_msg_error.text = msg ?: getString(R.string.auth_failed_message)

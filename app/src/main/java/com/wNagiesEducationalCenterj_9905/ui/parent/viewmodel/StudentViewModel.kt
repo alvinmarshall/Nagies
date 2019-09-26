@@ -102,6 +102,9 @@ class StudentViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedLabels.value = it
+                    if (data != null) {
+                        preferenceProvider.setUserBasicInfo(data.studentName,data.level)
+                    }
                 }, {})
         )
     }
@@ -119,6 +122,7 @@ class StudentViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    Timber.i("comp ${it}")
                     if (it.status == 200) {
                         savingComplaintToDb(parentComplaintRequest)
                         isSuccess.value = true
@@ -212,6 +216,8 @@ class StudentViewModel @Inject constructor(
                     }
                     DBEntities.BILLING -> {
                         id?.let { it1 -> studentRepository.deleteBillingById(it1) }
+                    }
+                    DBEntities.TIME_TABLE -> {
                     }
                 }
                 path?.let { p ->

@@ -151,7 +151,7 @@ class StudentListFragment : BaseFragment() {
                 requestBody = MultipartBody.Part.createFormData(
                     getString(R.string.upload_form_file),
                     file.name,
-                    RequestBody.create(MediaType.parse("image/*"), file)
+                    RequestBody.create(MediaType.parse("image/jpeg"), file)
                 )
             }
             null -> {

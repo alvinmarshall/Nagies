@@ -13,41 +13,52 @@ import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface ApiService {
-    @POST("users/parent")
-    fun getAuthenticatedParent(@Body userEntity: UserEntity)
-            : LiveData<ApiResponse<AuthResponse>>
+    @POST("users")
+    fun getAuthenticatedUser(
+        @Query("role") role: String,
+        @Body userEntity: UserEntity
+    ): LiveData<ApiResponse<AuthResponse>>
 
-    @POST("users/teacher")
-    fun getAuthenticatedTeacher(@Body userEntity: UserEntity)
-            : LiveData<ApiResponse<AuthResponse>>
-
-    @GET("students/messages")
+    @GET("message")
     fun getStudentMessages(@Header("Authorization") token: String): LiveData<ApiResponse<MessageResponse>>
 
     @GET("users/profile")
     fun getStudentProfile(@Header("Authorization") token: String): LiveData<ApiResponse<StudentProfileResponse>>
 
-    @POST("students/complaints")
-    fun sendParentComplaint(@Header("Authorization") token: String, @Body parentComplaint: ParentComplaintRequest)
-            : Single<ParentComplaintResponse>
+    @POST("message")
+    fun sendParentComplaint(
+        @Header("Authorization") token: String,
+        @Body parentComplaint: ParentComplaintRequest,
+        @Query("to") to: String = "teacher"
+    ): Single<ParentComplaintResponse>
 
-    @GET("students/assignment_pdf")
+    @GET("file/path")
     fun getStudentAssignmentPDF(
-        @Header("Authorization")
-        token: String
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "assignment",
+        @Query("format") format: String = "pdf"
     ): LiveData<ApiResponse<AssignmentResponse>>
 
-    @GET("students/assignment_image")
+    @GET("file/path")
     fun getStudentAssignmentImage(
-        @Header("Authorization")
-        token: String
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "assignment",
+        @Query("format") format: String = "image"
     ): LiveData<ApiResponse<AssignmentResponse>>
 
-    @GET("students/report_pdf")
-    fun getStudentReportPDF(@Header("Authorization") token: String): LiveData<ApiResponse<ReportResponse>>
+    @GET("file/path")
+    fun getStudentReportPDF(
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "report",
+        @Query("format") format: String = "pdf"
+    ): LiveData<ApiResponse<ReportResponse>>
 
-    @GET("students/report_image")
-    fun getStudentReportImage(@Header("Authorization") token: String): LiveData<ApiResponse<ReportResponse>>
+    @GET("file/path")
+    fun getStudentReportImage(
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "report",
+        @Query("format") format: String = "image"
+    ): LiveData<ApiResponse<ReportResponse>>
 
     @POST("users/change_password")
     fun requestParentAccountPasswordChange(
@@ -55,14 +66,20 @@ interface ApiService {
         @Body changePassRequest: ChangePasswordRequest
     ): Observable<ChangePasswordResponse>
 
-    @GET("students/teachers")
+    @GET("students/teacher")
     fun getClassTeacher(@Header("Authorization") token: String): LiveData<ApiResponse<StudentTeachersResponse>>
 
-    @GET("teachers/announcement")
-    fun getTeachersAnnouncement(@Header("Authorization") token: String): LiveData<ApiResponse<AnnouncementResponse>>
+    @GET("message")
+    fun getTeachersAnnouncement(
+        @Header("Authorization") token: String,
+        @Query("from") from: String = "announcement"
+    ): LiveData<ApiResponse<AnnouncementResponse>>
 
-    @GET("teachers/complaints")
-    fun getTeacherComplaint(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherComplaintResponse>>
+    @GET("message")
+    fun getTeacherComplaint(
+        @Header("Authorization") token: String,
+        @Query("from") from: String = "complaint"
+    ): LiveData<ApiResponse<TeacherComplaintResponse>>
 
     @POST("users/change_password")
     fun requestTeacherAccountPasswordChange(
@@ -73,69 +90,93 @@ interface ApiService {
     @GET("users/profile")
     fun getTeacherProfile(@Header("Authorization") token: String): LiveData<ApiResponse<TeacherProfileResponse>>
 
-    @POST("teachers/send_message")
-    fun sendTeacherMessage(@Header("Authorization") token: String, @Body teacherMessage: TeacherMessageRequest)
-            : Single<TeacherMessageResponse>
+    @POST("message")
+    fun sendTeacherMessage(
+        @Header("Authorization") token: String,
+        @Body teacherMessage: TeacherMessageRequest,
+        @Query("to") to: String = "parent"
+    ): Single<TeacherMessageResponse>
 
-    @GET("students/circular")
-    fun getCircular(@Header("Authorization") token: String): LiveData<ApiResponse<CircularResponse>>
+    @GET("file/path")
+    fun getCircular(
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "circular",
+        @Query("format") format: String = "image"
+    ): LiveData<ApiResponse<CircularResponse>>
 
-    @GET("students/billing")
-    fun getBilling(@Header("Authorization") token: String): LiveData<ApiResponse<BillingResponse>>
+    @GET("file/path")
+    fun getBilling(
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "bill",
+        @Query("format") format: String = "image"
+    ): LiveData<ApiResponse<BillingResponse>>
 
-    @GET("students/announcement")
-    fun getStudentAnnouncement(@Header("Authorization") token: String): LiveData<ApiResponse<AnnouncementResponse>>
+    @GET("message")
+    fun getStudentAnnouncement(
+        @Header("Authorization") token: String,
+        @Query("from") from: String = "announcement"
+    ): LiveData<ApiResponse<AnnouncementResponse>>
 
     @Multipart
-    @POST("teachers/upload_assignment_pdf")
+    @POST("file/uploads")
     fun uploadAssignmentPDF(
-        @Header("Authorization") token: String, @Part file: MultipartBody.Part
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Query("type") type: String = "assignment"
     ): Single<FileUploadResponse>
 
     @Multipart
-    @POST("teachers/upload_assignment_image")
+    @POST("file/uploads")
     fun uploadAssignmentIMAGE(
-        @Header("Authorization") token: String, @Part file: MultipartBody.Part
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part,
+        @Query("type") type: String = "assignment"
     ): Single<FileUploadResponse>
 
-    @GET("teachers/class_student")
+    @GET("teacher/student")
     fun fetchClassStudents(@Header("Authorization") token: String): LiveData<ApiResponse<ClassStudentResponse>>
 
     @Multipart
-    @POST("teachers/upload_report_pdf")
+    @POST("file/uploads")
     fun uploadReportPDF(
-        @Header("Authorization") token: String, @Part file: MultipartBody.Part?, @Part studentNo: MultipartBody.Part?, @Part studentName: MultipartBody.Part?
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part?,
+        @Part studentNo: MultipartBody.Part?,
+        @Part studentName: MultipartBody.Part?,
+        @Query("type") type: String = "report"
     ): Single<FileUploadResponse>
 
     @Multipart
-    @POST("teachers/upload_report_image")
+    @POST("file/uploads")
     fun uploadReportIMAGE(
-        @Header("Authorization") token: String, @Part file: MultipartBody.Part?, @Part studentNo: MultipartBody.Part?, @Part studentName: MultipartBody.Part?
+        @Header("Authorization") token: String,
+        @Part file: MultipartBody.Part?,
+        @Part studentNo: MultipartBody.Part?,
+        @Part studentName: MultipartBody.Part?,
+        @Query("type") type: String = "report"
     ): Single<FileUploadResponse>
 
-    @GET("teachers/get_upload")
+    @GET("file/path")
     fun getUploadedFile(
         @Header("Authorization") token: String,
-        @Query(
-            "format"
-        ) format: String?,
-        @Query("type") type: String?
+        @Query("type") type: String?,
+        @Query("format") format: String?
     ): Observable<ExplorerResponse>
 
-    @DELETE("teachers/delete_upload")
+    @DELETE("file/{id}")
     fun deleteUploadedFile(
         @Header("Authorization") token: String,
-        @Query("id") id: String?,
-        @Query("path") path: String?,
-        @Query(
-            "format"
-        ) format: String?,
-        @Query("type") type: String?
+        @Path("id") id: String?,
+        @Query("type") type: String?,
+        @Query("format") format: String?,
+        @Query("path") path: String?
     ): Single<ExplorerDeleteResponse>
 
-    @GET("students/timetable")
+    @GET("file/path")
     fun fetchStudentTimetable(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("type") type: String = "timetable",
+        @Query("format") format: String = "image"
     ): LiveData<ApiResponse<TimetableResponse>>
 
 }

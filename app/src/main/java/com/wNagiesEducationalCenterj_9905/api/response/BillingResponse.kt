@@ -8,7 +8,7 @@ data class BillingResponse(
     val type: String,
     val message: String,
     val count: Int,
-    @SerializedName("Billing")
+    @SerializedName("data")
     val billing: List<BillingEntity>,
     val status: Int
 )

@@ -12,8 +12,9 @@ data class AssignmentEntity(
     override val date: String,
     override var format: String?,
     override var token: String?,
-    override var path: String?
-) :IFileModel{
+    override var path: String?,
+    override val studentNo: String
+) : IFileModel {
     @PrimaryKey(autoGenerate = true)
-    override var id:Int = 0
+    override var id: Int = 0
 }

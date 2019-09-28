@@ -31,6 +31,16 @@ class PreferenceProvider @Inject constructor(
         preferences.apply()
     }
 
+    fun setNotificationCallback(key:String,extra:Boolean){
+        val preferences = sharedPreferences.edit()
+        preferences.putBoolean(key, extra)
+        preferences.apply()
+    }
+
+    fun getNotificationCallback(key: String):Boolean?{
+        return sharedPreferences.getBoolean(key, false)
+    }
+
     fun getUserFullname():String?{
         return sharedPreferences.getString(USER_FULL_NAME, null)
     }

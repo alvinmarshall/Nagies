@@ -34,12 +34,26 @@ enum class ComplaintAction {
     DETAILS, CALL, MESSAGE
 }
 
-const val MESSAGE_RECEIVE_EXTRA = "message_extra"
-const val MESSAGE_BROADCAST_ACTION = "com.wNagiesEducationalCenterj_9905.onMessageReceived"
+const val FOREGROUND_PUSH_NOTIFICATION_EXTRA = "push_extras"
+const val NOTIFICATION_MESSAGE_EXTRAS = "notification_message_extras"
 const val NOTIFICATION_EXTRA_MESSAGE = "notification_message_extra"
 const val NOTIFICATION_EXTRA_REPORT = "notification_report_extra"
 const val NOTIFICATION_EXTRA_ASSIGNMENT = "notification_assignment_extra"
 const val NOTIFICATION_EXTRA_COMPLAINT = "notification_complaint_extra"
+const val FIREBASE_TOKEN_ID = "firebase_token_id"
+const val FOREGROUND_PUSH_NOTIFICATION = "pushNotification"
+
+const val NAVIGATE_TO_DASHBOARD = "dashboardFragment"
+const val NAVIGATE_TO_ASSIGNMENT_IMAGE = "assignmentJpegFragment"
+const val NAVIGATION_TO_COMPLAINT = "parentComplaintFragment"
+const val NAVIGATE_TO_DIALOG_RESET_PASSWORD = "passwordDialog"
+const val NAVIGATE_TO_ANNOUNCEMENT = "announcementFragment"
+const val NAVIGATE_TO_REPORT_IMAGE = "reportFragment"
+const val NAVIGATE_TO_REPORT_PDF = "reportPdfFragment"
+
+const val MESSAGE_RECEIVE_EXTRA = "message_extra"
+const val COMPLAINT_RECEIVE_EXTRA = "complaint_extra"
+const val ANNOUNCEMENT_RECEIVE_EXTRA = "announcement_extra"
 
 enum class FetchType {
     ASSIGNMENT_PDF, ASSIGNMENT_IMAGE, REPORT_PDF, REPORT_IMAGE, MESSAGE,

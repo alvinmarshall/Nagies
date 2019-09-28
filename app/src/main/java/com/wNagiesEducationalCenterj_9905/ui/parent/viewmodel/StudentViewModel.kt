@@ -103,7 +103,7 @@ class StudentViewModel @Inject constructor(
                 .subscribe({
                     cachedLabels.value = it
                     if (data != null) {
-                        preferenceProvider.setUserBasicInfo(data.studentName,data.level)
+                        preferenceProvider.setUserBasicInfo(data.studentName, data.level)
                     }
                 }, {})
         )
@@ -290,9 +290,10 @@ class StudentViewModel @Inject constructor(
 
     fun getAnnouncementMessage(
         token: String,
+        shouldFetch: Boolean = false,
         searchContent: String = ""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
-        return studentRepository.fetchStudentAnnouncement(token, searchContent = searchContent)
+        return studentRepository.fetchStudentAnnouncement(token, shouldFetch, searchContent)
     }
 
     fun getAnnouncementById(id: Int) {

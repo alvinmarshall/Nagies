@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -17,7 +18,6 @@ import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.adapter.TeacherComplaintAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
-import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_parent_complaint.*
 import timber.log.Timber
@@ -29,8 +29,7 @@ class ParentComplaintFragment : BaseFragment() {
     private var adapter: TeacherComplaintAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var loadingIndicator: ProgressBar? = null
-    private var shouldFetch: Boolean = false
-    private lateinit var sharedViewModel: SharedViewModel
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData()
     private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +53,10 @@ class ParentComplaintFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        val extra = arguments?.getBoolean(COMPLAINT_RECEIVE_EXTRA)
+        extra?.let { result ->
+            shouldFetch.value = result
+        }
         initRecyclerView()
         configureViewModel()
 
@@ -127,45 +130,32 @@ class ParentComplaintFragment : BaseFragment() {
 
     private fun subscribeObservers(token: String) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
-            teacherViewModel.getComplaintMessage(token, shouldFetch, search)
-                .observe(viewLifecycleOwner, Observer { resource ->
-                    when (resource.status) {
-                        Status.SUCCESS -> {
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                            adapter?.submitList(resource?.data)
-                            showLoadingDialog(false)
-                            Timber.i("data size: ${resource.data?.size}")
+            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                teacherViewModel.getComplaintMessage(token, fetch, search)
+                    .observe(viewLifecycleOwner, Observer { resource ->
+                        when (resource.status) {
+                            Status.SUCCESS -> {
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                adapter?.submitList(resource?.data)
+                                showLoadingDialog(false)
+                                Timber.i("data size: ${resource.data?.size}")
+                            }
+                            Status.ERROR -> {
+                                showLoadingDialog(false)
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                Timber.i(resource?.message)
+                            }
+                            Status.LOADING -> {
+                                Timber.i("loading")
+                                showLoadingDialog()
+                            }
                         }
-                        Status.ERROR -> {
-                            showLoadingDialog(false)
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                            Timber.i(resource?.message)
-                        }
-                        Status.LOADING -> {
-                            Timber.i("loading")
-                            showLoadingDialog()
-                        }
-                    }
 
-                })
-        })
-
-        getFetchComplaint().observe(viewLifecycleOwner, Observer {
-            if (it) {
-                Timber.i("complaint notification received")
-                shouldFetch = it
-            }
-        })
-
-        activity?.let {
-            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
-            sharedViewModel.fetchComplaint.observe(it, Observer { fetch ->
-                if (fetch) {
-                    Timber.i("complaint received from activity")
-                    shouldFetch = fetch
-                }
+                    })
             })
-        }
+
+        })
+
     }
 
     private fun configureViewModel() {
@@ -177,9 +167,21 @@ class ParentComplaintFragment : BaseFragment() {
         })
     }
 
-    override fun onStop() {
-        super.onStop()
-        sharedViewModel.fetchComplaint.value = false
+    override fun onResume() {
+        super.onResume()
+        val perf = preferenceProvider.getNotificationCallback(COMPLAINT_RECEIVE_EXTRA)
+        perf?.let {
+            if (it) {
+                shouldFetch.value = it
+            }
+        }
     }
+
+    override fun onPause() {
+        super.onPause()
+        preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
+
+    }
+
 
 }

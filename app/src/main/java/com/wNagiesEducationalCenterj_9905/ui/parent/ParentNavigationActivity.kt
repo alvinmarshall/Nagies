@@ -1,14 +1,19 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -21,7 +26,6 @@ import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
-import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.content_parent_navigation.*
 import kotlinx.android.synthetic.main.nav_header_parent_navigation.view.*
 import kotlinx.coroutines.launch
@@ -31,24 +35,36 @@ import org.jetbrains.anko.newTask
 import org.jetbrains.anko.startActivity
 import timber.log.Timber
 
+
 class ParentNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private var snackBar: Snackbar? = null
-    private var fetchMessage: Boolean? = false
-    private var fetchAssignment: Boolean? = false
-    private var fetchReport: Boolean? = false
-    private lateinit var sharedViewModel: SharedViewModel
+    private var alertDialog: AlertDialog.Builder? = null
+    private var mRegistrationBroadcastReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        alertDialog = AlertDialog.Builder(this)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+        setupNavigation()
 
+        firebaseMessageSubscription()
+
+        if (intent.hasExtra(USER_INFO)) {
+            setUserInfo(intent)
+        }
+
+        navigateFromNotificationCenter()
+        registerPushNotificationReceiver()
+    }
+
+    private fun firebaseMessageSubscription() {
         FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_parent)).addOnCompleteListener {
             if (!it.isSuccessful) {
                 Timber.i("Task Failed")
@@ -57,29 +73,88 @@ class ParentNavigationActivity : BaseActivity() {
             Timber.i("incoming parent topic")
         }
         FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_teacher))
-        setupNavigation()
-
-        if (intent.hasExtra(USER_INFO)) {
-            setUserInfo(intent)
-        }
-        if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
-            fetchMessage = intent.extras?.getBoolean(NOTIFICATION_EXTRA_MESSAGE)
-        }
-        if (intent.hasExtra(NOTIFICATION_EXTRA_ASSIGNMENT)) {
-            fetchAssignment = intent.extras?.getBoolean(NOTIFICATION_EXTRA_ASSIGNMENT)
-        }
-        if (intent.hasExtra(NOTIFICATION_EXTRA_REPORT)) {
-            fetchReport = intent.extras?.getBoolean(NOTIFICATION_EXTRA_REPORT)
-        }
-        configureSharedViewModel()
     }
 
-    private fun configureSharedViewModel() {
-        sharedViewModel = ViewModelProviders.of(this)[SharedViewModel::class.java]
-        sharedViewModel.fetchMessage.value = fetchMessage
-        sharedViewModel.fetchAssignmentJPEG.value = fetchAssignment
-        sharedViewModel.fetchAssignmentPDF.value = fetchAssignment
-        sharedViewModel.fetchReport.value = fetchReport
+    private fun navigateFromNotificationCenter() {
+        if (intent.hasExtra(NOTIFICATION_MESSAGE_EXTRAS)) {
+            when (intent.getStringExtra(NOTIFICATION_MESSAGE_EXTRAS)) {
+                NAVIGATE_TO_DASHBOARD -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_DASHBOARD)
+                }
+                NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
+                    showPasswordResetDialog(alertDialog)
+                }
+                NAVIGATE_TO_ANNOUNCEMENT -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_ANNOUNCEMENT)
+                }
+            }
+
+        }
+    }
+
+
+    private fun navigateUserToMessagePage(location: String?) {
+        Timber.i("navigation $location")
+        val extra = Bundle()
+        when (location) {
+            NAVIGATE_TO_DASHBOARD -> {
+                extra.putBoolean(MESSAGE_RECEIVE_EXTRA, true)
+                setNavigation(R.id.dashboardFragment, extra)
+            }
+            NAVIGATE_TO_ANNOUNCEMENT -> {
+                extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
+                setNavigation(R.id.announcementFragment, extra)
+            }
+        }
+    }
+
+    private fun registerPushNotificationReceiver() {
+        mRegistrationBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Timber.i("${intent?.action}")
+                when (intent?.action) {
+                    FOREGROUND_PUSH_NOTIFICATION -> {
+                        setFetchData(intent.getStringExtra(FOREGROUND_PUSH_NOTIFICATION_EXTRA))
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun setFetchData(type: String?) {
+        val extra = Bundle()
+        when (type) {
+            NAVIGATE_TO_DASHBOARD -> {
+                extra.putBoolean(MESSAGE_RECEIVE_EXTRA, true)
+                showNewMessageNavigationPrompt(R.id.dashboardFragment, MESSAGE_RECEIVE_EXTRA, extra)
+            }
+            NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
+                showPasswordResetDialog(alertDialog)
+            }
+            NAVIGATE_TO_ANNOUNCEMENT -> {
+                showNewMessageNavigationPrompt(R.id.announcementFragment, ANNOUNCEMENT_RECEIVE_EXTRA, extra)
+            }
+        }
+    }
+
+    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?) {
+        alertDialog?.setTitle("New Message Alert")
+        alertDialog?.setMessage("Do want to view message")
+        alertDialog?.setPositiveButton("yes") { dialog, _ ->
+            dialog.dismiss()
+            setNavigation(location, extra)
+        }
+        alertDialog?.setNegativeButton("cancel") { dialog, _ ->
+            preferenceProvider.setNotificationCallback(key, true)
+            dialog.dismiss()
+        }
+        alertDialog?.setCancelable(false)
+        alertDialog?.show()
+    }
+
+    private fun setNavigation(location: Int, extra: Bundle?) {
+        Navigation.findNavController(this, R.id.fragment_socket).navigate(location, extra)
     }
 
 
@@ -110,6 +185,23 @@ class ParentNavigationActivity : BaseActivity() {
         NavigationUI.setupWithNavController(navView, navController)
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        mRegistrationBroadcastReceiver?.let {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                it,
+                IntentFilter(FOREGROUND_PUSH_NOTIFICATION)
+            )
+//            NotificationUtils.clearNotifications(baseContext)
+        }
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        mRegistrationBroadcastReceiver?.let { LocalBroadcastManager.getInstance(this).unregisterReceiver(it) }
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, drawerLayout)

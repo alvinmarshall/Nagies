@@ -1,14 +1,19 @@
 package com.wNagiesEducationalCenterj_9905.ui.teacher
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -20,7 +25,6 @@ import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
-import com.wNagiesEducationalCenterj_9905.viewmodel.SharedViewModel
 import kotlinx.android.synthetic.main.nav_header_teacher_navigation.view.*
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
@@ -32,18 +36,32 @@ class TeacherNavigationActivity : BaseActivity() {
     private lateinit var navView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
-    private lateinit var sharedViewModel: SharedViewModel
-    private var fetchMessage: Boolean? = false
-    private var fetchComplaint: Boolean? = false
-
+    private var mRegistrationBroadcastReceiver: BroadcastReceiver? = null
+    private var alertDialog: AlertDialog.Builder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_teacher_navigation)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        alertDialog = AlertDialog.Builder(this)
+
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+        setupNavigation()
+
+        firebaseMessageSubscription()
+
+
+        if (intent.hasExtra(USER_INFO)) {
+            setUserInfo(intent)
+        }
+
+        navigateFromNotificationCenter()
+        registerPushNotificationReceiver()
+    }
+
+    private fun firebaseMessageSubscription() {
         FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_teacher)).addOnCompleteListener {
             if (!it.isSuccessful) {
                 Timber.i("Task Failed")
@@ -52,27 +70,8 @@ class TeacherNavigationActivity : BaseActivity() {
             Timber.i("incoming teachers topic")
         }
         FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_parent))
-        setupNavigation()
-        if (intent.hasExtra(USER_INFO)) {
-            setUserInfo(intent)
-        }
-
-        if (intent.hasExtra(NOTIFICATION_EXTRA_COMPLAINT)) {
-            fetchComplaint = intent.extras?.getBoolean(NOTIFICATION_EXTRA_COMPLAINT)
-        }
-        if (intent.hasExtra(NOTIFICATION_EXTRA_MESSAGE)) {
-            fetchMessage = intent.extras?.getBoolean(NOTIFICATION_EXTRA_MESSAGE)
-        }
-
-        configureSharedViewModel()
-
     }
 
-    private fun configureSharedViewModel() {
-        sharedViewModel = ViewModelProviders.of(this)[SharedViewModel::class.java]
-        sharedViewModel.fetchMessage.value = fetchMessage
-        sharedViewModel.fetchComplaint.value = fetchComplaint
-    }
 
     private fun setupNavigation() {
         navController = findNavController(R.id.fragment_socket)
@@ -85,10 +84,108 @@ class TeacherNavigationActivity : BaseActivity() {
         NavigationUI.setupWithNavController(navView, navController)
     }
 
+    private fun registerPushNotificationReceiver() {
+        mRegistrationBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Timber.i("${intent?.action}")
+                when (intent?.action) {
+                    FOREGROUND_PUSH_NOTIFICATION -> {
+                        setFetchData(intent.getStringExtra(FOREGROUND_PUSH_NOTIFICATION_EXTRA))
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun setFetchData(type: String?) {
+        val extra = Bundle()
+        when (type) {
+            NAVIGATION_TO_COMPLAINT -> {
+                extra.putBoolean(COMPLAINT_RECEIVE_EXTRA, true)
+                showNewMessageNavigationPrompt(R.id.parentComplaintFragment, COMPLAINT_RECEIVE_EXTRA, extra)
+            }
+            NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
+                showPasswordResetDialog(alertDialog)
+            }
+            NAVIGATE_TO_ANNOUNCEMENT -> {
+                extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
+                showNewMessageNavigationPrompt(R.id.teacherAnnouncementFragment, ANNOUNCEMENT_RECEIVE_EXTRA, extra)
+            }
+        }
+    }
+
+    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?) {
+        alertDialog?.setTitle("New Message Alert")
+        alertDialog?.setMessage("Do want to view message")
+        alertDialog?.setPositiveButton("yes") { dialog, _ ->
+            dialog.dismiss()
+            setNavigation(location, extra)
+        }
+        alertDialog?.setNegativeButton("cancel") { dialog, _ ->
+            preferenceProvider.setNotificationCallback(key, true)
+            dialog.dismiss()
+        }
+        alertDialog?.setCancelable(false)
+        alertDialog?.show()
+    }
+
+
+    private fun navigateFromNotificationCenter() {
+        if (intent.hasExtra(NOTIFICATION_MESSAGE_EXTRAS)) {
+            when (intent.getStringExtra(NOTIFICATION_MESSAGE_EXTRAS)) {
+                NAVIGATION_TO_COMPLAINT -> {
+                    navigateUserToMessagePage(NAVIGATION_TO_COMPLAINT)
+                }
+                NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
+                    showPasswordResetDialog(alertDialog)
+                }
+                NAVIGATE_TO_ANNOUNCEMENT -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_ANNOUNCEMENT)
+                }
+            }
+
+        }
+    }
+
+    private fun navigateUserToMessagePage(location: String?) {
+        Timber.i("navigation $location")
+        val extra = Bundle()
+        when (location) {
+            NAVIGATION_TO_COMPLAINT -> {
+                extra.putBoolean(COMPLAINT_RECEIVE_EXTRA, true)
+                setNavigation(R.id.parentComplaintFragment, extra)
+            }
+            NAVIGATE_TO_ANNOUNCEMENT -> {
+                extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
+                setNavigation(R.id.teacherAnnouncementFragment, extra)
+            }
+        }
+    }
+
+    private fun setNavigation(location: Int, extra: Bundle?) {
+        Navigation.findNavController(this, R.id.fragment_socket).navigate(location, extra)
+    }
+
+
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, drawerLayout)
     }
 
+    override fun onResume() {
+        super.onResume()
+        mRegistrationBroadcastReceiver?.let {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                it,
+                IntentFilter(FOREGROUND_PUSH_NOTIFICATION)
+            )
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mRegistrationBroadcastReceiver?.let { LocalBroadcastManager.getInstance(this).unregisterReceiver(it) }
+    }
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)

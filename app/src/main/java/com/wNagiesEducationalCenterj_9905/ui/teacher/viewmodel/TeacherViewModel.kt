@@ -67,9 +67,10 @@ class TeacherViewModel @Inject constructor(
 
     fun getAnnouncementMessage(
         token: String,
+        shouldFetch: Boolean=false,
         searchContent: String = ""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
-        return teacherRepository.fetchAnnouncement(token, searchContent = searchContent)
+        return teacherRepository.fetchAnnouncement(token,shouldFetch,searchContent)
     }
 
     fun getComplaintMessageById(id: Int) {

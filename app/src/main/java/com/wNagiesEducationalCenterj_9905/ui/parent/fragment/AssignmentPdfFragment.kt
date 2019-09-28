@@ -117,12 +117,7 @@ class AssignmentPdfFragment : BaseFragment() {
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
         })
-        getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
-            if (fetch) {
-                Timber.i("assignment received")
-                shouldFetch = fetch
-            }
-        })
+
         activity?.let {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchAssignmentPDF.observe(it, Observer { fetch ->

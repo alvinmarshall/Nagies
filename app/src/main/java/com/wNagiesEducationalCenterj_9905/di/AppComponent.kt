@@ -4,7 +4,6 @@ import android.app.Application
 import com.wNagiesEducationalCenterj_9905.App
 import com.wNagiesEducationalCenterj_9905.di.modules.ActivityModule
 import com.wNagiesEducationalCenterj_9905.di.modules.AppModule
-import com.wNagiesEducationalCenterj_9905.notification.AppNotificationManager
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -19,7 +18,6 @@ import javax.inject.Singleton
 ]
 )
 interface AppComponent :AndroidInjector<App>{
-    fun appNotification():AppNotificationManager
     @Component.Builder
     interface Builder{
         @BindsInstance

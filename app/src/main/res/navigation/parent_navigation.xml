@@ -9,6 +9,7 @@
               android:label="Dashboard" tools:layout="@layout/fragment_dashboard">
         <action android:id="@+id/action_dashboardFragment_to_messageDetailFragment"
                 app:destination="@id/messageDetailFragment"/>
+        <argument android:name="should_fetch" app:argType="boolean" android:defaultValue="false"/>
     </fragment>
     <fragment android:id="@+id/assignmentJpegFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AssignmentJpegFragment"
@@ -21,7 +22,9 @@
               android:label="Change Password" tools:layout="@layout/fragment_change_password"/>
     <fragment android:id="@+id/profileFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ProfileFragment"
-              android:label="Profile" tools:layout="@layout/fragment_profile"/>
+              android:label="Profile" tools:layout="@layout/fragment_profile">
+        <action android:id="@+id/action_profileFragment_to_dashboardFragment" app:destination="@id/dashboardFragment"/>
+    </fragment>
     <fragment android:id="@+id/sendMessageFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.SendMessageFragment"
               android:label="Sent Messages" tools:layout="@layout/fragment_send_message">

@@ -117,12 +117,7 @@ class AssignmentJpegFragment : BaseFragment() {
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
         })
-        getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
-            if (fetch) {
-                Timber.i("assignment image received")
-                shouldFetch = fetch
-            }
-        })
+
         activity?.let {
             sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
             sharedViewModel.fetchAssignmentJPEG.observe(it, Observer { fetch ->

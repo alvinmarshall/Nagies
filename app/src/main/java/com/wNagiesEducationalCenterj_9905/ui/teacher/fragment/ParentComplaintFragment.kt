@@ -4,7 +4,6 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.transition.Visibility
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
@@ -30,7 +29,7 @@ class ParentComplaintFragment : BaseFragment() {
     private var adapter: TeacherComplaintAdapter? = null
     private var recyclerView: RecyclerView? = null
     private var loadingIndicator: ProgressBar? = null
-    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData()
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
     private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,35 +129,36 @@ class ParentComplaintFragment : BaseFragment() {
         }
     }
 
-    private fun subscribeObservers(token: String) {
+    private fun subscribeObservers(token: String?) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
-            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
-                if (fetch){
-                    preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
-                }
-                teacherViewModel.getComplaintMessage(token, fetch, search)
-                    .observe(viewLifecycleOwner, Observer { resource ->
-                        when (resource.status) {
-                            Status.SUCCESS -> {
-//                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                                adapter?.submitList(resource?.data)
-                                showLoadingDialog(false)
-                                Timber.i("data size: ${resource.data?.size}")
+            token?.let {
+                shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                    if (fetch){
+                        preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
+                    }
+                    teacherViewModel.getComplaintMessage(it, fetch, search)
+                        .observe(viewLifecycleOwner, Observer { resource ->
+                            when (resource.status) {
+                                Status.SUCCESS -> {
+                                    showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                    adapter?.submitList(resource?.data)
+                                    showLoadingDialog(false)
+                                    Timber.i("data size: ${resource.data?.size}")
+                                }
+                                Status.ERROR -> {
+                                    showLoadingDialog(false)
+                                    showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                    Timber.i(resource?.message)
+                                }
+                                Status.LOADING -> {
+                                    Timber.i("loading")
+                                    showLoadingDialog()
+                                }
                             }
-                            Status.ERROR -> {
-                                showLoadingDialog(false)
-                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                                Timber.i(resource?.message)
-                            }
-                            Status.LOADING -> {
-                                Timber.i("loading")
-                                showLoadingDialog()
-                            }
-                        }
 
-                    })
-            })
-
+                        })
+                })
+            }
         })
 
     }
@@ -167,8 +167,8 @@ class ParentComplaintFragment : BaseFragment() {
         teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
         teacherViewModel.searchString.postValue("")
         teacherViewModel.getUserToken()
-        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
-            subscribeObservers(token)
+        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer {
+            subscribeObservers(it)
         })
     }
 

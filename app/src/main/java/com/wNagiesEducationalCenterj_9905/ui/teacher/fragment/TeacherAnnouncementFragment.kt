@@ -28,7 +28,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
-    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData()
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

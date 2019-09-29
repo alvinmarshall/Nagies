@@ -50,6 +50,8 @@ class ParentNavigationActivity : BaseActivity() {
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
         snackBar =Snackbar.make(root,"",Snackbar.LENGTH_SHORT)
+        val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
+        snackBar?.setText("welcome back $usr")?.show()
         setupNavigation()
 
         firebaseMessageSubscription()
@@ -176,7 +178,7 @@ class ParentNavigationActivity : BaseActivity() {
         val username = "user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
         val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         navView.getHeaderView(0).nav_header_title.text = username
-        snackBar?.setText("welcome back $usr")?.show()
+//        snackBar?.setText("welcome back $usr")?.show()
         navView.getHeaderView(0).nav_header_title.text = username
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.default_user_avatar)

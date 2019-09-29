@@ -26,7 +26,7 @@ class DashboardFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var messageAdapter: MessageAdapter? = null
     private var recyclerView: RecyclerView? = null
-    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData()
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
     private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

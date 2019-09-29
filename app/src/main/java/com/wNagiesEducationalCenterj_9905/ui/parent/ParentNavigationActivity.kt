@@ -29,10 +29,7 @@ import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_parent_navigation.*
 import kotlinx.android.synthetic.main.nav_header_parent_navigation.view.*
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.clearTask
-import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.newTask
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.*
 import timber.log.Timber
 
 
@@ -52,7 +49,7 @@ class ParentNavigationActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
-
+        snackBar =Snackbar.make(root,"",Snackbar.LENGTH_SHORT)
         setupNavigation()
 
         firebaseMessageSubscription()
@@ -124,18 +121,37 @@ class ParentNavigationActivity : BaseActivity() {
         when (type) {
             NAVIGATE_TO_DASHBOARD -> {
                 extra.putBoolean(MESSAGE_RECEIVE_EXTRA, true)
-                showNewMessageNavigationPrompt(R.id.dashboardFragment, MESSAGE_RECEIVE_EXTRA, extra)
+                showNewMessageNavigationPrompt(
+                    R.id.dashboardFragment, MESSAGE_RECEIVE_EXTRA, extra,
+                    NAVIGATE_TO_DASHBOARD
+                )
             }
             NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
                 showPasswordResetDialog(alertDialog)
             }
             NAVIGATE_TO_ANNOUNCEMENT -> {
-                showNewMessageNavigationPrompt(R.id.announcementFragment, ANNOUNCEMENT_RECEIVE_EXTRA, extra)
+                showNewMessageNavigationPrompt(
+                    R.id.announcementFragment,
+                    ANNOUNCEMENT_RECEIVE_EXTRA,
+                    extra,
+                    NAVIGATE_TO_ANNOUNCEMENT
+                )
             }
         }
     }
 
-    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?) {
+    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?, navigation: String? = null) {
+        val currentFragment = navController.currentDestination?.label
+        // don't show dialog if user is in the same location
+        currentFragment?.let {
+            if (it == navigation) {
+                Timber.i("same location so pref set")
+                snackBar?.setText("new message received")?.show()
+                preferenceProvider.setNotificationCallback(key, true)
+                return
+            }
+        }
+
         alertDialog?.setTitle("New Message Alert")
         alertDialog?.setMessage("Do want to view message")
         alertDialog?.setPositiveButton("yes") { dialog, _ ->
@@ -157,11 +173,10 @@ class ParentNavigationActivity : BaseActivity() {
 
     private fun setUserInfo() = launch {
         val photo = preferenceProvider.getUserSessionData().imageUrl
-        val username ="user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
+        val username = "user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
         val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         navView.getHeaderView(0).nav_header_title.text = username
-        snackBar = Snackbar.make(root, "welcome back $usr", Snackbar.LENGTH_LONG)
-        snackBar?.show()
+        snackBar?.setText("welcome back $usr")?.show()
         navView.getHeaderView(0).nav_header_title.text = username
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.default_user_avatar)

@@ -117,6 +117,9 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private fun subscribeObservers(token: String) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
             shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch){
+                    preferenceProvider.setNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA, false)
+                }
                 teacherViewModel.getAnnouncementMessage(token, fetch, search)
                     .observe(viewLifecycleOwner, Observer { resource ->
                         when (resource.status) {
@@ -161,10 +164,10 @@ class TeacherAnnouncementFragment : BaseFragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        preferenceProvider.setNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA, false)
-    }
+//    override fun onPause() {
+//        super.onPause()
+//        preferenceProvider.setNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA, false)
+//    }
 
 
 }

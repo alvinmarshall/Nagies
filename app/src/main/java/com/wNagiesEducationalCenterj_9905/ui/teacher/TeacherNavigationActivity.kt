@@ -49,7 +49,7 @@ class TeacherNavigationActivity : BaseActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         alertDialog = AlertDialog.Builder(this)
-
+        snackBar =Snackbar.make(root,"",Snackbar.LENGTH_SHORT)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
         setupNavigation()
@@ -103,19 +103,36 @@ class TeacherNavigationActivity : BaseActivity() {
         when (type) {
             NAVIGATION_TO_COMPLAINT -> {
                 extra.putBoolean(COMPLAINT_RECEIVE_EXTRA, true)
-                showNewMessageNavigationPrompt(R.id.parentComplaintFragment, COMPLAINT_RECEIVE_EXTRA, extra)
+                showNewMessageNavigationPrompt(
+                    R.id.parentComplaintFragment, COMPLAINT_RECEIVE_EXTRA, extra,
+                    NAVIGATION_TO_COMPLAINT
+                )
             }
             NAVIGATE_TO_DIALOG_RESET_PASSWORD -> {
                 showPasswordResetDialog(alertDialog)
             }
             NAVIGATE_TO_ANNOUNCEMENT -> {
                 extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
-                showNewMessageNavigationPrompt(R.id.teacherAnnouncementFragment, ANNOUNCEMENT_RECEIVE_EXTRA, extra)
+                showNewMessageNavigationPrompt(
+                    R.id.teacherAnnouncementFragment, ANNOUNCEMENT_RECEIVE_EXTRA, extra,
+                    NAVIGATE_TO_ANNOUNCEMENT
+                )
             }
         }
     }
 
-    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?) {
+    private fun showNewMessageNavigationPrompt(location: Int, key: String, extra: Bundle?, navigation: String? = null) {
+        val currentFragment = navController.currentDestination?.label
+        // don't show dialog if user is in the same location
+        currentFragment?.let {
+            if (it == navigation) {
+                Timber.i("same location so pref set")
+                snackBar?.setText("new message received")?.show()
+                preferenceProvider.setNotificationCallback(key, true)
+                return
+            }
+        }
+
         alertDialog?.setTitle("New Message Alert")
         alertDialog?.setMessage("Do want to view message")
         alertDialog?.setPositiveButton("yes") { dialog, _ ->
@@ -129,7 +146,6 @@ class TeacherNavigationActivity : BaseActivity() {
         alertDialog?.setCancelable(false)
         alertDialog?.show()
     }
-
 
     private fun navigateFromNotificationCenter() {
         if (intent.hasExtra(NOTIFICATION_MESSAGE_EXTRAS)) {
@@ -209,11 +225,10 @@ class TeacherNavigationActivity : BaseActivity() {
 
     private fun setUserInfo() = launch {
         val photo = preferenceProvider.getUserSessionData().imageUrl
-        val username ="user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
+        val username = "user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
         val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         navView.getHeaderView(0).nav_header_title.text = username
-        snackBar = Snackbar.make(root, "welcome back $usr", Snackbar.LENGTH_LONG)
-        snackBar?.show()
+        snackBar?.setText("welcome back $usr")?.show()
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.parent)
             .circleCrop()

@@ -107,6 +107,9 @@ class DashboardFragment : BaseFragment() {
         studentViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
             token?.let {
                 shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                    if (fetch){
+                        preferenceProvider.setNotificationCallback(MESSAGE_RECEIVE_EXTRA, false)
+                    }
                     studentViewModel.getStudentMessages(it, fetch, search).observe(viewLifecycleOwner, Observer { r ->
                         when (r.status) {
                             Status.SUCCESS -> {
@@ -150,10 +153,10 @@ class DashboardFragment : BaseFragment() {
             }
         }
     }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceProvider.setNotificationCallback(MESSAGE_RECEIVE_EXTRA, false)
-    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        preferenceProvider.setNotificationCallback(MESSAGE_RECEIVE_EXTRA, false)
+//    }
 
 }

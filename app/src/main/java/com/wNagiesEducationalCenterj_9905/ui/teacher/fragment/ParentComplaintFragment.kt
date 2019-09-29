@@ -4,6 +4,7 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.transition.Visibility
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
@@ -49,6 +50,7 @@ class ParentComplaintFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = recycler_view
         loadingIndicator = progressBar
+        loadingIndicator?.visibility = View.GONE
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -131,11 +133,14 @@ class ParentComplaintFragment : BaseFragment() {
     private fun subscribeObservers(token: String) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
             shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch){
+                    preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
+                }
                 teacherViewModel.getComplaintMessage(token, fetch, search)
                     .observe(viewLifecycleOwner, Observer { resource ->
                         when (resource.status) {
                             Status.SUCCESS -> {
-                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+//                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
                                 adapter?.submitList(resource?.data)
                                 showLoadingDialog(false)
                                 Timber.i("data size: ${resource.data?.size}")
@@ -177,11 +182,11 @@ class ParentComplaintFragment : BaseFragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
-
-    }
+//    override fun onPause() {
+//        super.onPause()
+//        preferenceProvider.setNotificationCallback(COMPLAINT_RECEIVE_EXTRA, false)
+//
+//    }
 
 
 }

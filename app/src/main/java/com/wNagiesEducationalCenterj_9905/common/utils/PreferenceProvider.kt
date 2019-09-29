@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
+import com.wNagiesEducationalCenterj_9905.vo.SessionData
 import java.util.*
 import javax.inject.Inject
 
@@ -14,47 +15,55 @@ class PreferenceProvider @Inject constructor(
 ) {
     fun setUserLogin(isLogin: Boolean, token: String?) {
         val preferences = sharedPreferences.edit()
-        preferences.putBoolean(LOGIN_PREF, isLogin)
-        preferences.putString(USER_TOKEN, token)
+        preferences.putBoolean(USER_LOGIN_STATUS_PREF_KEY, isLogin)
+        preferences.putString(USER_TOKEN_PREF_KEY, token)
         preferences.apply()
     }
 
     fun setUserLoginRole(role: String?) {
         val preferences = sharedPreferences.edit()
-        preferences.putString(SELECTED_ROLE, role)
-        preferences.apply()
-    }
-    fun setUserBasicInfo(name:String?, level:String?){
-        val preferences = sharedPreferences.edit()
-        preferences.putString(USER_FULL_NAME,name)
-        preferences.putString(USER_LEVEL_NAME,level)
+        preferences.putString(USER_SELECTED_ROLE_PREF_KEY, role)
         preferences.apply()
     }
 
-    fun setNotificationCallback(key:String,extra:Boolean){
+    fun setUserBasicInfo(username: String?, name: String?, level: String?, imageUrl: String? = null) {
+        val preferences = sharedPreferences.edit()
+        preferences.putString(USER_NAME_PREF_KEY, username)
+        preferences.putString(USER_FULL_NAME_PREF_KEY, name)
+        preferences.putString(USER_LEVEL_NAME_PREF_KEY, level)
+        preferences.putString(USER_IMAGE_URL_PREF_KEY, imageUrl)
+        preferences.apply()
+    }
+
+    fun setNotificationCallback(key: String, extra: Boolean) {
         val preferences = sharedPreferences.edit()
         preferences.putBoolean(key, extra)
         preferences.apply()
     }
 
-    fun getNotificationCallback(key: String):Boolean?{
+    fun getNotificationCallback(key: String): Boolean? {
         return sharedPreferences.getBoolean(key, false)
     }
 
-    fun getUserFullname():String?{
-        return sharedPreferences.getString(USER_FULL_NAME, null)
+    fun getUserSessionData(): SessionData {
+        val name = sharedPreferences.getString(USER_FULL_NAME_PREF_KEY, null)
+        val imageUrl = sharedPreferences.getString(USER_IMAGE_URL_PREF_KEY, null)
+        val level = sharedPreferences.getString(USER_LEVEL_NAME_PREF_KEY, null)
+        val sessionData = SessionData(name, level, imageUrl)
+        sessionData.username = sharedPreferences.getString(USER_NAME_PREF_KEY, null)
+        sessionData.token = sharedPreferences.getString(USER_TOKEN_PREF_KEY, null)
+        sessionData.loginStatus = sharedPreferences.getBoolean(USER_LOGIN_STATUS_PREF_KEY, false)
+        sessionData.userRole = sharedPreferences.getString(USER_SELECTED_ROLE_PREF_KEY, null)
+        return sessionData
     }
 
-    fun getUserLoginStatus(): Boolean {
-        return sharedPreferences.getBoolean(LOGIN_PREF, false)
-    }
 
     fun getUserToken(): String? {
-        return sharedPreferences.getString(USER_TOKEN, null)
+        return sharedPreferences.getString(USER_TOKEN_PREF_KEY, null)
     }
 
     fun getUserLoginRole(): String? {
-        return sharedPreferences.getString(SELECTED_ROLE, null)
+        return sharedPreferences.getString(USER_SELECTED_ROLE_PREF_KEY, null)
     }
 
     fun setFetchDate(type: FetchType) {
@@ -136,7 +145,7 @@ class PreferenceProvider @Inject constructor(
                 val minutes = getDifferenceInTime(fetchDate)
                 (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
             }
-            FetchType.TIME_TABLE ->{
+            FetchType.TIME_TABLE -> {
                 fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_timetable), null)
                 val minutes = getDifferenceInTime(fetchDate)
                 (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
@@ -150,7 +159,7 @@ class PreferenceProvider @Inject constructor(
             context.getString(R.string.pref_fetch_option_key),
             context.getString(R.string.pref_fetch_option_20_min_value)
         )
-        return interval?.toInt()?:20
+        return interval?.toInt() ?: 20
     }
 
 

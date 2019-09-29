@@ -19,13 +19,16 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
+import kotlinx.android.synthetic.main.content_teacher_navigation.*
 import kotlinx.android.synthetic.main.nav_header_teacher_navigation.view.*
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.clearTask
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.newTask
@@ -38,6 +41,7 @@ class TeacherNavigationActivity : BaseActivity() {
     private lateinit var navController: NavController
     private var mRegistrationBroadcastReceiver: BroadcastReceiver? = null
     private var alertDialog: AlertDialog.Builder? = null
+    private var snackBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,10 +56,6 @@ class TeacherNavigationActivity : BaseActivity() {
 
         firebaseMessageSubscription()
 
-
-        if (intent.hasExtra(USER_INFO)) {
-            setUserInfo(intent)
-        }
 
         navigateFromNotificationCenter()
         registerPushNotificationReceiver()
@@ -172,20 +172,6 @@ class TeacherNavigationActivity : BaseActivity() {
         return NavigationUI.navigateUp(navController, drawerLayout)
     }
 
-    override fun onResume() {
-        super.onResume()
-        mRegistrationBroadcastReceiver?.let {
-            LocalBroadcastManager.getInstance(this).registerReceiver(
-                it,
-                IntentFilter(FOREGROUND_PUSH_NOTIFICATION)
-            )
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mRegistrationBroadcastReceiver?.let { LocalBroadcastManager.getInstance(this).unregisterReceiver(it) }
-    }
 
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -221,19 +207,34 @@ class TeacherNavigationActivity : BaseActivity() {
         }
     }
 
-    private fun setUserInfo(intent: Intent?) {
-        val bundle = intent?.extras?.getStringArrayList(USER_INFO)
-        val photo = bundle?.get(1)
-        val id = bundle?.get(0)
-        Timber.i("user info : $photo")
-        val title = "Teacher: $id"
-        navView.getHeaderView(0).nav_header_title.text = title
-
-        GlideApp.with(this).load(photo)
+    private fun setUserInfo() = launch {
+        val photo = preferenceProvider.getUserSessionData().imageUrl
+        val username ="user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
+        val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
+        navView.getHeaderView(0).nav_header_title.text = username
+        snackBar = Snackbar.make(root, "welcome back $usr", Snackbar.LENGTH_LONG)
+        snackBar?.show()
+        GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.parent)
             .circleCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(navView.getHeaderView(0).img_sidebar)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setUserInfo()
+        mRegistrationBroadcastReceiver?.let {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                it,
+                IntentFilter(FOREGROUND_PUSH_NOTIFICATION)
+            )
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mRegistrationBroadcastReceiver?.let { LocalBroadcastManager.getInstance(this).unregisterReceiver(it) }
     }
 
 }

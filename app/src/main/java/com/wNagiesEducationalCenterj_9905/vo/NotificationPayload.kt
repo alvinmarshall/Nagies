@@ -14,8 +14,8 @@ data class NotificationPayload(
 ) {
 
     fun getNotificationExtras(context: Context, preferences: SharedPreferences?): String? {
-        val localUsername = preferences?.getString(USER_FULL_NAME, null)
-        val localLevel = preferences?.getString(USER_LEVEL_NAME, null)
+        val localUsername = preferences?.getString(USER_FULL_NAME_PREF_KEY, null)
+        val localLevel = preferences?.getString(USER_LEVEL_NAME_PREF_KEY, null)
         return when (type) {
             context.getString(R.string.notification_type_password_reset) -> {
                 if (localUsername == name) {
@@ -78,6 +78,6 @@ data class NotificationPayload(
     }
 
     fun getCurrentRole(preferences: SharedPreferences?): String? {
-        return preferences?.getString(SELECTED_ROLE, null)
+        return preferences?.getString(USER_SELECTED_ROLE_PREF_KEY, null)
     }
 }

@@ -102,9 +102,6 @@ class StudentViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedLabels.value = it
-                    if (data != null) {
-                        preferenceProvider.setUserBasicInfo(data.studentName, data.level)
-                    }
                 }, {})
         )
     }

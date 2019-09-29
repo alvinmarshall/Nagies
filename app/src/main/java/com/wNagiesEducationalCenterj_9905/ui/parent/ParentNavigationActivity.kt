@@ -52,13 +52,10 @@ class ParentNavigationActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
+
         setupNavigation()
 
         firebaseMessageSubscription()
-
-        if (intent.hasExtra(USER_INFO)) {
-            setUserInfo(intent)
-        }
 
         navigateFromNotificationCenter()
         registerPushNotificationReceiver()
@@ -158,20 +155,19 @@ class ParentNavigationActivity : BaseActivity() {
     }
 
 
-    private fun setUserInfo(intent: Intent?) = launch {
-        val bundle = intent?.extras?.getStringArrayList(USER_INFO)
-        val photo = bundle?.get(1)
-        val index = bundle?.get(0)
-        val title = "index: $index"
-        snackBar = Snackbar.make(root, "welcome back $index", Snackbar.LENGTH_LONG)
+    private fun setUserInfo() = launch {
+        val photo = preferenceProvider.getUserSessionData().imageUrl
+        val username ="user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
+        val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
+        navView.getHeaderView(0).nav_header_title.text = username
+        snackBar = Snackbar.make(root, "welcome back $usr", Snackbar.LENGTH_LONG)
         snackBar?.show()
-        navView.getHeaderView(0).nav_header_title.text = title
+        navView.getHeaderView(0).nav_header_title.text = username
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.default_user_avatar)
             .circleCrop()
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(navView.getHeaderView(0).img_sidebar)
-
     }
 
     private fun setupNavigation() {
@@ -188,6 +184,7 @@ class ParentNavigationActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        setUserInfo()
         mRegistrationBroadcastReceiver?.let {
             LocalBroadcastManager.getInstance(this).registerReceiver(
                 it,

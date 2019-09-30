@@ -24,6 +24,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
+import com.wNagiesEducationalCenterj_9905.common.utils.NotificationUtils
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_teacher_navigation.*
@@ -228,9 +229,7 @@ class TeacherNavigationActivity : BaseActivity() {
     private fun setUserInfo() = launch {
         val photo = preferenceProvider.getUserSessionData().imageUrl
         val username = "user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
-        val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         navView.getHeaderView(0).nav_header_title.text = username
-//        snackBar?.setText("welcome back $usr")?.show()
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.parent)
             .circleCrop()

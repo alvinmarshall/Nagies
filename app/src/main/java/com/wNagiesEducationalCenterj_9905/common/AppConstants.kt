@@ -56,6 +56,10 @@ const val NAVIGATE_TO_REPORT_PDF = "Report-PDF"
 const val MESSAGE_RECEIVE_EXTRA = "message_extra"
 const val COMPLAINT_RECEIVE_EXTRA = "complaint_extra"
 const val ANNOUNCEMENT_RECEIVE_EXTRA = "announcement_extra"
+const val ASSIGNMENT_IMAGE_RECIEVE_EXTRA = "assignment_image_extra"
+const val ASSIGNMENT_PDF_RECIEVE_EXTRA ="assignment_pdf_extra"
+const val REPORT_IMAGE_RECEIVE_EXTRA ="report_image_extra"
+const val REPORT_PDF_RECEIVE_EXTRA = "report_pdf_extra"
 
 enum class FetchType {
     ASSIGNMENT_PDF, ASSIGNMENT_IMAGE, REPORT_PDF, REPORT_IMAGE, MESSAGE,

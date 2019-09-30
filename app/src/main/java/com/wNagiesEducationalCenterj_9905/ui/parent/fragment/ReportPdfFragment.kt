@@ -18,6 +18,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -45,6 +46,7 @@ class ReportPdfFragment : BaseFragment() {
     private var alertDialog: AlertDialog.Builder? = null
     private var loadingIndicator: ProgressBar? = null
     private var snackBar: Snackbar? = null
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
     private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
     private var downloadReceiver: BroadcastReceiver? = null
     override fun onCreateView(
@@ -57,6 +59,10 @@ class ReportPdfFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val extra = arguments?.getBoolean(REPORT_PDF_RECEIVE_EXTRA)
+        extra?.let { result ->
+            shouldFetch.value = result
+        }
         recyclerView = recycler_view
         loadingIndicator = progressBar
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
@@ -89,26 +95,32 @@ class ReportPdfFragment : BaseFragment() {
 
     private fun subscribeObservers() {
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getStudentReportPDF(token).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                        Timber.i("report_pdf files data :${resource.data?.size}")
-                        showLoadingDialog(false)
-                        reportAdapter?.submitList(resource?.data)
-                    }
-                    Status.ERROR -> {
-                        Timber.i(resource.message)
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                        showLoadingDialog(false)
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading...")
-                        showLoadingDialog()
-                    }
+            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch) {
+                    preferenceProvider.setNotificationCallback(REPORT_PDF_RECEIVE_EXTRA, false)
                 }
+                studentViewModel.getStudentReportPDF(token, fetch).observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            Timber.i("report_pdf files data :${resource.data?.size}")
+                            showLoadingDialog(false)
+                            reportAdapter?.submitList(resource?.data)
+                        }
+                        Status.ERROR -> {
+                            Timber.i(resource.message)
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            showLoadingDialog(false)
+                        }
+                        Status.LOADING -> {
+                            Timber.i("loading...")
+                            showLoadingDialog()
+                        }
+                    }
 
+                })
             })
+
         })
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
@@ -225,6 +237,16 @@ class ReportPdfFragment : BaseFragment() {
                 (view as ProgressBar).visibility = View.VISIBLE
             } else {
                 (view as ProgressBar).visibility = View.GONE
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val perf = preferenceProvider.getNotificationCallback(REPORT_PDF_RECEIVE_EXTRA)
+        perf?.let {
+            if (it) {
+                shouldFetch.value = it
             }
         }
     }

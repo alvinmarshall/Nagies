@@ -24,6 +24,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
+import com.wNagiesEducationalCenterj_9905.common.utils.NotificationUtils
 import com.wNagiesEducationalCenterj_9905.ui.auth.RoleActivity
 import com.wNagiesEducationalCenterj_9905.ui.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_parent_navigation.*
@@ -49,7 +50,7 @@ class ParentNavigationActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
         navView = findViewById(R.id.nav_view)
         drawerLayout = findViewById(R.id.drawer_layout)
-        snackBar =Snackbar.make(root,"",Snackbar.LENGTH_SHORT)
+        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         snackBar?.setText("welcome back $usr")?.show()
         setupNavigation()
@@ -83,6 +84,18 @@ class ParentNavigationActivity : BaseActivity() {
                 NAVIGATE_TO_ANNOUNCEMENT -> {
                     navigateUserToMessagePage(NAVIGATE_TO_ANNOUNCEMENT)
                 }
+                NAVIGATE_TO_ASSIGNMENT_IMAGE -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_ASSIGNMENT_IMAGE)
+                }
+                NAVIGATE_TO_ASSIGNMENT_PDF -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_ASSIGNMENT_PDF)
+                }
+                NAVIGATE_TO_REPORT_IMAGE -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_REPORT_IMAGE)
+                }
+                NAVIGATE_TO_REPORT_PDF -> {
+                    navigateUserToMessagePage(NAVIGATE_TO_REPORT_PDF)
+                }
             }
 
         }
@@ -100,6 +113,22 @@ class ParentNavigationActivity : BaseActivity() {
             NAVIGATE_TO_ANNOUNCEMENT -> {
                 extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
                 setNavigation(R.id.announcementFragment, extra)
+            }
+            NAVIGATE_TO_ASSIGNMENT_IMAGE -> {
+                extra.putBoolean(ASSIGNMENT_IMAGE_RECIEVE_EXTRA, true)
+                setNavigation(R.id.assignmentJpegFragment, extra)
+            }
+            NAVIGATE_TO_ASSIGNMENT_PDF -> {
+                extra.putBoolean(ASSIGNMENT_PDF_RECIEVE_EXTRA, true)
+                setNavigation(R.id.assignmentPdfFragment, extra)
+            }
+            NAVIGATE_TO_REPORT_IMAGE -> {
+                extra.putBoolean(REPORT_IMAGE_RECEIVE_EXTRA, true)
+                setNavigation(R.id.reportFragment, extra)
+            }
+            NAVIGATE_TO_REPORT_PDF -> {
+                extra.putBoolean(REPORT_PDF_RECEIVE_EXTRA, true)
+                setNavigation(R.id.reportPdfFragment, extra)
             }
         }
     }
@@ -132,11 +161,49 @@ class ParentNavigationActivity : BaseActivity() {
                 showPasswordResetDialog(alertDialog)
             }
             NAVIGATE_TO_ANNOUNCEMENT -> {
+                extra.putBoolean(ANNOUNCEMENT_RECEIVE_EXTRA, true)
                 showNewMessageNavigationPrompt(
                     R.id.announcementFragment,
                     ANNOUNCEMENT_RECEIVE_EXTRA,
                     extra,
                     NAVIGATE_TO_ANNOUNCEMENT
+                )
+            }
+            NAVIGATE_TO_ASSIGNMENT_IMAGE -> {
+                extra.putBoolean(ASSIGNMENT_IMAGE_RECIEVE_EXTRA, true)
+                showNewMessageNavigationPrompt(
+                    R.id.assignmentJpegFragment,
+                    ASSIGNMENT_IMAGE_RECIEVE_EXTRA,
+                    extra,
+                    NAVIGATE_TO_ASSIGNMENT_IMAGE
+                )
+
+            }
+            NAVIGATE_TO_ASSIGNMENT_PDF -> {
+                extra.putBoolean(ASSIGNMENT_PDF_RECIEVE_EXTRA, true)
+                showNewMessageNavigationPrompt(
+                    R.id.assignmentPdfFragment,
+                    ASSIGNMENT_PDF_RECIEVE_EXTRA,
+                    extra,
+                    NAVIGATE_TO_ASSIGNMENT_PDF
+                )
+            }
+            NAVIGATE_TO_REPORT_IMAGE -> {
+                extra.putBoolean(REPORT_IMAGE_RECEIVE_EXTRA, true)
+                showNewMessageNavigationPrompt(
+                    R.id.reportFragment,
+                    REPORT_IMAGE_RECEIVE_EXTRA,
+                    extra,
+                    NAVIGATE_TO_REPORT_IMAGE
+                )
+            }
+            NAVIGATE_TO_REPORT_PDF -> {
+                extra.putBoolean(REPORT_PDF_RECEIVE_EXTRA, true)
+                showNewMessageNavigationPrompt(
+                    R.id.reportPdfFragment,
+                    REPORT_PDF_RECEIVE_EXTRA,
+                    extra,
+                    NAVIGATE_TO_REPORT_PDF
                 )
             }
         }
@@ -176,9 +243,7 @@ class ParentNavigationActivity : BaseActivity() {
     private fun setUserInfo() = launch {
         val photo = preferenceProvider.getUserSessionData().imageUrl
         val username = "user: ${preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)}"
-        val usr = preferenceProvider.getUserSessionData().name?.split(" ")?.get(0)
         navView.getHeaderView(0).nav_header_title.text = username
-//        snackBar?.setText("welcome back $usr")?.show()
         navView.getHeaderView(0).nav_header_title.text = username
         GlideApp.with(applicationContext).load(photo)
             .placeholder(R.drawable.default_user_avatar)
@@ -207,7 +272,6 @@ class ParentNavigationActivity : BaseActivity() {
                 it,
                 IntentFilter(FOREGROUND_PUSH_NOTIFICATION)
             )
-//            NotificationUtils.clearNotifications(baseContext)
         }
     }
 

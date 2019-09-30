@@ -188,8 +188,11 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    fun getStudentAssignmentPDF(token: String): LiveData<Resource<List<AssignmentEntity>>> {
-        return studentRepository.fetchStudentAssignmentPDF(token)
+    fun getStudentAssignmentPDF(
+        token: String,
+        shouldFetch: Boolean = false
+    ): LiveData<Resource<List<AssignmentEntity>>> {
+        return studentRepository.fetchStudentAssignmentPDF(token, shouldFetch)
     }
 
     fun getStudentAssignmentImage(
@@ -234,12 +237,12 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    fun getStudentReportPDF(token: String): LiveData<Resource<List<ReportEntity>>> {
-        return studentRepository.fetchStudentReportPDF(token)
+    fun getStudentReportPDF(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
+        return studentRepository.fetchStudentReportPDF(token, shouldFetch)
     }
 
-    fun getStudentReportImage(token: String): LiveData<Resource<List<ReportEntity>>> {
-        return studentRepository.fetchStudentReportImage(token)
+    fun getStudentReportImage(token: String, shouldFetch: Boolean = false): LiveData<Resource<List<ReportEntity>>> {
+        return studentRepository.fetchStudentReportImage(token, shouldFetch)
     }
 
     fun saveDownloadFilePathToDb(id: Int?, path: String?, entity: DBEntities) {

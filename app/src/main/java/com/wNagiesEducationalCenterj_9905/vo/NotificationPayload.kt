@@ -58,7 +58,7 @@ data class NotificationPayload(
 
             context.getString(R.string.notification_type_assignment_pdf) -> {
                 if (localLevel == level) {
-                    NAVIGATE_TO_REPORT_PDF
+                    NAVIGATE_TO_ASSIGNMENT_PDF
                 } else {
                     null
                 }

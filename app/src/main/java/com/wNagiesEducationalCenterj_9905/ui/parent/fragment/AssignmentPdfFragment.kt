@@ -18,6 +18,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -47,8 +48,7 @@ class AssignmentPdfFragment : BaseFragment() {
     private var itemData: Triple<ViewFilesAction, Int?, String?>? = null
     private var loadingIndicator: ProgressBar? = null
     private var snackBar: Snackbar? = null
-    private var shouldFetch: Boolean = false
-    private lateinit var sharedViewModel: SharedViewModel
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
     private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
     private var downloadReceiver: BroadcastReceiver? = null
 
@@ -61,6 +61,10 @@ class AssignmentPdfFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val extra = arguments?.getBoolean(ASSIGNMENT_PDF_RECIEVE_EXTRA)
+        extra?.let { result ->
+            shouldFetch.value = result
+        }
         recyclerView = recycler_view
         loadingIndicator = progressBar
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
@@ -93,40 +97,36 @@ class AssignmentPdfFragment : BaseFragment() {
 
     private fun subscribeObservers() {
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getStudentAssignmentPDF(token).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                        Timber.i("assignment files data :${resource.data?.size}")
-                        showLoadingDialog(false)
-                        fileModelAdapter?.submitList(resource?.data)
-                    }
-                    Status.ERROR -> {
-                        Timber.i(resource.message)
-                        showLoadingDialog(false)
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading...")
-                        showLoadingDialog()
-                    }
+            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch) {
+                    preferenceProvider.setNotificationCallback(ASSIGNMENT_PDF_RECIEVE_EXTRA, false)
                 }
+                studentViewModel.getStudentAssignmentPDF(token,fetch).observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            Timber.i("assignment files data :${resource.data?.size}")
+                            showLoadingDialog(false)
+                            fileModelAdapter?.submitList(resource?.data)
+                        }
+                        Status.ERROR -> {
+                            Timber.i(resource.message)
+                            showLoadingDialog(false)
+                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                        }
+                        Status.LOADING -> {
+                            Timber.i("loading...")
+                            showLoadingDialog()
+                        }
+                    }
+                })
             })
+
 
         })
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
         })
-
-        activity?.let {
-            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
-            sharedViewModel.fetchAssignmentPDF.observe(it, Observer { fetch ->
-                if (fetch) {
-                    Timber.i("assignment pdf received from activity")
-                    shouldFetch = fetch
-                }
-            })
-        }
     }
 
     private fun initRecyclerView() {
@@ -241,9 +241,14 @@ class AssignmentPdfFragment : BaseFragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        sharedViewModel.fetchAssignmentJPEG.value = false
+    override fun onResume() {
+        super.onResume()
+        val perf = preferenceProvider.getNotificationCallback(ASSIGNMENT_PDF_RECIEVE_EXTRA)
+        perf?.let {
+            if (it) {
+                shouldFetch.value = it
+            }
+        }
     }
 
     override fun onDestroy() {

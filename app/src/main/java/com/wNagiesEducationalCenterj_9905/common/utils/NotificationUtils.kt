@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.Ringtone
 import android.media.RingtoneManager
@@ -27,8 +26,19 @@ object NotificationUtils {
             NotificationCompat.Builder(context, context.getString(R.string.announcement_channel_id))
         val iconRes: Int = R.mipmap.ic_launcher
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        val resultPendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-        showNotification(context, mBuilder, iconRes, title, message, resultPendingIntent, notificationSound)
+        val notificationId = floor(Math.random() * 20).toInt()
+        val resultPendingIntent =
+            PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        showNotification(
+            context,
+            mBuilder,
+            iconRes,
+            title,
+            message,
+            resultPendingIntent,
+            notificationSound,
+            notificationId
+        )
         playNotificationSound(context)
     }
 
@@ -52,23 +62,24 @@ object NotificationUtils {
         title: String?,
         message: String?,
         resultPendingIntent: PendingIntent?,
-        notificationSound: Uri?
+        notificationSound: Uri?,
+        notificationId: Int
     ) {
-        val inboxStyle: NotificationCompat.InboxStyle = NotificationCompat.InboxStyle()
-        inboxStyle.addLine(message)
+        val bigTextStyle: NotificationCompat.BigTextStyle = NotificationCompat.BigTextStyle()
+        bigTextStyle.bigText(message)
         val notification = mBuilder.setSmallIcon(iconRes).setTicker(title).setWhen(0)
             .setAutoCancel(true)
             .setContentTitle(title)
             .setContentIntent(resultPendingIntent)
             .setSound(notificationSound)
-            .setStyle(inboxStyle)
+            .setStyle(bigTextStyle)
+            .setWhen(System.currentTimeMillis())
             .setSmallIcon(iconRes)
-            .setLargeIcon(BitmapFactory.decodeResource(context.resources, iconRes))
             .setContentText(message)
             .build()
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = floor(Math.random() * 20).toInt()
+
         notificationManager.notify(notificationId, notification)
     }
 
@@ -88,10 +99,10 @@ object NotificationUtils {
         return isInBackground
     }
 
-    fun clearNotifications(context: Context) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancelAll()
-    }
+//    fun clearNotifications(context: Context) {
+//        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        notificationManager.cancelAll()
+//    }
 
     fun registerNotificationChannel(context: Context) {
         val channelId = context.getString(R.string.announcement_channel_id)

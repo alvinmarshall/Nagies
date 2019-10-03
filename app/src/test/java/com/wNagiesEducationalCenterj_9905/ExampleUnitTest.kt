@@ -1,8 +1,10 @@
 package com.wNagiesEducationalCenterj_9905
 
 import org.junit.Test
-
-import org.junit.Assert.*
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -11,7 +13,14 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun tttt(){
+         val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val value = "2019-09-01T20:24:19.000Z"
+
+
+        print(" date: ")
+
     }
+
+
 }

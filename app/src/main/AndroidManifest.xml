@@ -1,27 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:dist="http://schemas.android.com/apk/distribution"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.wNagiesEducationalCenterj_9905">
 
     <dist:module dist:instant="true"/>
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
     <application
-            android:allowBackup="true"
+            android:name=".App"
+            android:allowBackup="false"
+            android:fullBackupContent="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:usesCleartextTraffic="true"
+            tools:ignore="GoogleAppIndexingWarning"
+            tools:targetApi="n">
         <activity
-                android:name=".MainActivity"
-                android:label="@string/app_name"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:name=".ui.settings.SettingsActivity"
+                android:label="@string/title_activity_settings">
+        </activity>
+
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@drawable/ic_business_black_24dp"/>
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/colorAccent"/>
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_channel_id"
+                android:value="@string/announcement_channel_id"/>
+        <meta-data
+                android:name="firebase_messaging_auto_init_enabled"
+                android:value="false"/>
+        <meta-data
+                android:name="firebase_analytics_collection_enabled"
+                android:value="false"/>
+
+        <activity android:name=".ui.auth.RoleActivity">
+        </activity>
+        <activity
+                android:name=".ui.parent.ParentNavigationActivity"
+                android:theme="@style/AppTheme">
+        </activity>
+        <activity
+                android:name=".ui.auth.AuthActivity"
+                android:label="@string/label_login_page"
+                android:theme="@style/AppTheme">
+        </activity>
+        <activity
+                android:name=".ui.teacher.TeacherNavigationActivity"
+                android:label="@string/title_activity_teacher_navigation"
+                android:theme="@style/AppTheme">
+        </activity>
+        <activity
+                android:name=".SplashActivity"
+                android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="@string/file_provider_authority"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_provider_path"/>
+        </provider>
+
+        <service android:name=".notification.FirebaseMessageService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

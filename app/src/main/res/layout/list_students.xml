@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   android:layout_width="match_parent"
+                                                   android:background="@drawable/bg_list"
+                                                   app:cardUseCompatPadding="true"
+                                                   app:cardElevation="2dp"
+                                                   android:layout_height="wrap_content">
+
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+        <ImageView android:layout_width="match_parent"
+                   android:src="@color/colorPrimary"
+                   android:id="@+id/item_img"
+                   android:layout_height="250dp"
+                   android:layout_alignParentStart="true"
+                   android:layout_alignParentTop="true"
+                   android:contentDescription="@string/des_profile_image"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:padding="@dimen/text_padding_small"
+                  android:fontFamily="sans-serif-smallcaps"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                  android:layout_below="@id/item_img"
+                  android:id="@+id/item_ref"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:id="@+id/item_name"
+                  android:fontFamily="sans-serif-smallcaps"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                  android:padding="@dimen/text_padding_small"
+                  android:layout_below="@id/item_ref"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:id="@+id/item_index"
+                  android:fontFamily="sans-serif-smallcaps"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                  android:padding="@dimen/text_padding_small"
+                  android:layout_below="@id/item_name"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent"
+                  tools:text="@string/app_name"
+                  android:id="@+id/item_gender"
+                  android:padding="@dimen/text_padding_small"
+                  android:fontFamily="sans-serif-light"
+                  android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                  android:layout_below="@id/item_index"
+                  android:layout_height="wrap_content"/>
+
+        <Button android:layout_width="match_parent"
+                android:text="@string/btn_label_upload_report"
+                android:id="@+id/btn_upload_report"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_below="@id/item_gender"
+                android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

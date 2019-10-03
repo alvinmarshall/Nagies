@@ -17,7 +17,6 @@ import com.wNagiesEducationalCenterj_9905.data.db.converter.DateTypeConverter
         ReportEntity::class,
         StudentTeacherEntity::class,
         AnnouncementEntity::class,
-        TeacherComplaintEntity::class,
         TeacherProfileEntity::class,
         CircularEntity::class,
         BillingEntity::class,

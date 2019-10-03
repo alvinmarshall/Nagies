@@ -17,4 +17,6 @@ data class UserEntity(
     var role: String? = null
     var token: String? = null
     var photo: String? = null
+    var name:String?=null
+    var level:String?=null
 }

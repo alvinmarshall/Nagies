@@ -5,33 +5,23 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherComplaintEntity
 import io.reactivex.Flowable
 import io.reactivex.Single
 
 @Dao
 interface ComplaintDao {
     @Insert
-    fun insertParentComplaint(complaintEntity: ComplaintEntity): Single<Long>
+    fun insertComplaint(ComplaintEntityList: List<ComplaintEntity>)
 
-    @Query("SELECT * FROM parent_complaint WHERE token = :token")
-    fun getSavedComplaintMessage(token: String): Flowable<List<ComplaintEntity>>
+    @Query("SELECT * FROM complaint WHERE token = :token AND message LIKE :search")
+    fun getComplaintMessage(token: String,search:String): LiveData<List<ComplaintEntity>>
 
-    @Query("SELECT * FROM parent_complaint WHERE id = :id")
-    fun getSavedComplaintMessageById(id: Int): Single<ComplaintEntity>
+    @Query("SELECT * FROM complaint WHERE id = :id")
+    fun getComplaintMessageById(id: Int): Single<ComplaintEntity>
 
-    //region TeacherProfileEntity
-    @Insert
-    fun insertTeacherComplaint(teacherComplaintEntityList: List<TeacherComplaintEntity>)
+    @Query("DELETE FROM complaint WHERE token = :token")
+    fun deleteComplaint(token: String)
 
-    @Query("SELECT * FROM teacher_complaint WHERE token = :token AND message LIKE :search")
-    fun getTeacherComplaintMessage(token: String,search:String): LiveData<List<TeacherComplaintEntity>>
-
-    @Query("DELETE FROM teacher_complaint WHERE token = :token")
-    fun deleteTeacherComplaint(token: String)
-
-    @Query("SELECT * FROM teacher_complaint WHERE id = :id")
-    fun getComplaintMessageById(id: Int): Single<TeacherComplaintEntity>
-    //endregion
-
+    @Query("DELETE FROM complaint WHERE uid = :id")
+    fun deleteComplaintById(id:Int)
 }

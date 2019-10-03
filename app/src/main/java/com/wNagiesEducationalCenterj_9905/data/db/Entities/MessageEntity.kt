@@ -15,4 +15,5 @@ data class MessageEntity(
 ) : IMessageModel {
     @PrimaryKey(autoGenerate = true)
     override var id: Int = 0
+    override var uid: Int = 0
 }

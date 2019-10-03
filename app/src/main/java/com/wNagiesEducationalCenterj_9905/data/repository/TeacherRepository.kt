@@ -72,33 +72,33 @@ class TeacherRepository @Inject constructor(
         token: String,
         shouldFetch: Boolean = false,
         searchContent: String = ""
-    ): LiveData<Resource<List<TeacherComplaintEntity>>> {
-        return object : NetworkBoundResource<List<TeacherComplaintEntity>, TeacherComplaintResponse>(appExecutors) {
-            override fun saveCallResult(item: TeacherComplaintResponse) {
+    ): LiveData<Resource<List<ComplaintEntity>>> {
+        return object : NetworkBoundResource<List<ComplaintEntity>, ComplaintResponse>(appExecutors) {
+            override fun saveCallResult(item: ComplaintResponse) {
                 if (item.status == 200) {
                     item.complaints.forEach { complaint ->
                         complaint.token = token
                     }
                     db.runInTransaction {
-                        complaintDao.deleteTeacherComplaint(token)
-                        complaintDao.insertTeacherComplaint(item.complaints)
+                        complaintDao.deleteComplaint(token)
+                        complaintDao.insertComplaint(item.complaints)
                     }
                     preferenceProvider.setFetchDate(FetchType.COMPLAINT)
                 }
             }
 
-            override fun shouldFetch(data: List<TeacherComplaintEntity>?): Boolean {
+            override fun shouldFetch(data: List<ComplaintEntity>?): Boolean {
                 val isOld = preferenceProvider.getFetchType(FetchType.COMPLAINT)
                 Timber.i("is old $isOld")
                 return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
-            override fun loadFromDb(): LiveData<List<TeacherComplaintEntity>> {
-                return complaintDao.getTeacherComplaintMessage(token, "%$searchContent%")
+            override fun loadFromDb(): LiveData<List<ComplaintEntity>> {
+                return complaintDao.getComplaintMessage(token, "%$searchContent%")
             }
 
-            override fun createCall(): LiveData<ApiResponse<TeacherComplaintResponse>> =
-                apiService.getTeacherComplaint(token)
+            override fun createCall(): LiveData<ApiResponse<ComplaintResponse>> =
+                apiService.getComplaint(token)
         }.asLiveData()
     }
 
@@ -146,7 +146,7 @@ class TeacherRepository @Inject constructor(
         return messageDao.insertSentMessage(sentMessage)
     }
 
-    fun getComplaintMessageById(id: Int): Single<TeacherComplaintEntity> {
+    fun getComplaintMessageById(id: Int): Single<ComplaintEntity> {
         return complaintDao.getComplaintMessageById(id)
     }
 

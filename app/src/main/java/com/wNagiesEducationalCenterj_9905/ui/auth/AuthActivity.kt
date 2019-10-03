@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.LOGIN_ROLE_OPTIONS
-import com.wNagiesEducationalCenterj_9905.common.SELECTED_ROLE
+import com.wNagiesEducationalCenterj_9905.common.USER_SELECTED_ROLE_PREF_KEY
 import com.wNagiesEducationalCenterj_9905.common.UserAccount
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.common.utils.InputValidationProvider
@@ -37,7 +37,7 @@ class AuthActivity : BaseActivity() {
         setSupportActionBar(toolbar)
 
         showLoadingDialog(false)
-        if (!intent.hasExtra(SELECTED_ROLE)) {
+        if (!intent.hasExtra(USER_SELECTED_ROLE_PREF_KEY)) {
             return
         }
         getAccountUser()
@@ -49,7 +49,7 @@ class AuthActivity : BaseActivity() {
 
     private fun getAccountUser() {
         val bundle = intent.extras
-        val role = bundle?.getString(SELECTED_ROLE)
+        val role = bundle?.getString(USER_SELECTED_ROLE_PREF_KEY)
         userAccount = when (role) {
             LOGIN_ROLE_OPTIONS[0] -> UserAccount.PARENT
             LOGIN_ROLE_OPTIONS[1] -> UserAccount.TEACHER
@@ -88,7 +88,6 @@ class AuthActivity : BaseActivity() {
                     })
             }
             null -> {
-                throw NullPointerException("login role option cannot be null")
             }
         }
     }
@@ -102,7 +101,7 @@ class AuthActivity : BaseActivity() {
                 showLoadingDialog(false)
                 when (userAccount) {
                     UserAccount.PARENT -> {
-                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[0].toLowerCase()) {
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[0]) {
                             showErrorMessage(true)
                             return
                         }
@@ -111,7 +110,7 @@ class AuthActivity : BaseActivity() {
                         finish()
                     }
                     UserAccount.TEACHER -> {
-                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[1].toLowerCase()) {
+                        if (resource.data?.role != LOGIN_ROLE_OPTIONS[1]) {
                             showErrorMessage(true)
                             return
                         }
@@ -144,6 +143,7 @@ class AuthActivity : BaseActivity() {
     private fun setPreference(role: String, data: UserEntity) {
         preferenceProvider.setUserLoginRole(role)
         preferenceProvider.setUserLogin(true, data.token)
+        preferenceProvider.setUserBasicInfo(data.username, data.name, data.level, data.photo)
         Timber.i("user authenticated with id: ${data.id}")
     }
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
@@ -13,10 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.MessageType
-import com.wNagiesEducationalCenterj_9905.common.showAnyView
-import com.wNagiesEducationalCenterj_9905.common.showDataAvailableMessage
+import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
@@ -30,6 +28,7 @@ class TeacherAnnouncementFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +53,10 @@ class TeacherAnnouncementFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        val extra = arguments?.getBoolean(ANNOUNCEMENT_RECEIVE_EXTRA)
+        extra?.let { result ->
+            shouldFetch.value = result
+        }
         initRecyclerView()
         configureViewModel()
     }
@@ -113,24 +116,31 @@ class TeacherAnnouncementFragment : BaseFragment() {
 
     private fun subscribeObservers(token: String) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
-            teacherViewModel.getAnnouncementMessage(token, search).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                        adapter?.submitList(resource?.data)
-                        showLoadingDialog(false)
-                        Timber.i("data size: ${resource.data?.size}")
-                    }
-                    Status.ERROR -> {
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
-                        showLoadingDialog(false)
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading...")
-                        showLoadingDialog()
-                    }
+            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch){
+                    preferenceProvider.setNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA, false)
                 }
+                teacherViewModel.getAnnouncementMessage(token, fetch, search)
+                    .observe(viewLifecycleOwner, Observer { resource ->
+                        when (resource.status) {
+                            Status.SUCCESS -> {
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                adapter?.submitList(resource?.data)
+                                showLoadingDialog(false)
+                                Timber.i("data size: ${resource.data?.size}")
+                            }
+                            Status.ERROR -> {
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                showLoadingDialog(false)
+                            }
+                            Status.LOADING -> {
+                                Timber.i("loading...")
+                                showLoadingDialog()
+                            }
+                        }
+                    })
             })
+
         })
     }
 
@@ -143,5 +153,21 @@ class TeacherAnnouncementFragment : BaseFragment() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        val perf = preferenceProvider.getNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA)
+        perf?.let {
+            if (it) {
+                shouldFetch.value = it
+            }
+        }
+    }
+
+//    override fun onPause() {
+//        super.onPause()
+//        preferenceProvider.setNotificationCallback(ANNOUNCEMENT_RECEIVE_EXTRA, false)
+//    }
+
 
 }

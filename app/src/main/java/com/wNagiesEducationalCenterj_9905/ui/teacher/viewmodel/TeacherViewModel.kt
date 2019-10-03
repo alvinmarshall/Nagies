@@ -31,7 +31,7 @@ class TeacherViewModel @Inject constructor(
     private val preferenceProvider: PreferenceProvider
 ) : BaseViewModel() {
     var userToken: MutableLiveData<String> = MutableLiveData()
-    var cachedComplaint: MutableLiveData<TeacherComplaintEntity> = MutableLiveData()
+    var cachedComplaint: MutableLiveData<ComplaintEntity> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
     val cachedLabels: MutableLiveData<MutableList<Pair<Profile, String?>>> = MutableLiveData()
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
@@ -61,15 +61,16 @@ class TeacherViewModel @Inject constructor(
         token: String,
         shouldFetch: Boolean,
         searchContent: String = ""
-    ): LiveData<Resource<List<TeacherComplaintEntity>>> {
+    ): LiveData<Resource<List<ComplaintEntity>>> {
         return teacherRepository.fetchComplaint(token, shouldFetch, searchContent)
     }
 
     fun getAnnouncementMessage(
         token: String,
+        shouldFetch: Boolean=false,
         searchContent: String = ""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
-        return teacherRepository.fetchAnnouncement(token, searchContent = searchContent)
+        return teacherRepository.fetchAnnouncement(token,shouldFetch,searchContent)
     }
 
     fun getComplaintMessageById(id: Int) {
@@ -122,9 +123,6 @@ class TeacherViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedLabels.value = it
-                    if (data !== null) {
-                        preferenceProvider.setUserBasicInfo(data.name,data.level)
-                    }
                 }, {})
         )
     }

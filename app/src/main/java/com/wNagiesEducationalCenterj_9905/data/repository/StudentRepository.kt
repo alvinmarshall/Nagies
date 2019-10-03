@@ -17,7 +17,6 @@ import com.wNagiesEducationalCenterj_9905.data.db.AppDatabase
 import com.wNagiesEducationalCenterj_9905.data.db.DAO.*
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
 import com.wNagiesEducationalCenterj_9905.vo.Resource
-import io.reactivex.Flowable
 import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
@@ -71,6 +70,10 @@ class StudentRepository @Inject constructor(
         return messageDao.getMessageById(message_id)
     }
 
+    fun getComplaintMessageById(id: Int): Single<ComplaintEntity> {
+        return complaintDao.getComplaintMessageById(id)
+    }
+
     fun fetchStudentProfile(token: String): LiveData<Resource<StudentProfileEntity>> {
         return object : NetworkBoundResource<StudentProfileEntity, StudentProfileResponse>(appExecutors) {
             override fun saveCallResult(item: StudentProfileResponse) {
@@ -112,17 +115,43 @@ class StudentRepository @Inject constructor(
         return apiService.sendParentComplaint(token, parentComplaintRequest)
     }
 
-    fun saveComplaintMessage(complaintEntity: ComplaintEntity): Single<Long> {
-        return complaintDao.insertParentComplaint(complaintEntity)
+
+    fun fetchSentComplaint(
+        token: String,
+        shouldFetch: Boolean = false,
+        searchContent: String = ""
+    ): LiveData<Resource<List<ComplaintEntity>>> {
+        return object : NetworkBoundResource<List<ComplaintEntity>, ComplaintResponse>(appExecutors) {
+            override fun saveCallResult(item: ComplaintResponse) {
+                if (item.status == 200){
+                    item.complaints.forEach { complaint ->
+                        complaint.token = token
+                    }
+                    db.runInTransaction {
+                        complaintDao.deleteComplaint(token)
+                        complaintDao.insertComplaint(item.complaints)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.COMPLAINT)
+                }
+            }
+
+            override fun shouldFetch(data: List<ComplaintEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.COMPLAINT)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun loadFromDb(): LiveData<List<ComplaintEntity>> {
+                return complaintDao.getComplaintMessage(token,"%$searchContent%")
+            }
+
+            override fun createCall(): LiveData<ApiResponse<ComplaintResponse>> {
+                return apiService.getComplaint(token)
+            }
+        }.asLiveData()
     }
 
-    fun getSavedParentComplaints(token: String): Flowable<List<ComplaintEntity>> {
-        return complaintDao.getSavedComplaintMessage(token)
-    }
 
-    fun getSavedParentComplaintsById(id: Int): Single<ComplaintEntity> {
-        return complaintDao.getSavedComplaintMessageById(id)
-    }
 
     fun fetchStudentAssignmentPDF(
         token: String,
@@ -502,5 +531,10 @@ class StudentRepository @Inject constructor(
                 return apiService.fetchStudentTimetable(token)
             }
         }.asLiveData()
+    }
+
+    fun deleteComplaint(token:String,id:Int?,type: String="complaint"):Single<DeleteMessageResponse>{
+        id?.let { complaintDao.deleteComplaintById(it) }
+        return apiService.deleteMessage(token,id,type)
     }
 }

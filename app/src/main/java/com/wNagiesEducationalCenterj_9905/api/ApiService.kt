@@ -9,7 +9,6 @@ import com.wNagiesEducationalCenterj_9905.data.db.Entities.UserEntity
 import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.MultipartBody
-import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface ApiService {
@@ -76,10 +75,10 @@ interface ApiService {
     ): LiveData<ApiResponse<AnnouncementResponse>>
 
     @GET("message")
-    fun getTeacherComplaint(
+    fun getComplaint(
         @Header("Authorization") token: String,
         @Query("from") from: String = "complaint"
-    ): LiveData<ApiResponse<TeacherComplaintResponse>>
+    ): LiveData<ApiResponse<ComplaintResponse>>
 
     @POST("users/change_password")
     fun requestTeacherAccountPasswordChange(
@@ -178,5 +177,12 @@ interface ApiService {
         @Query("type") type: String = "timetable",
         @Query("format") format: String = "image"
     ): LiveData<ApiResponse<TimetableResponse>>
+
+    @DELETE("message/{id}/{type}")
+    fun deleteMessage(
+        @Header("Authorization") token: String,
+        @Path("id") id: Int?,
+        @Path("type") type: String?
+    ): Single<DeleteMessageResponse>
 
 }

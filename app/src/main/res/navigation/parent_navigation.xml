@@ -9,19 +9,22 @@
               android:label="Dashboard" tools:layout="@layout/fragment_dashboard">
         <action android:id="@+id/action_dashboardFragment_to_messageDetailFragment"
                 app:destination="@id/messageDetailFragment"/>
+        <argument android:name="should_fetch" app:argType="boolean" android:defaultValue="false"/>
     </fragment>
     <fragment android:id="@+id/assignmentJpegFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AssignmentJpegFragment"
-              android:label="Assignment jpeg" tools:layout="@layout/fragment_assignment_jpeg"/>
+              android:label="Assignment-Image" tools:layout="@layout/fragment_assignment_jpeg"/>
     <fragment android:id="@+id/assignmentPdfFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AssignmentPdfFragment"
-              android:label="Assignment pdf" tools:layout="@layout/fragment_assignment_pdf"/>
+              android:label="Assignment-PDF" tools:layout="@layout/fragment_assignment_pdf"/>
     <fragment android:id="@+id/changePasswordFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.fragment.ChangePasswordFragment"
               android:label="Change Password" tools:layout="@layout/fragment_change_password"/>
     <fragment android:id="@+id/profileFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ProfileFragment"
-              android:label="Profile" tools:layout="@layout/fragment_profile"/>
+              android:label="Profile" tools:layout="@layout/fragment_profile">
+        <action android:id="@+id/action_profileFragment_to_dashboardFragment" app:destination="@id/dashboardFragment"/>
+    </fragment>
     <fragment android:id="@+id/sendMessageFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.SendMessageFragment"
               android:label="Sent Messages" tools:layout="@layout/fragment_send_message">
@@ -46,10 +49,10 @@
               android:label="Circular" tools:layout="@layout/fragment_circular"/>
     <fragment android:id="@+id/reportFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ReportFragment"
-              android:label="Reports" tools:layout="@layout/fragment_report"/>
+              android:label="Report-Image" tools:layout="@layout/fragment_report"/>
     <fragment android:id="@+id/reportPdfFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.ReportPdfFragment"
-              android:label="Report pdf" tools:layout="@layout/fragment_report_pdf"/>
+              android:label="Report-PDF" tools:layout="@layout/fragment_report_pdf"/>
     <fragment android:id="@+id/createMessageFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.CreateMessageFragment"
               android:label="New Message" tools:layout="@layout/fragment_create_message"/>

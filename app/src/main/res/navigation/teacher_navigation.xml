@@ -17,7 +17,7 @@
     </fragment>
     <fragment android:id="@+id/parentComplaintFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.ParentComplaintFragment"
-              android:label="Parent Complaint" tools:layout="@layout/fragment_parent_complaint">
+              android:label="Complaint" tools:layout="@layout/fragment_parent_complaint">
         <action android:id="@+id/action_parentComplaintFragment_to_parentComplaintDetailsFragment"
                 app:destination="@id/parentComplaintDetailsFragment"/>
     </fragment>
@@ -55,7 +55,7 @@
     </fragment>
     <fragment android:id="@+id/studentListFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.StudentListFragment"
-              android:label="Class Students" tools:layout="@layout/fragment_student_list"/>
+              android:label="Student List" tools:layout="@layout/fragment_student_list"/>
     <fragment android:id="@+id/fileExplorerFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileExplorerFragment"
               android:label="File Explorer" tools:layout="@layout/fragment_file_explorer">

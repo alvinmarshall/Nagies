@@ -18,6 +18,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -46,8 +47,7 @@ class AssignmentJpegFragment : BaseFragment() {
     private var itemData: Triple<ViewFilesAction, Int?, String?>? = null
     private var loadingIndicator: ProgressBar? = null
     private var snackBar: Snackbar? = null
-    private var shouldFetch: Boolean = false
-    private lateinit var sharedViewModel: SharedViewModel
+    private var shouldFetch: MutableLiveData<Boolean> = MutableLiveData(false)
     private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
     private var downloadReceiver: BroadcastReceiver? = null
 
@@ -60,6 +60,10 @@ class AssignmentJpegFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val extra = arguments?.getBoolean(ASSIGNMENT_IMAGE_RECIEVE_EXTRA)
+        extra?.let { result ->
+            shouldFetch.value = result
+        }
         recyclerView = recycler_view
         loadingIndicator = progressBar
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
@@ -92,46 +96,37 @@ class AssignmentJpegFragment : BaseFragment() {
 
     private fun subscribeObservers() {
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getStudentAssignmentImage(token, shouldFetch)
-                .observe(viewLifecycleOwner, Observer { resource ->
-                    when (resource.status) {
-                        Status.SUCCESS -> {
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                            Timber.i("assignment image data :${resource.data?.size}")
-                            fileModelAdapter?.submitList(resource?.data)
-                            showLoadingDialog(false)
+            shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
+                if (fetch) {
+                    preferenceProvider.setNotificationCallback(ASSIGNMENT_IMAGE_RECIEVE_EXTRA, false)
+                }
+                studentViewModel.getStudentAssignmentImage(token, fetch)
+                    .observe(viewLifecycleOwner, Observer { resource ->
+                        when (resource.status) {
+                            Status.SUCCESS -> {
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                                Timber.i("assignment image data :${resource.data?.size}")
+                                fileModelAdapter?.submitList(resource?.data)
+                                showLoadingDialog(false)
+                            }
+                            Status.ERROR -> {
+                                Timber.i(resource.message)
+                                showLoadingDialog(false)
+                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            }
+                            Status.LOADING -> {
+                                Timber.i("loading...")
+                                showLoadingDialog()
+                            }
                         }
-                        Status.ERROR -> {
-                            Timber.i(resource.message)
-                            showLoadingDialog(false)
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
-                        }
-                        Status.LOADING -> {
-                            Timber.i("loading...")
-                            showLoadingDialog()
-                        }
-                    }
-                })
+                    })
+            })
         })
 
         studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
             showDownloadComplete(it)
         })
-        getFetchAssignment().observe(viewLifecycleOwner, Observer { fetch ->
-            if (fetch) {
-                Timber.i("assignment image received")
-                shouldFetch = fetch
-            }
-        })
-        activity?.let {
-            sharedViewModel = ViewModelProviders.of(it)[SharedViewModel::class.java]
-            sharedViewModel.fetchAssignmentJPEG.observe(it, Observer { fetch ->
-                if (fetch) {
-                    Timber.i("assignment received from activity")
-                    shouldFetch = fetch
-                }
-            })
-        }
+
     }
 
     private fun initRecyclerView() {
@@ -248,11 +243,16 @@ class AssignmentJpegFragment : BaseFragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        sharedViewModel.fetchAssignmentJPEG.value = false
-    }
 
+    override fun onResume() {
+        super.onResume()
+        val perf = preferenceProvider.getNotificationCallback(ASSIGNMENT_IMAGE_RECIEVE_EXTRA)
+        perf?.let {
+            if (it) {
+                shouldFetch.value = it
+            }
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         context?.unregisterReceiver(downloadReceiver)

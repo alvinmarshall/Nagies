@@ -59,8 +59,11 @@ class AuthRepository @Inject constructor(
         entity.photo = ServerPathUtil.setCorrectPath(item.image)
         entity.token = item.Token
         entity.uid = item.Id
+        entity.name = item.name
+        entity.level = item.level
         userDao.insertUser(entity)
         preferenceProvider.setUserLogin(true, entity.token)
+        preferenceProvider.setUserBasicInfo(username,entity.name,entity.level,entity.photo)
     }
 
     fun getAuthenticatedUserFromDb(token: String): Single<UserEntity> {

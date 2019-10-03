@@ -31,7 +31,7 @@ class TeacherViewModel @Inject constructor(
     private val preferenceProvider: PreferenceProvider
 ) : BaseViewModel() {
     var userToken: MutableLiveData<String> = MutableLiveData()
-    var cachedComplaint: MutableLiveData<TeacherComplaintEntity> = MutableLiveData()
+    var cachedComplaint: MutableLiveData<ComplaintEntity> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
     val cachedLabels: MutableLiveData<MutableList<Pair<Profile, String?>>> = MutableLiveData()
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
@@ -61,7 +61,7 @@ class TeacherViewModel @Inject constructor(
         token: String,
         shouldFetch: Boolean,
         searchContent: String = ""
-    ): LiveData<Resource<List<TeacherComplaintEntity>>> {
+    ): LiveData<Resource<List<ComplaintEntity>>> {
         return teacherRepository.fetchComplaint(token, shouldFetch, searchContent)
     }
 

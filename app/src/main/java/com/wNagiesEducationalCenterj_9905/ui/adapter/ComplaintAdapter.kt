@@ -12,7 +12,7 @@ import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
 import kotlinx.android.synthetic.main.list_messages.view.*
 
 class ComplaintAdapter : ListAdapter<ComplaintEntity, ComplaintVH>(DiffUtil()) {
-    private var itemCallback:ItemCallback<Int>? = null
+    private var itemCallback: ItemCallback<Int>? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComplaintVH {
         return ComplaintVH(
             LayoutInflater.from(parent.context)
@@ -21,12 +21,14 @@ class ComplaintAdapter : ListAdapter<ComplaintEntity, ComplaintVH>(DiffUtil()) {
     }
 
     override fun onBindViewHolder(holder: ComplaintVH, position: Int) {
-        holder.bind(getItem(position),itemCallback)
+        holder.bind(getItem(position), itemCallback)
     }
 
-    fun setItemCallback(callback: ItemCallback<Int>?){
+    fun setItemCallback(callback: ItemCallback<Int>?) {
         itemCallback = callback
     }
+
+
 
 }
 
@@ -35,12 +37,20 @@ class ComplaintVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         item: ComplaintEntity?,
         itemCallback: ItemCallback<Int>?
     ) {
-        itemView.tv_msg_content.text = item?.content
-        itemView.tv_msg_date.text = item?.date
-        val sender = "sender: you"
+        val sender = "Guardian: ${item?.guardianName}"
+        val date = "Date: ${item?.date}"
+        val content = "Content: ${item?.message}"
+        val teacher = "Teacher: ${item?.teacherName}"
+        itemView.tv_msg_content.text = content
+        itemView.tv_msg_date.text = date
+        itemView.tv_msg_level.text = teacher
         itemView.tv_msg_sender.text = sender
         itemView.setOnClickListener {
             itemCallback?.onClick(item?.id)
+        }
+        itemView.setOnLongClickListener {
+            itemCallback?.onHold(item?.uid)
+            true
         }
 
     }
@@ -52,8 +62,6 @@ private class DiffUtil : DiffUtil.ItemCallback<ComplaintEntity>() {
     }
 
     override fun areContentsTheSame(oldItem: ComplaintEntity, newItem: ComplaintEntity): Boolean {
-        return oldItem.content == newItem.content &&
-                oldItem.date == newItem.content &&
-                oldItem.token == newItem.token
+        return false
     }
 }

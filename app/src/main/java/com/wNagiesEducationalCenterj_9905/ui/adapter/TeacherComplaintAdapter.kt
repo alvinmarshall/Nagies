@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.ComplaintAction
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.TeacherComplaintEntity
+import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
 import kotlinx.android.synthetic.main.list_complaint.view.*
 
-class TeacherComplaintAdapter : ListAdapter<TeacherComplaintEntity, TComplaintVH>(TComplaintDiff()) {
+class TeacherComplaintAdapter : ListAdapter<ComplaintEntity, TComplaintVH>(TComplaintDiff()) {
     private var itemCallback: ItemCallback<Pair<ComplaintAction, String?>>? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TComplaintVH {
         return TComplaintVH(
@@ -32,7 +32,7 @@ class TeacherComplaintAdapter : ListAdapter<TeacherComplaintEntity, TComplaintVH
 }
 
 class TComplaintVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    fun bind(item: TeacherComplaintEntity?, itemCallback: ItemCallback<Pair<ComplaintAction, String?>>?) {
+    fun bind(item: ComplaintEntity?, itemCallback: ItemCallback<Pair<ComplaintAction, String?>>?) {
         val sender = "Guardian: ${item?.guardianName}"
         val child = "Child: ${item?.studentName}"
         val date = "Date: ${item?.date}"
@@ -61,12 +61,12 @@ class TComplaintVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 }
 
-private class TComplaintDiff : DiffUtil.ItemCallback<TeacherComplaintEntity>() {
-    override fun areItemsTheSame(oldItem: TeacherComplaintEntity, newItem: TeacherComplaintEntity): Boolean {
+private class TComplaintDiff : DiffUtil.ItemCallback<ComplaintEntity>() {
+    override fun areItemsTheSame(oldItem: ComplaintEntity, newItem: ComplaintEntity): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: TeacherComplaintEntity, newItem: TeacherComplaintEntity): Boolean {
+    override fun areContentsTheSame(oldItem: ComplaintEntity, newItem: ComplaintEntity): Boolean {
         return oldItem.message == newItem.message
     }
 }

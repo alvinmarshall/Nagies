@@ -14,10 +14,6 @@ import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import kotlinx.android.synthetic.main.fragment_complaint_detail.*
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class ComplaintDetailFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var complaintId:Int? = 0
@@ -48,16 +44,15 @@ class ComplaintDetailFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this,viewModelFactory)[StudentViewModel::class.java]
-        complaintId?.let { studentViewModel.getSavedParentComplaintById(it) }
+        complaintId?.let { studentViewModel.getParentComplaintById(it) }
         subscribeObserver()
     }
 
     private fun subscribeObserver() {
         studentViewModel.cachedSavedComplaintById.observe(viewLifecycleOwner, Observer {
-            val sender = "sender: you"
-            itemTitle?.text = sender
+            itemTitle?.text = it.guardianName
             itemDate?.text = it.date
-            itemContent?.text = it.content
+            itemContent?.text = it.message
         })
     }
 

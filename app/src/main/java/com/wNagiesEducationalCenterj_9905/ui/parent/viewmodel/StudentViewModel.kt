@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
 import com.wNagiesEducationalCenterj_9905.common.DBEntities
-import com.wNagiesEducationalCenterj_9905.common.extension.getCurrentDateTime
-import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
@@ -29,7 +27,6 @@ class StudentViewModel @Inject constructor(
     val cachedToken: MutableLiveData<String> = MutableLiveData()
     val cachedMessage: MutableLiveData<MessageEntity> = MutableLiveData()
     val cachedLabels: MutableLiveData<MutableList<Pair<Profile, String?>>> = MutableLiveData()
-    var cachedSavedComplaint: MutableLiveData<Resource<List<ComplaintEntity>>> = MutableLiveData()
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
@@ -116,16 +113,15 @@ class StudentViewModel @Inject constructor(
                 .flatMap {
                     studentRepository.sendParentComplaint(it, parentComplaintRequest)
                 }
+                .doOnError { isSuccess.postValue(false) }
+                .doOnSuccess { isSuccess.postValue(true) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Timber.i("comp ${it}")
+                    Timber.i("comp $it")
                     if (it.status == 200) {
-                        savingComplaintToDb(parentComplaintRequest)
-                        isSuccess.value = true
-                        return@subscribe
+                        Timber.i("message sent $it")
                     }
-                    isSuccess.value = false
 
                 }, {
                     Timber.i("send error: $it")
@@ -135,57 +131,24 @@ class StudentViewModel @Inject constructor(
         )
     }
 
-    private fun savingComplaintToDb(parentComplaintRequest: ParentComplaintRequest) {
-        disposable.addAll(
-            Single.just(preferenceProvider.getUserToken())
-                .map {
-                    return@map it
-                }
-                .flatMap {
-                    val date = getCurrentDateTime().toString("yyyy/MM/dd")
-                    val complaint =
-                        ComplaintEntity(parentComplaintRequest.content, date, it)
-                    return@flatMap studentRepository.saveComplaintMessage(complaint)
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    Timber.i("saved data id: $it")
-                }, {})
-        )
-    }
 
-    fun getSavedParentComplaint() {
+    fun getParentComplaintById(complaint_id: Int) {
         disposable.addAll(
-            Flowable.just(preferenceProvider.getUserToken()).map {
-                return@map it
-            }
-                .flatMap {
-                    return@flatMap studentRepository.getSavedParentComplaints(it)
-                }
-                .map {
-                    if (it.isEmpty()) return@map Resource.error("No content available", null)
-                    return@map Resource.success(it)
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    cachedSavedComplaint.value = Resource.loading(null)
-                    Timber.i("parent complaint messages: ${it.data?.size}")
-                    cachedSavedComplaint.value = it
-                }, {})
-        )
-    }
-
-    fun getSavedParentComplaintById(complaint_id: Int) {
-        disposable.addAll(
-            studentRepository.getSavedParentComplaintsById(complaint_id)
+            studentRepository.getComplaintMessageById(complaint_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     cachedSavedComplaintById.value = it
                 }, {})
         )
+    }
+
+    fun getComplaintMessage(
+        token: String,
+        shouldFetch: Boolean=false,
+        searchContent: String = ""
+    ): LiveData<Resource<List<ComplaintEntity>>> {
+        return studentRepository.fetchSentComplaint(token, shouldFetch, searchContent)
     }
 
     fun getStudentAssignmentPDF(
@@ -310,6 +273,22 @@ class StudentViewModel @Inject constructor(
 
     fun getTimetable(token: String): LiveData<Resource<List<TimeTableEntity>>> {
         return studentRepository.fetchStudentTimetable(token)
+    }
+
+    fun deleteMessage(id: Int?){
+        disposable.addAll(Single.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { studentRepository.deleteComplaint(it,id) }
+            .doOnSubscribe { isSuccess.postValue(false) }
+            .doOnError { isSuccess.postValue(false) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it.status == 200){
+                    Timber.i("message deleted success")
+                    isSuccess.value = true
+                }
+            },{err-> Timber.i(err,"deleteMessage")}))
     }
 
 

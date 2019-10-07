@@ -153,7 +153,7 @@
     <string name="attachment_title">Download incoming attachments</string>
     <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="pref_app_version">version 1.0.2</string>
+    <string name="pref_app_version">version 1.0.3</string>
     <string name="pref_contact_us">Contact Us</string>
     <string name="pref_about_us">About Us</string>
     <string name="pref_about_us_url">http://infordasgh.com/AboutUs.html</string>

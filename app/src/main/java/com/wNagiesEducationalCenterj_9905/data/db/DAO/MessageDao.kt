@@ -31,4 +31,7 @@ interface MessageDao {
 
     @Query("SELECT * FROM messages WHERE token = :token")
     fun getSentMessages(token: String):Flowable<List<MessageEntity>>
+
+    @Query("DELETE FROM messages WHERE uid = :id")
+    fun deleteMessageById(id:Int)
 }

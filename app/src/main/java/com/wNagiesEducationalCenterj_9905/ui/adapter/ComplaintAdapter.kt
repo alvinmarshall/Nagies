@@ -29,7 +29,6 @@ class ComplaintAdapter : ListAdapter<ComplaintEntity, ComplaintVH>(DiffUtil()) {
     }
 
 
-
 }
 
 class ComplaintVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -62,6 +61,7 @@ private class DiffUtil : DiffUtil.ItemCallback<ComplaintEntity>() {
     }
 
     override fun areContentsTheSame(oldItem: ComplaintEntity, newItem: ComplaintEntity): Boolean {
-        return false
+        return oldItem.message == newItem.message &&
+                oldItem.level == newItem.level
     }
 }

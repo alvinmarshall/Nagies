@@ -32,11 +32,11 @@ class TeacherViewModel @Inject constructor(
 ) : BaseViewModel() {
     var userToken: MutableLiveData<String> = MutableLiveData()
     var cachedComplaint: MutableLiveData<ComplaintEntity> = MutableLiveData()
+    val cachedMessage: MutableLiveData<MessageEntity> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
     val cachedLabels: MutableLiveData<MutableList<Pair<Profile, String?>>> = MutableLiveData()
     val isSuccess: MutableLiveData<Boolean> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
-    val cachedSentMessage: MutableLiveData<Resource<List<MessageEntity>>> = MutableLiveData()
     val searchString: MutableLiveData<String> = MutableLiveData()
     var cachedUploadData: MutableLiveData<List<IFileModel>> = MutableLiveData()
     var deleteUploadResponse: MutableLiveData<ExplorerDeleteResponse> = MutableLiveData()
@@ -135,15 +135,15 @@ class TeacherViewModel @Inject constructor(
             .flatMap { token ->
                 teacherRepository.sendTeacherMessage(token, teacherMessageRequest)
             }
+            .doOnError { isSuccess.postValue(false) }
+            .doOnSuccess { isSuccess.postValue(true) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                Timber.i("comp $it")
                 if (it.status == 200) {
-                    savingMessageToDb(teacherMessageRequest, it.level)
-                    isSuccess.value = true
-                    return@subscribe
+                    Timber.i("message sent $it")
                 }
-                isSuccess.value = false
             }, { err ->
                 Timber.i(err)
                 errorMessage.value = com.wNagiesEducationalCenterj_9905.R.string.errorConnection
@@ -151,42 +151,12 @@ class TeacherViewModel @Inject constructor(
         )
     }
 
-    private fun savingMessageToDb(
-        teacherMessageRequest: TeacherMessageRequest,
-        level: String?
-    ) {
-        disposable.addAll(Single.just(preferenceProvider.getUserToken())
-            .map { return@map it }
-            .flatMap { token ->
-                val date = getCurrentDateTime().toString("yyyy/MM/dd")
-                val message = level?.let { MessageEntity("you", it, teacherMessageRequest.content, null, token, date) }
-                return@flatMap message?.let { teacherRepository.saveSentMessage(it) }
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Timber.i("saved data id: $it")
-            }, { err -> Timber.i(err) })
-        )
-    }
-
-    fun getSentMessages() {
-        disposable.addAll(Flowable.just(preferenceProvider.getUserToken())
-            .map { return@map it }
-            .flatMap { token ->
-                teacherRepository.getSentMessages(token)
-            }
-            .map {
-                if (it.isEmpty()) return@map Resource.error("no data available", null)
-                return@map Resource.success(it)
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Resource.loading(null)
-                cachedSentMessage.value = it
-            }, { err -> Timber.i(err) })
-        )
+    fun getSentMessages(
+        token: String,
+        shouldFetch: Boolean = false,
+        search: String = ""
+    ): LiveData<Resource<List<MessageEntity>>> {
+        return teacherRepository.fetchSentMessages(token, shouldFetch, search)
     }
 
     fun uploadFile(
@@ -278,6 +248,29 @@ class TeacherViewModel @Inject constructor(
 
             }, { err -> Timber.i(err, "delete uploaded file err") })
         )
+    }
+
+    fun getMessageById(messageId: Int) {
+        disposable.addAll(
+            teacherRepository.getMessageById(messageId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ cachedMessage.value = it }, {})
+        )
+
+    }
+
+    fun deleteMessage(id: Int?){
+        disposable.addAll(Single.just(preferenceProvider.getUserToken())
+            .map { return@map it }
+            .flatMap { teacherRepository.deleteSentMessage(it,id) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it.status == 200){
+                    Timber.i("message deleted success")
+                }
+            },{err-> Timber.i(err,"deleteMessage")}))
     }
 
 }

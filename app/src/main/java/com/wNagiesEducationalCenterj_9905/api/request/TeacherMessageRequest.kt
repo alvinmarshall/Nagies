@@ -8,5 +8,4 @@ data class TeacherMessageRequest(
     override val content: String
 ) : IMessageRequestModel{
     var title: String = "message from class teacher"
-    var condition: String = "'parent' in topics "
 }

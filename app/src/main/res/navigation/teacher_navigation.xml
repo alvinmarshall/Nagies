@@ -8,6 +8,8 @@
               android:label="Sent Message" tools:layout="@layout/fragment_send_message_teacher">
         <action android:id="@+id/action_sendMessageTeacherFragment_to_createTeacherMessageFragment"
                 app:destination="@id/createTeacherMessageFragment"/>
+        <action android:id="@+id/action_sendMessageTeacherFragment_to_teacherMessageDetailFragment"
+                app:destination="@id/teacherMessageDetailFragment"/>
     </fragment>
     <fragment android:id="@+id/fileManagementFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileManagementFragment"
@@ -60,5 +62,10 @@
               android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.FileExplorerFragment"
               android:label="File Explorer" tools:layout="@layout/fragment_file_explorer">
         <argument android:name="explorer_type" app:argType="string" app:nullable="true"/>
+    </fragment>
+    <fragment android:id="@+id/teacherMessageDetailFragment"
+              android:name="com.wNagiesEducationalCenterj_9905.ui.teacher.fragment.TeacherMessageDetailFragment"
+              android:label="fragment_teacher_message_detail" tools:layout="@layout/fragment_teacher_message_detail">
+        <argument android:name="args_message_id" app:argType="integer"/>
     </fragment>
 </navigation>

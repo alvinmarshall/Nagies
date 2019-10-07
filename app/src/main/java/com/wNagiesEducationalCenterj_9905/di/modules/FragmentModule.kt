@@ -90,4 +90,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeStudentTimetableFragment(): StudentTimetableFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeTeacherMessageDetailFragment():TeacherMessageDetailFragment
 }

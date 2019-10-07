@@ -19,6 +19,8 @@
                   android:id="@+id/tv_msg_date"
                   android:padding="2dp"
                   tools:text="@string/label_teacher_login"
+                  android:maxLines="1"
+                  android:ellipsize="end"
                   android:layout_height="wrap_content"
         />
 
@@ -26,6 +28,8 @@
                   android:id="@+id/tv_msg_sender"
                   android:padding="2dp"
                   tools:text="@string/label_teacher_login"
+                  android:maxLines="1"
+                  android:ellipsize="end"
                   android:layout_below="@id/tv_msg_date"
                   android:layout_height="wrap_content"
         />
@@ -34,6 +38,8 @@
                   android:padding="2dp"
                   android:id="@+id/tv_msg_level"
                   tools:text="@string/label_teacher_login"
+                  android:maxLines="2"
+                  android:ellipsize="end"
                   android:layout_below="@id/tv_msg_sender"
                   android:layout_height="wrap_content"
         />
@@ -42,7 +48,7 @@
                   android:padding="2dp"
                   android:id="@+id/tv_msg_content"
                   tools:text="@string/label_teacher_login"
-                  android:maxLines="2"
+                  android:maxLines="1"
                   android:ellipsize="end"
                   android:layout_below="@id/tv_msg_level"
                   android:layout_height="wrap_content"

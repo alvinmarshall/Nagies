@@ -153,13 +153,15 @@
     <string name="attachment_title">Download incoming attachments</string>
     <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="pref_app_version">version 1.0.1</string>
+    <string name="pref_app_version">version 1.0.2</string>
     <string name="pref_contact_us">Contact Us</string>
     <string name="pref_about_us">About Us</string>
     <string name="pref_about_us_url">http://infordasgh.com/AboutUs.html</string>
     <string name="pref_contact_us_url">http://infordasgh.com/contact.html</string>
     <string name="menu_view_time_table">TimeTable</string>
     <string name="password_reset_notification_dialog_title">Password Reset Info</string>
-    <string name="password_reset_notification_diaload_body">Your account password has been reset to the reset password, Remember to use the recent one during account login</string>
+    <string name="password_reset_notification_diaload_body">Your account password has been reset to the reset password,
+        Remember to use the recent one during account login
+    </string>
 
 </resources>

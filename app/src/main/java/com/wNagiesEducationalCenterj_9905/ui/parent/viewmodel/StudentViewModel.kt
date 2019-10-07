@@ -279,14 +279,11 @@ class StudentViewModel @Inject constructor(
         disposable.addAll(Single.just(preferenceProvider.getUserToken())
             .map { return@map it }
             .flatMap { studentRepository.deleteComplaint(it,id) }
-            .doOnSubscribe { isSuccess.postValue(false) }
-            .doOnError { isSuccess.postValue(false) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.status == 200){
                     Timber.i("message deleted success")
-                    isSuccess.value = true
                 }
             },{err-> Timber.i(err,"deleteMessage")}))
     }

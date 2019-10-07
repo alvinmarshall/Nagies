@@ -142,10 +142,6 @@ class TeacherRepository @Inject constructor(
         return apiService.sendTeacherMessage(token, teacherMessage)
     }
 
-    fun saveSentMessage(sentMessage: MessageEntity): Single<Long> {
-        return messageDao.insertSentMessage(sentMessage)
-    }
-
     fun getComplaintMessageById(id: Int): Single<ComplaintEntity> {
         return complaintDao.getComplaintMessageById(id)
     }
@@ -154,8 +150,37 @@ class TeacherRepository @Inject constructor(
         return announcementDao.getAnnouncementById(id)
     }
 
-    fun getSentMessages(token: String): Flowable<List<MessageEntity>> {
-        return messageDao.getSentMessages(token)
+    fun fetchSentMessages(
+        token: String,
+        shouldFetch: Boolean = false,
+        searchContent: String = ""
+    ): LiveData<Resource<List<MessageEntity>>> {
+        return object : NetworkBoundResource<List<MessageEntity>, MessageResponse>(appExecutors) {
+            override fun loadFromDb(): LiveData<List<MessageEntity>> {
+                return messageDao.getMessages(token, "%$searchContent%")
+            }
+
+            override fun saveCallResult(item: MessageResponse) {
+                if (item.status == 200) {
+                    item.messages.forEach { msg ->
+                        msg.token = token
+                    }
+                    db.runInTransaction {
+                        messageDao.deleteMessages(token)
+                        messageDao.insertMessages(item.messages)
+                    }
+                    preferenceProvider.setFetchDate(FetchType.MESSAGE)
+                }
+            }
+
+            override fun shouldFetch(data: List<MessageEntity>?): Boolean {
+                val isOld = preferenceProvider.getFetchType(FetchType.MESSAGE)
+                Timber.i("is old $isOld")
+                return data == null || data.isEmpty() || shouldFetch || isOld
+            }
+
+            override fun createCall() = apiService.getStudentMessages(token)
+        }.asLiveData()
     }
 
     fun uploadAssignmentPDF(token: String, request: MultipartBody.Part): Single<FileUploadResponse> {
@@ -226,6 +251,15 @@ class TeacherRepository @Inject constructor(
 
     fun deleteUploadData(token: String, request: ExplorerRequest): Single<ExplorerDeleteResponse> {
         return apiService.deleteUploadedFile(token, request.id,request.type,request.format,request.path)
+    }
+
+    fun getMessageById(message_id: Int): Single<MessageEntity> {
+        return messageDao.getMessageById(message_id)
+    }
+
+    fun deleteSentMessage(token:String,id:Int?,type: String="message"):Single<DeleteMessageResponse>{
+        id?.let { messageDao.deleteMessageById(it) }
+        return apiService.deleteMessage(token,id,type)
     }
 
 }

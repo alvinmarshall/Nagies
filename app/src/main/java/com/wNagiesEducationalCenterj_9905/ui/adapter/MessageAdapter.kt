@@ -43,6 +43,10 @@ class MessageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.tv_msg_sender.text = level
         itemView.tv_msg_level.text = content
         itemView.setOnClickListener { itemCallback?.onClick(entity?.id) }
+        itemView.setOnLongClickListener {
+            itemCallback?.onHold(entity?.uid)
+            true
+        }
     }
 }
 

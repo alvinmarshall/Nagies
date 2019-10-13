@@ -7,13 +7,14 @@ import com.wNagiesEducationalCenterj_9905.ui.parent.ParentNavigationActivity
 import com.wNagiesEducationalCenterj_9905.ui.teacher.TeacherNavigationActivity
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.toast
 
 class SplashActivity : BaseActivity() {
 
     private fun startApp() = launch {
         val role = preferenceProvider.getUserSessionData().userRole
         val loginStatus = preferenceProvider.getUserSessionData().loginStatus
-        if (!loginStatus && role == null) {
+        if (!loginStatus) {
             startActivity<RoleActivity>()
             finish()
         } else {

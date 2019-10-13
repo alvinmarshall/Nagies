@@ -9,6 +9,7 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.CircularAction
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.CircularEntity
 import kotlinx.android.synthetic.main.list_circular.view.*
 import java.io.File
@@ -35,7 +36,7 @@ class CircularAdapter : PagerAdapter() {
             view.fab_download.show()
         }
         view.fab_download.setOnClickListener {
-            itemCallback?.onClick(Triple(CircularAction.DOWNLOAD, data?.id, data?.path))
+            itemCallback?.onClick(Triple(CircularAction.DOWNLOAD, data?.id, ServerPathUtil.setCorrectPath(data?.path)))
         }
 
         GlideApp.with(container.context)

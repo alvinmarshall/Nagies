@@ -25,7 +25,7 @@
                     android:data="@string/pref_contact_us_url"/>
         </Preference>
 
-        <Preference android:title="@string/pref_app_version"/>
+        <Preference android:key="@string/pref_app_version_key"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

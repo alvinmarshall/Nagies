@@ -2,13 +2,13 @@ package com.wNagiesEducationalCenterj_9905.common
 
 val LOGIN_ROLE_OPTIONS = arrayListOf("parent", "teacher")
 const val USER_SELECTED_ROLE_PREF_KEY = "USER_SELECTED_ROLE_PREF_KEY"
-const val INFORDAS_BASE_URL =
-    "https://infodasgh.com/api/v1/" //https://infodasgh.com/api/
+const val INFORDAS_BASE_URL = "https://infodasgh.com/api/v1/"
+const val DEV_INFORDAS_BASE_URL = "https://developers.nagies.infodasgh.com/api/v1/"
 const val DATABASE_NAME = "app_db"
 const val USER_LOGIN_STATUS_PREF_KEY = "login_in_status"
 const val USER_TOKEN_PREF_KEY = "user_token"
-const val SERVER_URL =
-    "https://infodasgh.com/api/v1/file/download?path=" //https://infodasgh.com/api/download?path=
+const val SERVER_URL = "https://infodasgh.com/api/v1/file/download?path="
+const val DEV_SERVER_URL = "https://developers.nagies.infodasgh.com/api/v1/file/download?path="
 const val PERMISSION_PREF = "permission_pref"
 const val REQUEST_EXTERNAL_STORAGE = 100
 const val USER_FULL_NAME_PREF_KEY = "full_name_key"

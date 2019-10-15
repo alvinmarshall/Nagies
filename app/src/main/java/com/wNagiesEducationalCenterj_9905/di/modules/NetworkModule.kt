@@ -1,6 +1,8 @@
 package com.wNagiesEducationalCenterj_9905.di.modules
 
+import com.wNagiesEducationalCenterj_9905.BuildConfig
 import com.wNagiesEducationalCenterj_9905.api.ApiService
+import com.wNagiesEducationalCenterj_9905.common.DEV_INFORDAS_BASE_URL
 import com.wNagiesEducationalCenterj_9905.common.INFORDAS_BASE_URL
 import com.wNagiesEducationalCenterj_9905.common.utils.LiveDataCallAdapterFactory
 import dagger.Module
@@ -33,7 +35,7 @@ class NetworkModule {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addCallAdapterFactory(LiveDataCallAdapterFactory())
             .client(okHttpClient)
-            .baseUrl(INFORDAS_BASE_URL)
+            .baseUrl(getBaseUrl())
             .build()
     }
 
@@ -41,5 +43,10 @@ class NetworkModule {
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    private fun getBaseUrl():String{
+        if (BuildConfig.DEBUG) return DEV_INFORDAS_BASE_URL
+        return INFORDAS_BASE_URL
     }
 }

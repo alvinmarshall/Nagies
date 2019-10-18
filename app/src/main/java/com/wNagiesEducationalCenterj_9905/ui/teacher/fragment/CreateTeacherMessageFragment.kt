@@ -1,8 +1,10 @@
 package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -95,6 +97,8 @@ class CreateTeacherMessageFragment : BaseFragment() {
         when (item.itemId) {
             R.id.action_send -> {
                 if (!isBusy) {
+                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(view?.windowToken,0)
                     preparingToMessage()
                 }
             }

@@ -1,8 +1,10 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -128,6 +130,8 @@ class CreateMessageFragment : BaseFragment() {
         when (item.itemId) {
             R.id.action_send -> {
                 if (!isBusy) {
+                    val imm  = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(view?.windowToken,0)
                     preparingToSendComplaint()
                 }
             }

@@ -3,6 +3,7 @@ package com.wNagiesEducationalCenterj_9905.data.db.DAO
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.ComplaintEntity
 import io.reactivex.Flowable
@@ -10,7 +11,7 @@ import io.reactivex.Single
 
 @Dao
 interface ComplaintDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertComplaint(ComplaintEntityList: List<ComplaintEntity>)
 
     @Query("SELECT * FROM complaint WHERE token = :token AND message LIKE :search")

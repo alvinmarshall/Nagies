@@ -116,7 +116,7 @@ class DashboardFragment : BaseFragment() {
                                 showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
                                 messageAdapter?.submitList(r.data)
                                 showLoadingDialog(false)
-                                Timber.i("message data size: ${r.data?.size}")
+                                Timber.i("message data size: ${r.data?.size} ${r.data?.get(0)?.id}")
                             }
                             Status.ERROR -> {
                                 showLoadingDialog(false)

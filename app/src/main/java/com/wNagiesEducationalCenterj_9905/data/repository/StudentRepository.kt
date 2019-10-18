@@ -47,6 +47,7 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.messages.forEach { msg ->
                         msg.token = token
+                        msg.id = msg.uid
                     }
                     db.runInTransaction {
                         messageDao.deleteMessages(token)
@@ -79,6 +80,7 @@ class StudentRepository @Inject constructor(
             override fun saveCallResult(item: StudentProfileResponse) {
                 if (item.status == 200) {
                     item.studentProfile.token = token
+                    item.studentProfile.id = item.id
                     item.studentProfile.imageUrl = ServerPathUtil.setCorrectPath(item.studentProfile.imageUrl)
                     db.runInTransaction {
                         studentDao.deleteProfile(token)
@@ -126,6 +128,7 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200){
                     item.complaints.forEach { complaint ->
                         complaint.token = token
+                        complaint.id = complaint.uid
                     }
                     db.runInTransaction {
                         complaintDao.deleteComplaint(token)

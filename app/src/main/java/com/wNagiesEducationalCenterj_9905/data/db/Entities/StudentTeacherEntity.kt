@@ -12,6 +12,6 @@ data class StudentTeacherEntity(
     var imageUrl: String?,
     var token:String?
 ) {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     var id: Int = 0
 }

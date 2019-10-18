@@ -18,7 +18,7 @@ data class ComplaintEntity(
     override var token: String?
 
 ) : IComplaintModel {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     override var id: Int = 0
     override var uid: Int = 0
 }

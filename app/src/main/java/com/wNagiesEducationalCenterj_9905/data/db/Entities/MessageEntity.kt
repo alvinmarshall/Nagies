@@ -13,7 +13,7 @@ data class MessageEntity(
     override var token: String?,
     override val date: String
 ) : IMessageModel {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     override var id: Int = 0
     override var uid: Int = 0
 }

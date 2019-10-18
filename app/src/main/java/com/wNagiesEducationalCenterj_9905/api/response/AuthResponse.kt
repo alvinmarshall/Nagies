@@ -3,8 +3,8 @@ package com.wNagiesEducationalCenterj_9905.api.response
 import com.google.gson.annotations.SerializedName
 
 data class AuthResponse(
-    @SerializedName("id")
-    val Id:String,
+    @SerializedName("uuid")
+    val Id:Int,
     @SerializedName("status")
     val Status:Int,
     @SerializedName("message")

@@ -22,7 +22,7 @@ import com.wNagiesEducationalCenterj_9905.data.db.converter.DateTypeConverter
         BillingEntity::class,
         ClassStudentEntity::class,
         TimeTableEntity::class
-    ], version = 1, exportSchema = false
+    ], version = 2, exportSchema = false
 )
 @TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {

@@ -1,66 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:showIn="navigation_view">
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
         <item
                 android:id="@+id/dashboardFragment"
                 android:icon="@drawable/ic_dashboard_black_24dp"
-                android:title="@string/menu_dashboard"/>
+                android:title="@string/menu_dashboard" />
         <item
                 android:id="@+id/circularFragment"
                 android:icon="@drawable/ic_description_black_24dp"
-                android:title="@string/menu_view_circular"/>
+                android:title="@string/menu_view_circular" />
+        <item
+                android:id="@+id/studentBillingFragment"
+                android:icon="@drawable/ic_format_bold_black_24dp"
+                android:title="@string/menu_bill" />
+        <item
+                android:id="@+id/announcementFragment"
+                android:icon="@drawable/ic_radio_black_24dp"
+                android:title="@string/menu_announcement" />
+        <item
+                android:id="@+id/sendMessageFragment"
+                android:icon="@drawable/ic_message_black_24dp"
+                android:title="@string/menu_send_message" />
         <item
                 android:id="@+id/profileFragment"
                 android:icon="@drawable/ic_person_black_24dp"
-                android:title="@string/menu_profile"/>
+                android:title="@string/menu_profile" />
         <item
                 android:id="@+id/assignmentJpegFragment"
                 android:icon="@drawable/ic_description_black_24dp"
-                android:title="@string/menu_view_assignment_jpeg"/>
-
-        <item android:id="@+id/studentTimetableFragment"
-              android:title="@string/menu_view_time_table"
-              android:icon="@drawable/ic_schedule_black_24dp"/>
+                android:title="@string/menu_view_assignment_jpeg" />
 
         <item
                 android:id="@+id/assignmentPdfFragment"
                 android:icon="@drawable/ic_picture_as_pdf_black_24dp"
-                android:title="@string/menu_view_assignment_pdf"/>
-        <item
-                android:id="@+id/studentBillingFragment"
-                android:icon="@drawable/ic_format_bold_black_24dp"
-                android:title="@string/menu_bill"/>
-
+                android:title="@string/menu_view_assignment_pdf" />
         <item
                 android:id="@+id/reportFragment"
                 android:icon="@drawable/ic_description_black_24dp"
-                android:title="@string/menu_view_report"/>
-
+                android:title="@string/menu_view_report" />
         <item
                 android:id="@+id/reportPdfFragment"
                 android:icon="@drawable/ic_picture_as_pdf_black_24dp"
-                android:title="@string/menu_reports_pdf"/>
+                android:title="@string/menu_reports_pdf" />
+        <item
+                android:id="@+id/studentTimetableFragment"
+                android:icon="@drawable/ic_schedule_black_24dp"
+                android:title="@string/menu_view_time_table" />
 
         <item
-                android:id="@+id/announcementFragment"
-                android:icon="@drawable/ic_radio_black_24dp"
-                android:title="@string/menu_announcement"/>
+                android:id="@+id/classTeacherFragment"
+                android:icon="@drawable/ic_supervisor_account_black_24dp"
+                android:title="@string/menu_class_teacher" />
 
-        <item android:id="@+id/classTeacherFragment"
-              android:icon="@drawable/ic_supervisor_account_black_24dp"
-              android:title="@string/menu_class_teacher"/>
-
-        <item
-                android:id="@+id/sendMessageFragment"
-                android:icon="@drawable/ic_message_black_24dp"
-                android:title="@string/menu_send_message"/>
         <item
                 android:id="@+id/changePasswordFragment"
                 android:icon="@drawable/ic_lock_black_24dp"
-                android:title="@string/menu_change_password"/>
+                android:title="@string/menu_change_password" />
 
     </group>
 

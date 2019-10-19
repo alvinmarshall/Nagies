@@ -3,68 +3,76 @@ package com.wNagiesEducationalCenterj_9905.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewpager.widget.PagerAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.wNagiesEducationalCenterj_9905.R
-import com.wNagiesEducationalCenterj_9905.common.CircularAction
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
-import com.wNagiesEducationalCenterj_9905.common.utils.ServerPathUtil
+import com.wNagiesEducationalCenterj_9905.common.ViewFilesAction
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.CircularEntity
 import kotlinx.android.synthetic.main.list_circular.view.*
 import java.io.File
 
-class CircularAdapter : PagerAdapter() {
-    private var circularEntityList: List<CircularEntity>? = null
-    private var itemCallback: ItemCallback<Triple<CircularAction, Int?, String?>>? = null
+class CircularAdapter : ListAdapter<CircularEntity, CircularViewHolder>(CircularDiff()) {
+    private var itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>? = null
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CircularViewHolder {
+        return CircularViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_circular, parent, false))
 
-    override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = LayoutInflater.from(container.context).inflate(R.layout.list_circular, container, false)
-        val data = circularEntityList?.get(position)
+    }
 
-        if (data?.filePath != null) {
-            val file = File(data.filePath!!)
+    override fun onBindViewHolder(holder: CircularViewHolder, position: Int) {
+        holder.bind(getItem(position), itemCallback)
+    }
+
+
+    fun setCallBack(callback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>?) {
+        itemCallback = callback
+    }
+}
+
+class CircularViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    fun bind(
+        data: CircularEntity?,
+        itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>?
+    ) {
+        if (data?.path != null) {
+            val file = File(data.path!!)
             if (file.exists()) {
-                view.fab_download.hide()
-                view.setOnClickListener {
-                    itemCallback?.onClick(Triple(CircularAction.VIEW, data.id, data.filePath))
+                itemView.fab_download.hide()
+                itemView.setOnClickListener {
+                    itemCallback?.onClick(Triple(ViewFilesAction.VIEW, data.id, data.path))
                 }
-            }else{
-                view.fab_download.show()
+            } else {
+                itemView.fab_download.show()
             }
-        }else{
-            view.fab_download.show()
+        } else {
+            itemView.fab_download.show()
         }
-        view.fab_download.setOnClickListener {
-            itemCallback?.onClick(Triple(CircularAction.DOWNLOAD, data?.id, ServerPathUtil.setCorrectPath(data?.path)))
-        }
-
-        GlideApp.with(container.context)
+        GlideApp.with(itemView.context)
             .load(data?.fileUrl)
             .placeholder(R.drawable.notice_board)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .into(view.item_image)
-        container.addView(view)
-        return view
+            .into(itemView.item_image)
+
+
+        itemView.fab_download.setOnClickListener {
+            itemCallback?.onClick(Triple(ViewFilesAction.DOWNLOAD, data?.id, data?.fileUrl))
+        }
+        itemView.setOnLongClickListener {
+            itemCallback?.onHold(Triple(ViewFilesAction.DELETE, data?.id, data?.path))
+            true
+        }
+    }
+}
+
+class CircularDiff : DiffUtil.ItemCallback<CircularEntity>() {
+    override fun areItemsTheSame(oldItem: CircularEntity, newItem: CircularEntity): Boolean {
+        return oldItem.id == newItem.id
     }
 
-    override fun isViewFromObject(view: View, `object`: Any): Boolean {
-        return view == `object`
+    override fun areContentsTheSame(oldItem: CircularEntity, newItem: CircularEntity): Boolean {
+        return oldItem.id == newItem.id && oldItem.path == newItem.path
     }
-
-    override fun getCount() = circularEntityList?.size ?: 0
-
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as View)
-    }
-
-    fun submitList(listEntity: List<CircularEntity>?) {
-        circularEntityList = listEntity
-        notifyDataSetChanged()
-    }
-
-    fun setCallBack(callback: ItemCallback<Triple<CircularAction, Int?, String?>>?) {
-        itemCallback = callback
-    }
-
 }

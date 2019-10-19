@@ -125,7 +125,7 @@ class StudentRepository @Inject constructor(
     ): LiveData<Resource<List<ComplaintEntity>>> {
         return object : NetworkBoundResource<List<ComplaintEntity>, ComplaintResponse>(appExecutors) {
             override fun saveCallResult(item: ComplaintResponse) {
-                if (item.status == 200){
+                if (item.status == 200) {
                     item.complaints.forEach { complaint ->
                         complaint.token = token
                         complaint.id = complaint.uid
@@ -145,7 +145,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<ComplaintEntity>> {
-                return complaintDao.getComplaintMessage(token,"%$searchContent%")
+                return complaintDao.getComplaintMessage(token, "%$searchContent%")
             }
 
             override fun createCall(): LiveData<ApiResponse<ComplaintResponse>> {
@@ -153,7 +153,6 @@ class StudentRepository @Inject constructor(
             }
         }.asLiveData()
     }
-
 
 
     fun fetchStudentAssignmentPDF(
@@ -381,7 +380,6 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.circular.forEach { circular ->
                         circular.token = token
-                        circular.path = circular.fileUrl
                         circular.fileUrl = ServerPathUtil.setCorrectPath(circular.fileUrl)
                     }
                     db.runInTransaction {
@@ -536,8 +534,8 @@ class StudentRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun deleteComplaint(token:String,id:Int?,type: String="complaint"):Single<DeleteMessageResponse>{
+    fun deleteComplaint(token: String, id: Int?, type: String = "complaint"): Single<DeleteMessageResponse> {
         id?.let { complaintDao.deleteComplaintById(it) }
-        return apiService.deleteMessage(token,id,type)
+        return apiService.deleteMessage(token, id, type)
     }
 }

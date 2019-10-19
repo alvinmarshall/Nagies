@@ -19,7 +19,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.viewpager.widget.ViewPager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
@@ -37,11 +38,11 @@ import java.io.File
 class CircularFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var adapter: CircularAdapter? = null
-    private var viewPager: ViewPager? = null
     private var downloadReceiver: BroadcastReceiver? = null
     private var downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
-    private var itemData: Triple<CircularAction, Int?, String?>? = null
+    private var itemData: Triple<ViewFilesAction, Int?, String?>? = null
     private var snackBar: Snackbar? = null
+    private var recyclerView: RecyclerView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,33 +54,47 @@ class CircularFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPager = view_pager
+        recyclerView = recycler_view
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_SHORT)
         downloadReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                 downloadList.forEach {
                     if (it.third == id) {
-                        studentViewModel.saveDownloadFilePathToDb(it.first, it.second, DBEntities.CIRCULAR)
+                        studentViewModel.saveDownloadFilePathToDb(
+                            it.first,
+                            it.second,
+                            DBEntities.CIRCULAR
+                        )
                     }
                 }
             }
         }
-        context?.registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        context?.registerReceiver(
+            downloadReceiver,
+            IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+        )
+
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        initRecyclerView()
         configureViewModel()
-        initViewPager()
     }
 
-    private fun initViewPager() {
+    private fun initRecyclerView() {
+        recyclerView?.hasFixedSize()
+        recyclerView?.layoutManager = LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         adapter = CircularAdapter()
-        val callback = object : ItemCallback<Triple<CircularAction, Int?, String?>> {
-            override fun onClick(data: Triple<CircularAction, Int?, String?>?) {
+        adapter?.setCallBack(object : ItemCallback<Triple<ViewFilesAction, Int?, String?>> {
+            override fun onHold(data: Triple<ViewFilesAction, Int?, String?>?) {
+
+            }
+
+            override fun onClick(data: Triple<ViewFilesAction, Int?, String?>?) {
                 when (data?.first) {
-                    CircularAction.VIEW -> {
+                    ViewFilesAction.VIEW -> {
                         itemData = data
                         context?.let {
                             PermissionUtils.checkPermission(
@@ -89,7 +104,7 @@ class CircularFragment : BaseFragment() {
                         }
 
                     }
-                    CircularAction.DOWNLOAD -> {
+                    ViewFilesAction.DOWNLOAD -> {
                         itemData = data
                         context?.let {
                             PermissionUtils.checkPermission(
@@ -97,25 +112,93 @@ class CircularFragment : BaseFragment() {
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE, listener
                             )
                         }
+                    }
+                    else -> {
                     }
                 }
 
             }
+        })
+        recyclerView?.adapter = adapter
+    }
 
-            override fun onHold(data: Triple<CircularAction, Int?, String?>?) {
+    private fun configureViewModel() {
+        studentViewModel =
+            ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel.getUserToken()
+        subscribeObservers()
+    }
+
+    private fun subscribeObservers() {
+        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
+            studentViewModel.getCircularInformation(token)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            showDataAvailableMessage(
+                                label_msg_title,
+                                resource.data,
+                                MessageType.FILES
+                            )
+                            adapter?.submitList(resource.data)
+                            showLoadingDialog(false)
+                        }
+                        Status.ERROR -> {
+                            showDataAvailableMessage(
+                                label_msg_title,
+                                resource.data,
+                                MessageType.FILES
+                            )
+                            showLoadingDialog(false)
+                        }
+                        Status.LOADING -> {
+                            showLoadingDialog()
+                        }
+                    }
+                })
+        })
+        studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
+            showDownloadComplete(it)
+        })
+    }
+
+    private fun showLoadingDialog(show: Boolean = true) {
+        showAnyView(progressBar, null, null, show) { view, _, _, visible ->
+            if (visible) {
+                (view as ProgressBar).visibility = View.VISIBLE
+            } else {
+                (view as ProgressBar).visibility = View.GONE
             }
         }
-        adapter?.setCallBack(callback)
-        viewPager?.adapter = adapter
+    }
+
+    private fun showDownloadComplete(show: Boolean = true) {
+        showAnyView(
+            snackBar,
+            getString(R.string.download_complete_message),
+            null,
+            show
+        ) { view, msg, _, visible ->
+            if (visible) {
+                (view as Snackbar).setText(msg!!).show()
+                adapter?.notifyDataSetChanged()
+            } else {
+                (view as Snackbar).setText("Download Started...").show()
+            }
+        }
     }
 
     private fun loadFile(path: String?) {
-        if (itemData?.first == CircularAction.VIEW) {
+        if (itemData?.first == ViewFilesAction.VIEW) {
             path?.let {
                 val file = File(it)
                 if (file.exists()) {
                     val openIntent = Intent(Intent.ACTION_VIEW)
-                    val url = FileProvider.getUriForFile(context!!, getString(R.string.file_provider_authority), file)
+                    val url = FileProvider.getUriForFile(
+                        context!!,
+                        getString(R.string.file_provider_authority),
+                        file
+                    )
                     openIntent.setDataAndType(url, FileTypeUtils.getType(file.absolutePath))
                     openIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     val open = Intent.createChooser(openIntent, getString(R.string.chooser_title))
@@ -126,7 +209,8 @@ class CircularFragment : BaseFragment() {
     }
 
     private fun fetchFileFromServer(url: String?) {
-        if (itemData?.first == CircularAction.DOWNLOAD) {
+
+        if (itemData?.first == ViewFilesAction.DOWNLOAD) {
             url?.let { fileUrl ->
                 val fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1, fileUrl.length)
                 downloadList = downloadWithManager(fileUrl, fileName, itemData)
@@ -134,44 +218,18 @@ class CircularFragment : BaseFragment() {
         }
     }
 
-    private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
-        studentViewModel.getUserToken()
-        subscribeObservers()
-
-    }
-
-    private fun subscribeObservers() {
-        studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->
-            studentViewModel.getCircularInformation(token).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        adapter?.submitList(resource.data)
-                        showLoadingDialog(false)
-                    }
-                    Status.ERROR -> {
-                        showLoadingDialog(false)
-                    }
-                    Status.LOADING -> {
-                        showLoadingDialog()
-                    }
-                }
-            })
-        })
-        studentViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
-            showDownloadComplete(it)
-        })
-    }
-
     private fun downloadWithManager(
         url: String,
         filename: String,
-        data: Triple<CircularAction, Int?, String?>?
+        data: Triple<ViewFilesAction, Int?, String?>?
     ): ArrayList<Triple<Int?, String?, Long?>> {
         val downloadList: ArrayList<Triple<Int?, String?, Long?>> = ArrayList()
         val id = data?.second
         val path =
-            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename)
+            File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                filename
+            )
         if (path.exists()) {
             studentViewModel.saveDownloadFilePathToDb(id, path.absolutePath, DBEntities.CIRCULAR)
             return downloadList
@@ -189,43 +247,29 @@ class CircularFragment : BaseFragment() {
         return downloadList
     }
 
-    private fun showLoadingDialog(show: Boolean = true) {
-        showAnyView(progressBar, null, null, show) { view, _, _, visible ->
-            if (visible) {
-                (view as ProgressBar).visibility = View.VISIBLE
-            } else {
-                (view as ProgressBar).visibility = View.GONE
-            }
-        }
-    }
-
-    private fun showDownloadComplete(show: Boolean = true) {
-        showAnyView(snackBar, getString(R.string.download_complete_message), null, show) { view, msg, _, visible ->
-            if (visible) {
-                (view as Snackbar).setText(msg!!).show()
-            } else {
-                (view as Snackbar).setText("Download Started...").show()
-            }
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         context?.unregisterReceiver(downloadReceiver)
     }
 
     //region Permission
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     when (itemData?.first) {
-                        CircularAction.VIEW -> {
+                        ViewFilesAction.VIEW -> {
                             loadFile(itemData?.third)
                         }
-                        CircularAction.DOWNLOAD -> {
+                        ViewFilesAction.DOWNLOAD -> {
                             fetchFileFromServer(itemData?.third)
+                        }
+                        else -> {
                         }
                     }
 
@@ -267,20 +311,19 @@ class CircularFragment : BaseFragment() {
 
             override fun onPermissionGranted() {
                 when (itemData?.first) {
-                    CircularAction.VIEW -> {
+                    ViewFilesAction.VIEW -> {
                         toast("view file ${itemData?.third}")
-                        itemData = Triple(CircularAction.VIEW, itemData?.second, itemData?.third)
+                        itemData = Triple(ViewFilesAction.VIEW, itemData?.second, itemData?.third)
                         loadFile(itemData?.third)
 
                     }
-                    CircularAction.DOWNLOAD -> {
+                    ViewFilesAction.DOWNLOAD -> {
                         fetchFileFromServer(itemData?.third)
+                    }
+                    else -> {
                     }
                 }
             }
         }
-
-
     //endregion
-
 }

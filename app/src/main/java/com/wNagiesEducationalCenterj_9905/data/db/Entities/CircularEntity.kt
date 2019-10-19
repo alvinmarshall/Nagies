@@ -9,8 +9,7 @@ data class CircularEntity(
     var fileUrl: String?,
     val date: String,
     var token:String?,
-    var path:String?,
-    var filePath:String?
+    var path:String?
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

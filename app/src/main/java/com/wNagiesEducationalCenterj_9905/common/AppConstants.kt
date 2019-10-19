@@ -44,7 +44,7 @@ const val NOTIFICATION_EXTRA_COMPLAINT = "notification_complaint_extra"
 const val FIREBASE_TOKEN_ID = "firebase_token_id"
 const val FOREGROUND_PUSH_NOTIFICATION = "pushNotification"
 
-const val NAVIGATE_TO_DASHBOARD = "Dashboard"
+const val NAVIGATE_TO_DASHBOARD = "Messages"
 const val NAVIGATE_TO_ASSIGNMENT_IMAGE = "Assignment-Image"
 const val NAVIGATE_TO_ASSIGNMENT_PDF = "Assignment-PDF"
 const val NAVIGATION_TO_COMPLAINT = "Complaint"

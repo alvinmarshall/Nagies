@@ -39,7 +39,7 @@ interface StudentDao {
     @Query("DELETE FROM circular WHERE token = :token")
     fun deleteCircular(token: String)
 
-    @Query("UPDATE circular SET filePath = :file WHERE id = :id")
+    @Query("UPDATE circular SET path = :file WHERE id = :id")
     fun updateCircularImagePath(id: Int, file: String): Int
     //endregion
 

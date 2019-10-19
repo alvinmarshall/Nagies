@@ -4,12 +4,18 @@
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/app_navigation"
             app:startDestination="@id/profileFragment">
 
-    <fragment android:id="@+id/dashboardFragment"
-              android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.DashboardFragment"
-              android:label="Dashboard" tools:layout="@layout/fragment_dashboard">
-        <action android:id="@+id/action_dashboardFragment_to_messageDetailFragment"
-                app:destination="@id/messageDetailFragment"/>
-        <argument android:name="should_fetch" app:argType="boolean" android:defaultValue="false"/>
+    <fragment
+            android:id="@+id/dashboardFragment"
+            android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.DashboardFragment"
+            android:label="Messages"
+            tools:layout="@layout/fragment_dashboard">
+        <action
+                android:id="@+id/action_dashboardFragment_to_messageDetailFragment"
+                app:destination="@id/messageDetailFragment" />
+        <argument
+                android:name="should_fetch"
+                android:defaultValue="false"
+                app:argType="boolean" />
     </fragment>
     <fragment android:id="@+id/assignmentJpegFragment"
               android:name="com.wNagiesEducationalCenterj_9905.ui.parent.fragment.AssignmentJpegFragment"

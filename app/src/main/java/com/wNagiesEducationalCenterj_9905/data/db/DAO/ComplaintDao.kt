@@ -14,7 +14,7 @@ interface ComplaintDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertComplaint(ComplaintEntityList: List<ComplaintEntity>)
 
-    @Query("SELECT * FROM complaint WHERE token = :token AND message LIKE :search")
+    @Query("SELECT * FROM complaint WHERE token = :token AND message LIKE :search ORDER BY id DESC")
     fun getComplaintMessage(token: String,search:String): LiveData<List<ComplaintEntity>>
 
     @Query("SELECT * FROM complaint WHERE id = :id")

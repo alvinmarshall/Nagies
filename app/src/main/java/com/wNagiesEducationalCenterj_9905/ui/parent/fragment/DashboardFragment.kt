@@ -36,7 +36,6 @@ class DashboardFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
-        studentViewModel.searchString.postValue("")
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer {
             subscribeObserver(it)
@@ -74,12 +73,12 @@ class DashboardFragment : BaseFragment() {
         searchView?.isSubmitButtonEnabled
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                studentViewModel.searchString.postValue(query)
+                studentViewModel.searchString.value = query
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                studentViewModel.searchString.postValue(newText)
+                studentViewModel.searchString.value = newText
                 return true
             }
         })
@@ -116,7 +115,6 @@ class DashboardFragment : BaseFragment() {
                                 showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
                                 messageAdapter?.submitList(r.data)
                                 showLoadingDialog(false)
-                                Timber.i("message data size: ${r.data?.size} ${r.data?.get(0)?.id}")
                             }
                             Status.ERROR -> {
                                 showLoadingDialog(false)

@@ -12,7 +12,7 @@ import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -168,7 +168,7 @@ class StudentListFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         teacherViewModel.getUserToken()
         teacherViewModel.searchString.postValue("")
         teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->

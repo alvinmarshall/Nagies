@@ -8,7 +8,7 @@ import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wNagiesEducationalCenterj_9905.R
@@ -101,7 +101,7 @@ class ClassTeacherFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.searchString.postValue("")
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer { token ->

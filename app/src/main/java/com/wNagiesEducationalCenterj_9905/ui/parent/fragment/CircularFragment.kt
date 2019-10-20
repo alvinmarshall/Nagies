@@ -18,7 +18,7 @@ import android.widget.ProgressBar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -124,7 +124,7 @@ class CircularFragment : BaseFragment() {
 
     private fun configureViewModel() {
         studentViewModel =
-            ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+            ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         subscribeObservers()
     }

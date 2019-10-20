@@ -20,7 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -88,7 +88,7 @@ class ReportPdfFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         subscribeObservers()
     }

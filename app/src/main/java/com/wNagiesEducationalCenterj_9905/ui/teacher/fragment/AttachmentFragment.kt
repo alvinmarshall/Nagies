@@ -1,7 +1,6 @@
 package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
-import com.wNagiesEducationalCenterj_9905.common.utils.RealPathUtil
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -13,7 +12,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
@@ -26,6 +25,7 @@ import com.wNagiesEducationalCenterj_9905.common.UploadFileType
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
+import com.wNagiesEducationalCenterj_9905.common.utils.RealPathUtil
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import kotlinx.android.synthetic.main.fragment_attachment.*
 import okhttp3.MediaType
@@ -33,7 +33,6 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
-import timber.log.Timber
 import java.io.File
 
 
@@ -68,7 +67,7 @@ class AttachmentFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         subscribeObservers()
     }
 

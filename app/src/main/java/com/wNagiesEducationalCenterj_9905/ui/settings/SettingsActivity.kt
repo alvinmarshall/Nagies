@@ -43,8 +43,8 @@ class SettingsActivity : AppCompatActivity() {
             preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         }
 
-        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-            val pref = findPreference(key)
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String) {
+            val pref = findPreference<Preference>(key)
             if (null != pref) {
                 val value = sharedPreferences?.getString(pref.key, "")
                 setPreferenceSummary(pref, value)
@@ -64,10 +64,10 @@ class SettingsActivity : AppCompatActivity() {
                 val value = sharedPreferences.getString(pref.key, "")
                 setPreferenceSummary(pref, value)
             }
-            val listPref = findPreference(getString(R.string.pref_fetch_option_key)) as ListPreference
-            val prefAppText = findPreference(getString(R.string.pref_app_version_key)) as Preference
-            prefAppText.title = BuildConfig.VERSION_NAME
-            listPref.summary = listPref.entry
+            val listPref = findPreference<ListPreference>(getString(R.string.pref_fetch_option_key))
+            val prefAppText = findPreference<Preference>(getString(R.string.pref_app_version_key))
+            prefAppText?.title = BuildConfig.VERSION_NAME
+            listPref?.summary = listPref?.entry
         }
 
         private fun setPreferenceSummary(pref: Preference?, value: String?) {

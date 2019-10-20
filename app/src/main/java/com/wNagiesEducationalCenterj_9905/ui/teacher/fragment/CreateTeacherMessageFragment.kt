@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
@@ -58,7 +58,7 @@ class CreateTeacherMessageFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         subscribeObservers()
     }
 

@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -164,7 +164,7 @@ class ParentComplaintFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         teacherViewModel.searchString.postValue("")
         teacherViewModel.getUserToken()
         teacherViewModel.userToken.observe(viewLifecycleOwner, Observer {

@@ -11,7 +11,7 @@ import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
@@ -58,7 +58,7 @@ class CreateMessageFragment : BaseFragment() {
 
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         subscribeObservers()
     }
@@ -99,7 +99,7 @@ class CreateMessageFragment : BaseFragment() {
                             val classAdapter = ArrayAdapter(
                                 context!!,
                                 android.R.layout.select_dialog_singlechoice,
-                                teacherNames.toArray()
+                                teacherNames
                             )
                             spinner.adapter = classAdapter
                             classAdapter.notifyDataSetChanged()

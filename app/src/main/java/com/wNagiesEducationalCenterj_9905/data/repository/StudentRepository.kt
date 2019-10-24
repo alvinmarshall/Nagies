@@ -457,11 +457,15 @@ class StudentRepository @Inject constructor(
     }
 
     fun updateTimetableFilePath(id: Int, path: String): Int {
-        return studentDao.updateBillingImagePath(id, path)
+        return studentDao.updateTimetableImagePath(id, path)
     }
 
     fun deleteBillingById(id: Int) {
         return studentDao.deleteBillingById(id)
+    }
+
+    fun deleteTimetableById(id: Int) {
+        return studentDao.deleteTimetableById(id)
     }
 
     fun fetchStudentAnnouncement(

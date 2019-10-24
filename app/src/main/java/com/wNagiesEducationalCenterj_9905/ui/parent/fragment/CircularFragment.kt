@@ -312,7 +312,6 @@ class CircularFragment : BaseFragment() {
             override fun onPermissionGranted() {
                 when (itemData?.first) {
                     ViewFilesAction.VIEW -> {
-                        toast("view file ${itemData?.third}")
                         itemData = Triple(ViewFilesAction.VIEW, itemData?.second, itemData?.third)
                         loadFile(itemData?.third)
 

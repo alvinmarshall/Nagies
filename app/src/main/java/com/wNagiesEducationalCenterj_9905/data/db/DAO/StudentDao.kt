@@ -74,5 +74,8 @@ interface StudentDao {
     @Query("UPDATE timetable SET path = :file WHERE id = :id")
     fun updateTimetableImagePath(id: Int, file: String): Int
 
+    @Query("DELETE FROM timetable WHERE id = :id")
+    fun deleteTimetableById(id: Int)
+
     //endregion
 }

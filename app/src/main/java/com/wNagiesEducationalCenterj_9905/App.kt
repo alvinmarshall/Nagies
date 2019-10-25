@@ -1,5 +1,7 @@
 package com.wNagiesEducationalCenterj_9905
 
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -18,12 +20,37 @@ class App : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
         appComponent.inject(this)
+        initTimber()
+        AndroidThreeTen.init(this)
+        initFCMService()
+        NotificationUtils.registerNotificationChannel(applicationContext)
+        RxJavaPlugins.setErrorHandler { err -> Timber.i(err) }
+        initWorkManager()
+    }
+
+    private fun initWorkManager() {
+        WorkManager.initialize(this, Configuration.Builder().run {
+            setWorkerFactory(appComponent.workerFactory())
+                .build()
+        })
+    }
+
+
+    override fun applicationInjector() = appComponent
+
+    private fun getGlobalTopic(): String {
+        if (BuildConfig.DEBUG) return getString(R.string.fcm_topic_dev_global)
+        return getString(R.string.fcm_topic_global)
+    }
+
+    private fun initTimber() {
         if (BuildConfig.DEBUG) {
             toast("developer mode")
             Timber.plant(Timber.DebugTree())
         }
-        AndroidThreeTen.init(this)
+    }
 
+    private fun initFCMService() {
         FirebaseMessaging.getInstance().isAutoInitEnabled = true
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
             if (!it.isSuccessful) {
@@ -39,15 +66,5 @@ class App : DaggerApplication() {
             }
             Timber.i("incoming global topic")
         }
-        NotificationUtils.registerNotificationChannel(applicationContext)
-
-        RxJavaPlugins.setErrorHandler { err -> Timber.i(err) }
-    }
-
-    override fun applicationInjector() = appComponent
-
-    private fun getGlobalTopic():String{
-        if (BuildConfig.DEBUG) return getString(R.string.fcm_topic_dev_global)
-        return getString(R.string.fcm_topic_global)
     }
 }

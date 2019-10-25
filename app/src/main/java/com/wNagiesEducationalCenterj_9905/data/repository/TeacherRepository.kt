@@ -165,6 +165,7 @@ class TeacherRepository @Inject constructor(
                 if (item.status == 200) {
                     item.messages.forEach { msg ->
                         msg.token = token
+                        msg.id = msg.uid
                     }
                     db.runInTransaction {
                         messageDao.deleteMessages(token)

@@ -3,11 +3,8 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.wNagiesEducationalCenterj_9905.api.request.ExplorerRequest
-import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
 import com.wNagiesEducationalCenterj_9905.api.response.ExplorerDeleteResponse
-import com.wNagiesEducationalCenterj_9905.common.FileUploadFormat
-import com.wNagiesEducationalCenterj_9905.common.UploadFileType
 import com.wNagiesEducationalCenterj_9905.common.utils.PreferenceProvider
 import com.wNagiesEducationalCenterj_9905.common.utils.ProfileLabel
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.*
@@ -64,10 +61,10 @@ class TeacherViewModel @Inject constructor(
 
     fun getAnnouncementMessage(
         token: String,
-        shouldFetch: Boolean=false,
+        shouldFetch: Boolean = false,
         searchContent: String = ""
     ): LiveData<Resource<List<AnnouncementEntity>>> {
-        return teacherRepository.fetchAnnouncement(token,shouldFetch,searchContent)
+        return teacherRepository.fetchAnnouncement(token, shouldFetch, searchContent)
     }
 
     fun getComplaintMessageById(id: Int) {
@@ -156,52 +153,10 @@ class TeacherViewModel @Inject constructor(
         return teacherRepository.fetchSentMessages(token, shouldFetch, search)
     }
 
-    fun uploadFile(
-        requestBody: FileUploadRequest,
-        format: FileUploadFormat?, uploadFileType: UploadFileType
-    ) {
-        disposable.addAll(Single.just(preferenceProvider.getUserToken())
-            .map { return@map it }
-            .flatMap { token ->
-                if (uploadFileType == UploadFileType.REPORT) {
-                    when (format) {
-                        FileUploadFormat.PDF -> {
-                            teacherRepository.uploadReportPDF(token, requestBody)
-                        }
-                        FileUploadFormat.IMAGE -> {
-                            teacherRepository.uploadReportIMAGE(token, requestBody)
-                        }
-                        null -> {
-                            return@flatMap null
-                        }
-                    }
-
-                } else {
-                    when (format) {
-                        FileUploadFormat.PDF -> {
-                            requestBody.requestBody?.let { teacherRepository.uploadAssignmentPDF(token, it) }
-                        }
-                        FileUploadFormat.IMAGE -> {
-                            requestBody.requestBody?.let { teacherRepository.uploadAssignmentIMAGE(token, it) }
-                        }
-                        null -> {
-                            return@flatMap null
-                        }
-                    }
-                }
-
-            }
-            .doOnSubscribe { isSuccess.postValue(false) }
-            .doOnSuccess { isSuccess.postValue(true) }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Timber.i("upload success message:${it.message}")
-            }, { err -> Timber.i(err, "upload error") })
-        )
-    }
-
-    fun getClassStudent(token: String, search: String = ""): LiveData<Resource<List<ClassStudentEntity>>> {
+    fun getClassStudent(
+        token: String,
+        search: String = ""
+    ): LiveData<Resource<List<ClassStudentEntity>>> {
         return teacherRepository.fetchClassStudent(token, searchName = search)
     }
 
@@ -257,17 +212,18 @@ class TeacherViewModel @Inject constructor(
 
     }
 
-    fun deleteMessage(id: Int?){
+    fun deleteMessage(id: Int?) {
         disposable.addAll(Single.just(preferenceProvider.getUserToken())
             .map { return@map it }
-            .flatMap { teacherRepository.deleteSentMessage(it,id) }
+            .flatMap { teacherRepository.deleteSentMessage(it, id) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                if (it.status == 200){
+                if (it.status == 200) {
                     Timber.i("message deleted success")
                 }
-            },{err-> Timber.i(err,"deleteMessage")}))
+            }, { err -> Timber.i(err, "deleteMessage") })
+        )
     }
 
 }

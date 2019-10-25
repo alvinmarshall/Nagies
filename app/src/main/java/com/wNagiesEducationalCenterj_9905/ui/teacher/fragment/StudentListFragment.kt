@@ -17,25 +17,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
-import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
-import com.wNagiesEducationalCenterj_9905.api.request.StudentInfo
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
-import com.wNagiesEducationalCenterj_9905.common.*
-import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
+import com.wNagiesEducationalCenterj_9905.common.FILE_CHOOSER_RESULT
+import com.wNagiesEducationalCenterj_9905.common.ItemCallback
+import com.wNagiesEducationalCenterj_9905.common.REQUEST_EXTERNAL_STORAGE
+import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.RealPathUtil
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.ClassStudentEntity
+import com.wNagiesEducationalCenterj_9905.jobs.UploadFilesWorker
 import com.wNagiesEducationalCenterj_9905.ui.adapter.ClassStudentAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_student_list.*
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
-import java.io.File
 
 class StudentListFragment : BaseFragment() {
     private lateinit var teacherViewModel: TeacherViewModel
@@ -73,7 +70,11 @@ class StudentListFragment : BaseFragment() {
             override fun onClick(data: ClassStudentEntity?) {
                 itemCallback = data
                 context?.let {
-                    PermissionUtils.checkPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE, listener)
+                    PermissionUtils.checkPermission(
+                        it,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        listener
+                    )
                 }
             }
 
@@ -134,37 +135,10 @@ class StudentListFragment : BaseFragment() {
     }
 
     private fun preparingToUpload(path: String?) {
-        if (path == null) return
-        val file = File(path)
-        var requestBody: MultipartBody.Part? = null
-
-        val format = FileTypeUtils.getFileFormat(file.name)
-        when (format) {
-            FileUploadFormat.PDF -> {
-                requestBody = MultipartBody.Part.createFormData(
-                    getString(R.string.upload_form_file),
-                    file.name,
-                    RequestBody.create(MediaType.parse("application/pdf"), file)
-                )
-            }
-            FileUploadFormat.IMAGE -> {
-                requestBody = MultipartBody.Part.createFormData(
-                    getString(R.string.upload_form_file),
-                    file.name,
-                    RequestBody.create(MediaType.parse("image/jpeg"), file)
-                )
-            }
-            null -> {
-                toast("file not supported")
-            }
-        }
-        val fileUploadRequest = FileUploadRequest(requestBody)
-        val studentNo =
-            MultipartBody.Part.createFormData(getString(R.string.report_form_student_no), itemCallback?.studentNo!!)
-        val studentName =
-            MultipartBody.Part.createFormData(getString(R.string.report_form_student_name), itemCallback?.studentName!!)
-        fileUploadRequest.studentInfo = StudentInfo(studentNo, studentName)
-        teacherViewModel.uploadFile(fileUploadRequest, format, UploadFileType.REPORT)
+        snackBar?.setText(getString(R.string.upload_msg_starting))?.show()
+        val studentNo: String = itemCallback?.studentNo.toString()
+        val studentName: String = itemCallback?.studentName.toString()
+        context?.let { UploadFilesWorker.start(it, path, true, arrayOf(studentNo, studentName)) }
     }
 
     private fun configureViewModel() {
@@ -178,30 +152,23 @@ class StudentListFragment : BaseFragment() {
 
     private fun subscribeObservers(token: String) {
         teacherViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
-            teacherViewModel.getClassStudent(token, search).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        adapter?.submitList(resource.data)
-                        showLoadingDialog(false)
+            teacherViewModel.getClassStudent(token, search)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            adapter?.submitList(resource.data)
+                            showLoadingDialog(false)
+                        }
+                        Status.ERROR -> {
+                            showLoadingDialog(false)
+                        }
+                        Status.LOADING -> {
+                            showLoadingDialog()
+                            Timber.i("loading...")
+                        }
                     }
-                    Status.ERROR -> {
-                        showLoadingDialog(false)
-                    }
-                    Status.LOADING -> {
-                        showLoadingDialog()
-                        Timber.i("loading...")
-                    }
-                }
-            })
+                })
         })
-        teacherViewModel.isSuccess.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                snackBar?.setText(getString(R.string.upload_msg_success))?.show()
-            } else {
-                snackBar?.setText(getString(R.string.upload_msg_starting))?.show()
-            }
-        })
-
     }
 
     private fun showLoadingDialog(show: Boolean = true) {
@@ -233,7 +200,11 @@ class StudentListFragment : BaseFragment() {
     }
 
     //region Permission
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_EXTERNAL_STORAGE -> {

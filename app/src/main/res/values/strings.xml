@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Nagies Angels</string>
+    <string name="app_name">Nagie\'s Angels</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -7,14 +7,14 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_dashboard">Dashboard</string>
-    <string name="menu_view_circular">View Circular</string>
+    <string name="menu_dashboard">Messages</string>
+    <string name="menu_view_circular">Circular Image</string>
     <string name="menu_profile">Profile</string>
-    <string name="menu_view_assignment_jpeg">View Assignment</string>
-    <string name="menu_view_assignment_pdf">View Assignment</string>
-    <string name="menu_view_report">View Reports</string>
+    <string name="menu_view_assignment_jpeg">Assignment Image</string>
+    <string name="menu_view_assignment_pdf">Assignment PDF</string>
+    <string name="menu_view_report">Report image</string>
     <string name="menu_change_password">Change Password</string>
-    <string name="menu_reports_pdf">Reports PDF</string>
+    <string name="menu_reports_pdf">Report PDF</string>
     <string name="menu_announcement">Announcement</string>
     <string name="menu_send_message">Send Message</string>
     <string name="error_role_select_message">Please select a role</string>
@@ -77,8 +77,8 @@
     <string name="sent_message_failed">sending message failed</string>
     <string name="network_state_no_connection">No internet connection</string>
     <string name="message_field_empty_error">Message can\'t be empty</string>
-    <string name="label_btn_call_teacher">Call Teacher</string>
-    <string name="label_btn_send_message">Send Message</string>
+    <string name="label_btn_call_teacher">Call</string>
+    <string name="label_btn_send_message">Message</string>
     <string name="menu_class_teacher">Class Teacher</string>
     <string name="fcm_topic_parent">parent</string>
     <string name="fcm_topic_dev_parent">dev_parent</string>
@@ -167,5 +167,6 @@
     <string name="password_reset_notification_diaload_body">Your account password has been reset to the reset password,
         Remember to use the recent one during account login
     </string>
+    <string name="tv_label_perform_action">Perform Action</string>
 
 </resources>

@@ -78,6 +78,7 @@ class TeacherRepository @Inject constructor(
                 if (item.status == 200) {
                     item.complaints.forEach { complaint ->
                         complaint.token = token
+                        complaint.id = complaint.uid
                     }
                     db.runInTransaction {
                         complaintDao.deleteComplaint(token)
@@ -164,6 +165,7 @@ class TeacherRepository @Inject constructor(
                 if (item.status == 200) {
                     item.messages.forEach { msg ->
                         msg.token = token
+                        msg.id = msg.uid
                     }
                     db.runInTransaction {
                         messageDao.deleteMessages(token)

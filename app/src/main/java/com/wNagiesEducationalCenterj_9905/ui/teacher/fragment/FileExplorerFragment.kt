@@ -9,16 +9,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ExplorerRequest
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
@@ -29,7 +27,6 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.UploadFileAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import kotlinx.android.synthetic.main.fragment_file_explorer.*
 import org.jetbrains.anko.support.v4.toast
-import java.io.File
 
 class FileExplorerFragment : BaseFragment() {
     private lateinit var teacherViewModel: TeacherViewModel
@@ -128,7 +125,7 @@ class FileExplorerFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         teacherViewModel.getUploadedFiles(getExplorerRequest())
         subscribeObservers()
     }

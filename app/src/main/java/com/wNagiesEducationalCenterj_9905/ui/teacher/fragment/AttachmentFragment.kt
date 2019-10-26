@@ -1,7 +1,6 @@
 package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
-import com.wNagiesEducationalCenterj_9905.common.utils.RealPathUtil
 import android.Manifest
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -13,7 +12,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
@@ -26,6 +25,8 @@ import com.wNagiesEducationalCenterj_9905.common.UploadFileType
 import com.wNagiesEducationalCenterj_9905.common.utils.FileTypeUtils
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionAskListener
 import com.wNagiesEducationalCenterj_9905.common.utils.PermissionUtils
+import com.wNagiesEducationalCenterj_9905.common.utils.RealPathUtil
+import com.wNagiesEducationalCenterj_9905.jobs.UploadFilesWorker
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import kotlinx.android.synthetic.main.fragment_attachment.*
 import okhttp3.MediaType
@@ -53,10 +54,14 @@ class AttachmentFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         alertDialog = context?.let { AlertDialog.Builder(it) }
-        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_INDEFINITE)
+        snackBar = Snackbar.make(root, "", Snackbar.LENGTH_LONG)
         btn_upload_assignment.onClick {
             context?.let {
-                PermissionUtils.checkPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE, listener)
+                PermissionUtils.checkPermission(
+                    it,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    listener
+                )
             }
         }
         btn_upload_report.onClick { openClassStudentList() }
@@ -68,7 +73,7 @@ class AttachmentFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         subscribeObservers()
     }
 
@@ -134,34 +139,16 @@ class AttachmentFragment : BaseFragment() {
     }
 
     private fun preparingToUpload(path: String?) {
-        if (path == null) return
-        val file = File(path)
-        var requestBody: MultipartBody.Part? = null
-        val format = FileTypeUtils.getFileFormat(file.name)
-        when (format) {
-            FileUploadFormat.PDF -> {
-                requestBody = MultipartBody.Part.createFormData(
-                    "file",
-                    file.name,
-                    RequestBody.create(MediaType.parse("application/pdf"), file)
-                )
-            }
-            FileUploadFormat.IMAGE -> {
-                requestBody = MultipartBody.Part.createFormData(
-                    "file",
-                    file.name,
-                    RequestBody.create(MediaType.parse("image/jpeg"), file)
-                )
-            }
-            null -> {
-                toast("file not supported")
-            }
-        }
-        teacherViewModel.uploadFile(FileUploadRequest(requestBody), format, UploadFileType.NORMAL)
+        snackBar?.setText(getString(R.string.upload_msg_starting))?.show()
+        context?.let { UploadFilesWorker.start(it, path, false, null) }
     }
 
     //region Permission
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_EXTERNAL_STORAGE -> {

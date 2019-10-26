@@ -1,6 +1,5 @@
 package com.wNagiesEducationalCenterj_9905.notification
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -23,12 +22,12 @@ class FirebaseMessageService : FirebaseMessagingService() {
         preferences = PreferenceManager.getDefaultSharedPreferences(baseContext)
     }
 
-    override fun onMessageReceived(p0: RemoteMessage?) {
+    override fun onMessageReceived(p0: RemoteMessage) {
         super.onMessageReceived(p0)
-        p0?.notification?.let {
+        p0.notification?.let {
             Timber.i("push notification message")
         }
-        val data = p0?.data
+        val data = p0.data
 
         if (data.isNullOrEmpty()) return
         Timber.i("push notification data")
@@ -71,7 +70,7 @@ class FirebaseMessageService : FirebaseMessagingService() {
         NotificationUtils.showNotificationMessage(applicationContext, title, body, resultIntent)
     }
 
-    override fun onNewToken(p0: String?) {
+    override fun onNewToken(p0: String) {
         super.onNewToken(p0)
         Timber.i("new token: $p0")
         val editor = preferences?.edit()

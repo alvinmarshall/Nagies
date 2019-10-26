@@ -1,20 +1,20 @@
 package com.wNagiesEducationalCenterj_9905.data.db.DAO
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.wNagiesEducationalCenterj_9905.data.db.Entities.MessageEntity
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZonedDateTime
 
 @Dao
 interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessages(messageEntity: List<MessageEntity>)
 
-    @Query("SELECT * FROM messages WHERE token = :token AND content LIKE :search")
+    @Query("SELECT * FROM messages WHERE token = :token AND content LIKE :search ORDER BY id DESC")
     fun getMessages(token: String,search:String):LiveData<List<MessageEntity>>
 
     @Query("SELECT * FROM messages WHERE token = :token LIMIT 1")

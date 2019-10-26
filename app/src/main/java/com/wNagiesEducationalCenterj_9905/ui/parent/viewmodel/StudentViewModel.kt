@@ -31,7 +31,7 @@ class StudentViewModel @Inject constructor(
     val cachedSavedComplaintById: MutableLiveData<ComplaintEntity> = MutableLiveData()
     val errorMessage: MutableLiveData<Int> = MutableLiveData()
     var cachedAnnouncement: MutableLiveData<AnnouncementEntity> = MutableLiveData()
-    val searchString: MutableLiveData<String> = MutableLiveData()
+    val searchString: MutableLiveData<String> = MutableLiveData("")
 
 
     fun getStudentMessages(

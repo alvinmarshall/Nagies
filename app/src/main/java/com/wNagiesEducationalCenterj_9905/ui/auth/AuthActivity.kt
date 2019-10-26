@@ -1,7 +1,9 @@
 package com.wNagiesEducationalCenterj_9905.ui.auth
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -43,6 +45,8 @@ class AuthActivity : BaseActivity() {
         getAccountUser()
         configureViewModel()
         btn_login.onClick {
+            val imm  = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it?.windowToken,0)
             authenticateUser()
         }
     }

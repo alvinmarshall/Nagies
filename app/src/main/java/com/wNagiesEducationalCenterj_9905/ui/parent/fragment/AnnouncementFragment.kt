@@ -7,7 +7,7 @@ import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -97,7 +97,7 @@ class AnnouncementFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.searchString.postValue("")
         getNetworkState()?.observe(viewLifecycleOwner, Observer {
             if (!it) {

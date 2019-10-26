@@ -58,7 +58,7 @@ class AuthRepository @Inject constructor(
         entity.role = item.role
         entity.photo = ServerPathUtil.setCorrectPath(item.image)
         entity.token = item.Token
-        entity.uid = item.Id
+        entity.uid = item.Id.toString()
         entity.name = item.name
         entity.level = item.level
         userDao.insertUser(entity)

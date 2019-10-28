@@ -149,7 +149,7 @@ class StudentRepository @Inject constructor(
             }
 
             override fun createCall(): LiveData<ApiResponse<ComplaintResponse>> {
-                return apiService.getComplaint(token)
+                return apiService.getSentComplaint(token)
             }
         }.asLiveData()
     }

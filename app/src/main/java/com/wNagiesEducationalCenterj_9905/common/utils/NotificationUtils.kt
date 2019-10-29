@@ -117,8 +117,30 @@ object NotificationUtils {
             notificationChannel.canShowBadge()
             notificationChannel.setSound(sound, attribute)
             val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(notificationChannel)
+            notificationManager?.createNotificationChannel(notificationChannel)
         }
+    }
+
+    fun showWorkerNotificationMessage(context: Context, title: String?, message: String?) {
+        val notificationSoundUrl =
+            "${ContentResolver.SCHEME_ANDROID_RESOURCE}//${context.packageName}/raw/notification"
+        val notificationSound = Uri.parse(notificationSoundUrl)
+        val mBuilder =
+            NotificationCompat.Builder(context, context.getString(R.string.announcement_channel_id))
+        val iconRes: Int = R.mipmap.ic_launcher
+        val notificationId = floor(Math.random() * 20).toInt()
+
+        showNotification(
+            context,
+            mBuilder,
+            iconRes,
+            title,
+            message,
+            null,
+            notificationSound,
+            notificationId
+        )
+        playNotificationSound(context)
     }
 
 

@@ -46,7 +46,10 @@ class ClassStudentVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.item_name.text = name
         itemView.item_gender.text = gender
         itemView.item_index.text = index
-        GlideApp.with(itemView.context).load(data?.imageUrl).centerCrop().placeholder(R.drawable.default_user_avatar)
+        GlideApp.with(itemView.context).load(data?.imageUrl)
+            .centerCrop()
+            .circleCrop()
+            .placeholder(R.drawable.default_user_avatar)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(itemView.item_img)
 

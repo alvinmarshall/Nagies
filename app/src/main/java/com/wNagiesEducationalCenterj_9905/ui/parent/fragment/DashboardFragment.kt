@@ -7,7 +7,7 @@ import android.widget.ProgressBar
 import android.widget.SearchView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +18,6 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_dashboard.*
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class DashboardFragment : BaseFragment() {
@@ -35,8 +34,7 @@ class DashboardFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
-        studentViewModel.searchString.postValue("")
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer {
             subscribeObserver(it)
@@ -74,12 +72,12 @@ class DashboardFragment : BaseFragment() {
         searchView?.isSubmitButtonEnabled
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                studentViewModel.searchString.postValue(query)
+                studentViewModel.searchString.value = query
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                studentViewModel.searchString.postValue(newText)
+                studentViewModel.searchString.value = newText
                 return true
             }
         })
@@ -116,7 +114,6 @@ class DashboardFragment : BaseFragment() {
                                 showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
                                 messageAdapter?.submitList(r.data)
                                 showLoadingDialog(false)
-                                Timber.i("message data size: ${r.data?.size}")
                             }
                             Status.ERROR -> {
                                 showLoadingDialog(false)

@@ -34,11 +34,14 @@ class TeacherVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(item: StudentTeacherEntity?, itemCallback: ItemCallback<Pair<ClassTeacherAction,String?>>?) {
         val name = "Name: ${item?.teacherName}"
         val gender = "Gender: ${item?.gender}"
-        itemView.tv_item_name.text = name
-        itemView.tv_item_gender.text = gender
+        itemView.item_name.text = name
+        itemView.item_gender.text = gender
+        
         GlideApp.with(itemView.context)
             .load(item?.imageUrl)
-            .centerCrop().placeholder(R.drawable.default_user_avatar)
+            .centerCrop()
+            .circleCrop()
+            .placeholder(R.drawable.default_user_avatar)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(itemView.item_img)
         itemView.btn_item_call.onClick {

@@ -2,6 +2,7 @@ package com.wNagiesEducationalCenterj_9905.common.utils
 
 import android.app.Application
 import android.content.SharedPreferences
+import com.wNagiesEducationalCenterj_9905.BuildConfig
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
@@ -159,7 +160,8 @@ class PreferenceProvider @Inject constructor(
             context.getString(R.string.pref_fetch_option_key),
             context.getString(R.string.pref_fetch_option_20_min_value)
         )
-        return interval?.toInt() ?: 20
+        if (BuildConfig.DEBUG) return 5
+        return  interval?.toInt() ?: 20
     }
 
 

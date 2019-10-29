@@ -47,6 +47,7 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.messages.forEach { msg ->
                         msg.token = token
+                        msg.id = msg.uid
                     }
                     db.runInTransaction {
                         messageDao.deleteMessages(token)
@@ -79,6 +80,7 @@ class StudentRepository @Inject constructor(
             override fun saveCallResult(item: StudentProfileResponse) {
                 if (item.status == 200) {
                     item.studentProfile.token = token
+                    item.studentProfile.id = item.id
                     item.studentProfile.imageUrl = ServerPathUtil.setCorrectPath(item.studentProfile.imageUrl)
                     db.runInTransaction {
                         studentDao.deleteProfile(token)
@@ -123,9 +125,10 @@ class StudentRepository @Inject constructor(
     ): LiveData<Resource<List<ComplaintEntity>>> {
         return object : NetworkBoundResource<List<ComplaintEntity>, ComplaintResponse>(appExecutors) {
             override fun saveCallResult(item: ComplaintResponse) {
-                if (item.status == 200){
+                if (item.status == 200) {
                     item.complaints.forEach { complaint ->
                         complaint.token = token
+                        complaint.id = complaint.uid
                     }
                     db.runInTransaction {
                         complaintDao.deleteComplaint(token)
@@ -142,15 +145,14 @@ class StudentRepository @Inject constructor(
             }
 
             override fun loadFromDb(): LiveData<List<ComplaintEntity>> {
-                return complaintDao.getComplaintMessage(token,"%$searchContent%")
+                return complaintDao.getComplaintMessage(token, "%$searchContent%")
             }
 
             override fun createCall(): LiveData<ApiResponse<ComplaintResponse>> {
-                return apiService.getComplaint(token)
+                return apiService.getSentComplaint(token)
             }
         }.asLiveData()
     }
-
 
 
     fun fetchStudentAssignmentPDF(
@@ -378,7 +380,6 @@ class StudentRepository @Inject constructor(
                 if (item.status == 200) {
                     item.circular.forEach { circular ->
                         circular.token = token
-                        circular.path = circular.fileUrl
                         circular.fileUrl = ServerPathUtil.setCorrectPath(circular.fileUrl)
                     }
                     db.runInTransaction {
@@ -456,11 +457,15 @@ class StudentRepository @Inject constructor(
     }
 
     fun updateTimetableFilePath(id: Int, path: String): Int {
-        return studentDao.updateBillingImagePath(id, path)
+        return studentDao.updateTimetableImagePath(id, path)
     }
 
     fun deleteBillingById(id: Int) {
         return studentDao.deleteBillingById(id)
+    }
+
+    fun deleteTimetableById(id: Int) {
+        return studentDao.deleteTimetableById(id)
     }
 
     fun fetchStudentAnnouncement(
@@ -533,8 +538,8 @@ class StudentRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun deleteComplaint(token:String,id:Int?,type: String="complaint"):Single<DeleteMessageResponse>{
+    fun deleteComplaint(token: String, id: Int?, type: String = "complaint"): Single<DeleteMessageResponse> {
         id?.let { complaintDao.deleteComplaintById(it) }
-        return apiService.deleteMessage(token,id,type)
+        return apiService.deleteMessage(token, id, type)
     }
 }

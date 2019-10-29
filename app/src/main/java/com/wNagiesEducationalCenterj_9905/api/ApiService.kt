@@ -21,6 +21,9 @@ interface ApiService {
     @GET("message")
     fun getStudentMessages(@Header("Authorization") token: String): LiveData<ApiResponse<MessageResponse>>
 
+    @GET("message/sent")
+    fun getSentMessages(@Header("Authorization") token: String): LiveData<ApiResponse<MessageResponse>>
+
     @GET("users/profile")
     fun getStudentProfile(@Header("Authorization") token: String): LiveData<ApiResponse<StudentProfileResponse>>
 
@@ -78,6 +81,11 @@ interface ApiService {
     fun getComplaint(
         @Header("Authorization") token: String,
         @Query("from") from: String = "complaint"
+    ): LiveData<ApiResponse<ComplaintResponse>>
+
+    @GET("message/sent")
+    fun getSentComplaint(
+        @Header("Authorization") token: String
     ): LiveData<ApiResponse<ComplaintResponse>>
 
     @POST("users/change_password")

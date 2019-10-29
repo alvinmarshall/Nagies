@@ -11,18 +11,24 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.GlideApp
 import com.wNagiesEducationalCenterj_9905.common.ItemCallback
 import com.wNagiesEducationalCenterj_9905.common.ViewFilesAction
-import com.wNagiesEducationalCenterj_9905.data.db.Entities.CircularEntity
+import com.wNagiesEducationalCenterj_9905.vo.IFileModel
 import kotlinx.android.synthetic.main.list_circular.view.*
 import java.io.File
 
-class CircularAdapter : ListAdapter<CircularEntity, CircularViewHolder>(CircularDiff()) {
+class TimetableAdapter : ListAdapter<IFileModel, TimetableVH>(TimetableDiff()) {
     private var itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CircularViewHolder {
-        return CircularViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_circular, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimetableVH {
+        return TimetableVH(
+            LayoutInflater.from(parent.context).inflate(
+                R.layout.list_circular,
+                parent,
+                false
+            )
+        )
 
     }
 
-    override fun onBindViewHolder(holder: CircularViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TimetableVH, position: Int) {
         holder.bind(getItem(position), itemCallback)
     }
 
@@ -30,19 +36,20 @@ class CircularAdapter : ListAdapter<CircularEntity, CircularViewHolder>(Circular
     fun setCallBack(callback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>?) {
         itemCallback = callback
     }
+
 }
 
-class CircularViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class TimetableVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(
-        data: CircularEntity?,
+        item: IFileModel?,
         itemCallback: ItemCallback<Triple<ViewFilesAction, Int?, String?>>?
     ) {
-        if (data?.path != null) {
-            val file = File(data.path!!)
+        if (item?.path != null) {
+            val file = File(item.path!!)
             if (file.exists()) {
                 itemView.fab_download.hide()
                 itemView.setOnClickListener {
-                    itemCallback?.onClick(Triple(ViewFilesAction.VIEW, data.id, data.path))
+                    itemCallback?.onClick(Triple(ViewFilesAction.VIEW, item.id, item.path))
                 }
             } else {
                 itemView.fab_download.show()
@@ -51,28 +58,28 @@ class CircularViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             itemView.fab_download.show()
         }
         GlideApp.with(itemView.context)
-            .load(data?.fileUrl)
+            .load(item?.fileUrl)
             .placeholder(R.drawable.notice_board)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(itemView.item_image)
 
 
         itemView.fab_download.setOnClickListener {
-            itemCallback?.onClick(Triple(ViewFilesAction.DOWNLOAD, data?.id, data?.fileUrl))
+            itemCallback?.onClick(Triple(ViewFilesAction.DOWNLOAD, item?.id, item?.fileUrl))
         }
         itemView.setOnLongClickListener {
-            itemCallback?.onHold(Triple(ViewFilesAction.DELETE, data?.id, data?.path))
+            itemCallback?.onHold(Triple(ViewFilesAction.DELETE, item?.id, item?.path))
             true
         }
     }
 }
 
-class CircularDiff : DiffUtil.ItemCallback<CircularEntity>() {
-    override fun areItemsTheSame(oldItem: CircularEntity, newItem: CircularEntity): Boolean {
+class TimetableDiff : DiffUtil.ItemCallback<IFileModel>() {
+    override fun areContentsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: CircularEntity, newItem: CircularEntity): Boolean {
+    override fun areItemsTheSame(oldItem: IFileModel, newItem: IFileModel): Boolean {
         return oldItem.id == newItem.id && oldItem.path == newItem.path
     }
 }

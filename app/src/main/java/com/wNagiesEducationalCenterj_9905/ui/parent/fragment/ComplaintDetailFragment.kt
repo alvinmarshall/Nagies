@@ -6,9 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
@@ -43,7 +42,7 @@ class ComplaintDetailFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this,viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this,viewModelFactory)[StudentViewModel::class.java]
         complaintId?.let { studentViewModel.getParentComplaintById(it) }
         subscribeObserver()
     }

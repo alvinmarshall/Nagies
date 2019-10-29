@@ -1,13 +1,15 @@
 package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.TeacherMessageRequest
@@ -56,7 +58,7 @@ class CreateTeacherMessageFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         subscribeObservers()
     }
 
@@ -95,6 +97,8 @@ class CreateTeacherMessageFragment : BaseFragment() {
         when (item.itemId) {
             R.id.action_send -> {
                 if (!isBusy) {
+                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(view?.windowToken,0)
                     preparingToMessage()
                 }
             }

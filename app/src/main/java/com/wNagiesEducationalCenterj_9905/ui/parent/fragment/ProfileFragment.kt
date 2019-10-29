@@ -2,13 +2,12 @@ package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,14 +21,9 @@ import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_dashboard.recycler_view
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class ProfileFragment : BaseFragment() {
     private lateinit var studentViewModel: StudentViewModel
     private var profileAdapter: ProfileAdapter? = null
@@ -64,7 +58,7 @@ class ProfileFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         studentViewModel.cachedToken.observe(viewLifecycleOwner, Observer {
             subscribeObserver(it)

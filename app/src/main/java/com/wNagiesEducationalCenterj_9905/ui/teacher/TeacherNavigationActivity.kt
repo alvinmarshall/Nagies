@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
+import com.wNagiesEducationalCenterj_9905.BuildConfig
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseActivity
 import com.wNagiesEducationalCenterj_9905.common.*
@@ -65,14 +66,14 @@ class TeacherNavigationActivity : BaseActivity() {
     }
 
     private fun firebaseMessageSubscription() {
-        FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.fcm_topic_teacher)).addOnCompleteListener {
+        FirebaseMessaging.getInstance().subscribeToTopic(getTeacherTopic()).addOnCompleteListener {
             if (!it.isSuccessful) {
                 Timber.i("Task Failed")
                 return@addOnCompleteListener
             }
             Timber.i("incoming teachers topic")
         }
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(getString(R.string.fcm_topic_parent))
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(getParentTopic())
     }
 
 
@@ -251,6 +252,16 @@ class TeacherNavigationActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         mRegistrationBroadcastReceiver?.let { LocalBroadcastManager.getInstance(this).unregisterReceiver(it) }
+    }
+
+    private fun getParentTopic():String{
+        return if (BuildConfig.DEBUG)   getString(R.string.fcm_topic_dev_parent) else  getString(R.string.fcm_topic_parent)
+
+    }
+
+    private fun getTeacherTopic():String{
+        return if (BuildConfig.DEBUG)   getString(R.string.fcm_topic_dev_teacher) else  getString(R.string.fcm_topic_teacher)
+
     }
 
 }

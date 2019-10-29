@@ -2,18 +2,15 @@ package com.wNagiesEducationalCenterj_9905.ui.teacher.fragment
 
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-
+import androidx.lifecycle.ViewModelProvider
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import kotlinx.android.synthetic.main.fragment_teacher_message_detail.*
-import javax.inject.Inject
 
 class TeacherMessageDetailFragment : BaseFragment() {
     private lateinit var teacherViewModel: TeacherViewModel
@@ -35,7 +32,7 @@ class TeacherMessageDetailFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         messageId?.let { teacherViewModel.getMessageById(it) }
     }
 

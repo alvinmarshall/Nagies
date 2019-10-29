@@ -1,15 +1,17 @@
 package com.wNagiesEducationalCenterj_9905.ui.parent.fragment
 
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.api.request.ParentComplaintRequest
@@ -56,7 +58,7 @@ class CreateMessageFragment : BaseFragment() {
 
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         studentViewModel.getUserToken()
         subscribeObservers()
     }
@@ -97,7 +99,7 @@ class CreateMessageFragment : BaseFragment() {
                             val classAdapter = ArrayAdapter(
                                 context!!,
                                 android.R.layout.select_dialog_singlechoice,
-                                teacherNames.toArray()
+                                teacherNames
                             )
                             spinner.adapter = classAdapter
                             classAdapter.notifyDataSetChanged()
@@ -128,6 +130,8 @@ class CreateMessageFragment : BaseFragment() {
         when (item.itemId) {
             R.id.action_send -> {
                 if (!isBusy) {
+                    val imm  = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(view?.windowToken,0)
                     preparingToSendComplaint()
                 }
             }

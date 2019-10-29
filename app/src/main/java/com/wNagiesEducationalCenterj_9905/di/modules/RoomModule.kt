@@ -16,6 +16,7 @@ class RoomModule {
     fun provideRoomDb(application: Application): AppDatabase {
         return Room
             .databaseBuilder(application.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+            .fallbackToDestructiveMigration()
             .build()
     }
 

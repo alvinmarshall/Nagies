@@ -9,7 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -101,7 +101,7 @@ class SendMessageFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        studentViewModel = ViewModelProviders.of(this, viewModelFactory)[StudentViewModel::class.java]
+        studentViewModel = ViewModelProvider(this, viewModelFactory)[StudentViewModel::class.java]
         subscribeObserver()
     }
 
@@ -118,7 +118,7 @@ class SendMessageFragment : BaseFragment() {
                         }
                         Status.ERROR -> {
                             showLoadingDialog(false)
-                            showNoContentMessage(resource?.message)
+                            showDataAvailableMessage(label_msg_title,resource.data,MessageType.MESSAGES)
                             Timber.i(resource.message)
                         }
                         Status.LOADING -> {

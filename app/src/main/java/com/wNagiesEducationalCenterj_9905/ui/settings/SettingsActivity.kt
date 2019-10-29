@@ -6,10 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
+import com.wNagiesEducationalCenterj_9905.BuildConfig
 import com.wNagiesEducationalCenterj_9905.R
 import kotlinx.android.synthetic.main.settings_activity.*
-
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -42,8 +41,8 @@ class SettingsActivity : AppCompatActivity() {
             preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         }
 
-        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-            val pref = findPreference(key)
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String) {
+            val pref = findPreference<Preference>(key)
             if (null != pref) {
                 val value = sharedPreferences?.getString(pref.key, "")
                 setPreferenceSummary(pref, value)
@@ -63,8 +62,10 @@ class SettingsActivity : AppCompatActivity() {
                 val value = sharedPreferences.getString(pref.key, "")
                 setPreferenceSummary(pref, value)
             }
-            val listPref = findPreference(getString(R.string.pref_fetch_option_key)) as ListPreference
-            listPref.summary = listPref.entry
+            val listPref = findPreference<ListPreference>(getString(R.string.pref_fetch_option_key))
+            val prefAppText = findPreference<Preference>(getString(R.string.pref_app_version_key))
+            prefAppText?.title = "Version ${BuildConfig.VERSION_NAME}"
+            listPref?.summary = listPref?.entry
         }
 
         private fun setPreferenceSummary(pref: Preference?, value: String?) {

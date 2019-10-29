@@ -6,12 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import kotlinx.android.synthetic.main.fragment_announcement_details.*
-import org.jetbrains.anko.support.v4.toast
 
 class AnnouncementDetailsFragment : BaseFragment() {
     private lateinit var teacherViewModel: TeacherViewModel
@@ -33,7 +32,7 @@ class AnnouncementDetailsFragment : BaseFragment() {
     }
 
     private fun configureViewModel() {
-        teacherViewModel = ViewModelProviders.of(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
         announcementId?.let {  teacherViewModel.getAnnouncementById(it) }
         subscribeObservers()
     }

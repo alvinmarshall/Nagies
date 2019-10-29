@@ -6,11 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import com.wNagiesEducationalCenterj_9905.BuildConfig
 import com.wNagiesEducationalCenterj_9905.R
 import kotlinx.android.synthetic.main.settings_activity.*
-
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -66,7 +64,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             val listPref = findPreference<ListPreference>(getString(R.string.pref_fetch_option_key))
             val prefAppText = findPreference<Preference>(getString(R.string.pref_app_version_key))
-            prefAppText?.title = BuildConfig.VERSION_NAME
+            prefAppText?.title = "Version ${BuildConfig.VERSION_NAME}"
             listPref?.summary = listPref?.entry
         }
 

@@ -181,7 +181,7 @@ class TeacherRepository @Inject constructor(
                 return data == null || data.isEmpty() || shouldFetch || isOld
             }
 
-            override fun createCall() = apiService.getStudentMessages(token)
+            override fun createCall() = apiService.getSentMessages(token)
         }.asLiveData()
     }
 

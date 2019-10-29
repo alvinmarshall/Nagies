@@ -118,7 +118,7 @@ class SendMessageFragment : BaseFragment() {
                         }
                         Status.ERROR -> {
                             showLoadingDialog(false)
-                            showNoContentMessage(resource?.message)
+                            showDataAvailableMessage(label_msg_title,resource.data,MessageType.MESSAGES)
                             Timber.i(resource.message)
                         }
                         Status.LOADING -> {

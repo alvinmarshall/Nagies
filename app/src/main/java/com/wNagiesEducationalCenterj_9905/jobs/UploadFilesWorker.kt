@@ -3,6 +3,8 @@ package com.wNagiesEducationalCenterj_9905.jobs
 import android.app.Application
 import android.content.Context
 import androidx.work.*
+import com.wNagiesEducationalCenterj_9905.api.request.FileUploadRequest
+import com.wNagiesEducationalCenterj_9905.api.response.FileUploadResponse
 import com.wNagiesEducationalCenterj_9905.common.FileUploadFormat
 import com.wNagiesEducationalCenterj_9905.common.UploadFileType
 import com.wNagiesEducationalCenterj_9905.common.utils.FileUploadUtil
@@ -32,6 +34,10 @@ class UploadFilesWorker @Inject constructor(
             FileUploadUtil(appContext, filePath, isReport, null)
         }
         val uploadData = fileUploadUtil.preparingToUpload()
+        return uploadingFileData(uploadData)
+    }
+
+    private fun uploadingFileData(uploadData: FileUploadRequest?): Single<Result> {
         uploadData?.let { request ->
             if (request.fileType == UploadFileType.REPORT) {
                 when (request.format) {
@@ -42,21 +48,7 @@ class UploadFilesWorker @Inject constructor(
                                 request
                             )
                             .doOnSuccess {
-                                if (it.status == 200) {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Report upload complete",
-                                        "file uploaded successfully"
-                                    )
-                                    Timber.i("file report upload: ${it.message}")
-                                } else {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Report upload failed",
-                                        "file upload failed"
-                                    )
-                                    Timber.e("file upload status: ${it.status}")
-                                }
+                                showUploadReportPDFNotification(it)
                             }
                             .doOnError {
                                 NotificationUtils.showWorkerNotificationMessage(
@@ -75,22 +67,7 @@ class UploadFilesWorker @Inject constructor(
                                 request
                             )
                             .doOnSuccess {
-                                if (it.status == 200) {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Report upload complete",
-                                        "file uploaded successfully"
-                                    )
-                                    Timber.i("file report upload: ${it.message}")
-                                } else {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Report upload failed",
-                                        "file upload failed"
-                                    )
-                                    Timber.e("file upload status: ${it.status}")
-                                }
-
+                                showUploadReportPDFNotification(it)
                             }
                             .doOnError {
                                 NotificationUtils.showWorkerNotificationMessage(
@@ -113,21 +90,7 @@ class UploadFilesWorker @Inject constructor(
                                 request.requestBody!!
                             )
                             .doOnSuccess {
-                                if (it.status == 200) {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Assignment upload complete",
-                                        "file uploaded successfully"
-                                    )
-                                    Timber.i("file assignment upload: ${it.message}")
-                                } else {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Assignment upload failed",
-                                        "file upload failed"
-                                    )
-                                    Timber.e("file upload status: ${it.status}")
-                                }
+                                showUploadAssignmentNotification(it)
                             }
                             .doOnError {
                                 NotificationUtils.showWorkerNotificationMessage(
@@ -148,21 +111,7 @@ class UploadFilesWorker @Inject constructor(
                                 request.requestBody!!
                             )
                             .doOnSuccess {
-                                if (it.status == 200) {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Assignment upload complete",
-                                        "file uploaded successfully"
-                                    )
-                                    Timber.i("file assignment upload: ${it.message}")
-                                } else {
-                                    NotificationUtils.showWorkerNotificationMessage(
-                                        appContext,
-                                        "Assignment upload failed",
-                                        "file upload failed"
-                                    )
-                                    Timber.e("file upload status: ${it.status}")
-                                }
+                                showUploadAssignmentNotification(it)
                             }
                             .doOnError {
                                 NotificationUtils.showWorkerNotificationMessage(
@@ -181,6 +130,42 @@ class UploadFilesWorker @Inject constructor(
 
 
         } ?: return Single.fromCallable { Result.failure() }
+    }
+
+    private fun showUploadAssignmentNotification(it: FileUploadResponse) {
+        if (it.status == 200) {
+            NotificationUtils.showWorkerNotificationMessage(
+                appContext,
+                "Assignment upload complete",
+                "file uploaded successfully"
+            )
+            Timber.i("file assignment upload: ${it.message}")
+        } else {
+            NotificationUtils.showWorkerNotificationMessage(
+                appContext,
+                "Assignment upload failed",
+                "file upload failed"
+            )
+            Timber.e("file upload status: ${it.status}")
+        }
+    }
+
+    private fun showUploadReportPDFNotification(it: FileUploadResponse) {
+        if (it.status == 200) {
+            NotificationUtils.showWorkerNotificationMessage(
+                appContext,
+                "Report upload complete",
+                "file uploaded successfully"
+            )
+            Timber.i("file report upload: ${it.message}")
+        } else {
+            NotificationUtils.showWorkerNotificationMessage(
+                appContext,
+                "Report upload failed",
+                "file upload failed"
+            )
+            Timber.e("file upload status: ${it.status}")
+        }
     }
 
     companion object {

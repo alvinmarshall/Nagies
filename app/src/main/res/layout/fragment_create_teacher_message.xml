@@ -7,11 +7,30 @@
                 android:id="@+id/root"
                 tools:context=".ui.teacher.fragment.CreateTeacherMessageFragment">
 
+    <TextView android:layout_width="match_parent"
+            android:text="Receiver options"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-light"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_alignParentStart="true"
+            android:id="@+id/tv1"
+            android:layout_height="wrap_content"/>
+    <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv1"
+            android:prompt="@string/label_select_class_teacher"
+            android:background="@android:color/white"
+            android:spinnerMode="dropdown"
+            android:id="@+id/spinner"/>
     <EditText
+            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:id="@+id/et_message_content"
             android:inputType="textMultiLine"
             android:padding="16dp"
+            android:layout_below="@id/spinner"
             android:background="@drawable/square_edit_text"
             android:hint="@string/hint_input_start_a_conversation"
             android:layout_height="wrap_content" tools:ignore="Autofill"/>
@@ -22,4 +41,5 @@
             android:indeterminate="true"
             android:layout_height="wrap_content"
             android:id="@+id/progressBar"/>
+
 </RelativeLayout>

@@ -14,13 +14,13 @@ interface AssignmentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAssignment(assignmentEntityList: List<AssignmentEntity>)
 
-    @Query("SELECT * FROM assignment WHERE  token = :token AND format = :format")
+    @Query("SELECT * FROM assignment WHERE  token = :token AND format = :format ORDER BY id DESC ")
     fun getStudentAssignmentPDF(token: String, format: String = PDF_FORMAT): LiveData<List<AssignmentEntity>>
 
     @Query("DELETE FROM assignment WHERE token = :token AND  format = :format")
     fun deleteAssignmentPDF(token: String,format: String = PDF_FORMAT)
 
-    @Query("SELECT * FROM assignment WHERE token = :token AND format = :format")
+    @Query("SELECT * FROM assignment WHERE token = :token AND format = :format ORDER BY id DESC")
     fun getAssignmentImage(token: String, format: String = IMAGE_FORMAT): LiveData<List<AssignmentEntity>>
 
     @Query("DELETE FROM assignment WHERE  token = :token AND format = :format")

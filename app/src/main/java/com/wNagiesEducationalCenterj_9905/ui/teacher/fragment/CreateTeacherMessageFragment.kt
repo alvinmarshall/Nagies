@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -17,7 +19,9 @@ import com.wNagiesEducationalCenterj_9905.base.BaseFragment
 import com.wNagiesEducationalCenterj_9905.common.showAnyView
 import com.wNagiesEducationalCenterj_9905.common.utils.InputValidationProvider
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
+import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_create_teacher_message.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class CreateTeacherMessageFragment : BaseFragment() {
@@ -30,11 +34,25 @@ class CreateTeacherMessageFragment : BaseFragment() {
     private var loadingIndicator: ProgressBar? = null
     private var dialog: AlertDialog.Builder? = null
     private var teacherMessageRequest: TeacherMessageRequest? = null
+    private var studentNumber = ""
+    private var studentName = ""
+    private val studentNumberArr = ArrayList<String>()
+    private val selectedItemListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
 
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            if (position <= 0) return
+            studentName = parent?.getItemAtPosition(position).toString()
+            studentNumber = studentNumberArr[position - 1]
+            Timber.i("student ref: $studentNumber and student name: $studentName")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
     }
 
     override fun onCreateView(
@@ -49,6 +67,8 @@ class CreateTeacherMessageFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         loadingIndicator = progressBar
         snackBar = Snackbar.make(root, "", Snackbar.LENGTH_LONG)
+
+        spinner.onItemSelectedListener = selectedItemListener
         showLoadingDialog(false)
     }
 
@@ -59,6 +79,7 @@ class CreateTeacherMessageFragment : BaseFragment() {
 
     private fun configureViewModel() {
         teacherViewModel = ViewModelProvider(this, viewModelFactory)[TeacherViewModel::class.java]
+        teacherViewModel.getUserToken()
         subscribeObservers()
     }
 
@@ -86,6 +107,39 @@ class CreateTeacherMessageFragment : BaseFragment() {
             connectionErrorDialog(it)
             isBusy = false
         })
+
+
+        teacherViewModel.userToken.observe(viewLifecycleOwner, Observer { token ->
+            teacherViewModel.getClassStudent(token)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            val studentNamesArr = ArrayList<String>()
+                            studentNamesArr.add("To entire class")
+                            resource.data?.forEach { student ->
+                                studentNamesArr.add(student.studentName)
+                                studentNumberArr.add(student.studentNo)
+                            }
+                            if (studentNamesArr.isNotEmpty()) {
+                                val classAdapter = ArrayAdapter(
+                                    context!!,
+                                    android.R.layout.select_dialog_singlechoice,
+                                    studentNamesArr
+                                )
+                                spinner.adapter = classAdapter
+                                classAdapter.notifyDataSetChanged()
+                            }
+                            showLoadingDialog(false)
+                        }
+                        Status.ERROR -> {
+                            showLoadingDialog(false)
+                        }
+                        Status.LOADING -> {
+                            showLoadingDialog()
+                        }
+                    }
+                })
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -96,9 +150,11 @@ class CreateTeacherMessageFragment : BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_send -> {
+                Timber.i("selected item: $studentNumber and name: $studentName")
                 if (!isBusy) {
-                    val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                    imm?.hideSoftInputFromWindow(view?.windowToken,0)
+                    val imm =
+                        context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.hideSoftInputFromWindow(view?.windowToken, 0)
                     preparingToMessage()
                 }
             }
@@ -123,6 +179,7 @@ class CreateTeacherMessageFragment : BaseFragment() {
 
     }
 
+
     private fun preparingToMessage() {
         when (isDeviceConnected) {
             true -> {
@@ -136,11 +193,15 @@ class CreateTeacherMessageFragment : BaseFragment() {
     }
 
     private fun sendMessage() {
-        if (!validationProvider.isEditTextFilled(et_message_content, getString(R.string.message_field_empty_error))) {
+        if (!validationProvider.isEditTextFilled(
+                et_message_content,
+                getString(R.string.message_field_empty_error)
+            )
+        ) {
             return
         }
         val content: String? = et_message_content.text.toString()
-        teacherMessageRequest = content?.let { TeacherMessageRequest(it) }
+        teacherMessageRequest = content?.let { TeacherMessageRequest(it,studentName,studentNumber) }
         teacherMessageRequest?.let {
             isBusy = true
             showLoadingDialog()

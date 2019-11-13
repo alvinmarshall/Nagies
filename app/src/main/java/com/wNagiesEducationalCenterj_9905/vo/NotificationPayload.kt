@@ -25,7 +25,7 @@ data class NotificationPayload(
                 }
             }
             context.getString(R.string.notification_type_message) -> {
-                if (localLevel == level) {
+                if (localLevel == level || localUsername == name) {
                     NAVIGATE_TO_DASHBOARD
                 } else {
                     null

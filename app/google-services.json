@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1089400715139",
+    "firebase_url": "https://nagieseducationalcenter.firebaseio.com",
+    "project_id": "nagieseducationalcenter",
+    "storage_bucket": "nagieseducationalcenter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089400715139:android:536250bed6a3956e",
+        "android_client_info": {
+          "package_name": "com.wNagiesEducationalCenterj_9905"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1089400715139-3c1lo0b367o215113o4dkcr690refib6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wNagiesEducationalCenterj_9905",
+            "certificate_hash": "3304f27dfd80953d1200717043c3b570236e8a0f"
+          }
+        },
+        {
+          "client_id": "1089400715139-b58jqv26skfevhfmp4f3kcqvc7n2nimd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIN5_aEbAeUy5uGFetaKP3lFTyufWAhy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089400715139-b58jqv26skfevhfmp4f3kcqvc7n2nimd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

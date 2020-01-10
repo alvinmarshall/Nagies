@@ -48,7 +48,7 @@ interface StudentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertStudentBills(billingEntityList: List<BillingEntity>)
 
-    @Query("SELECT * FROM billing WHERE token = :token")
+    @Query("SELECT * FROM billing WHERE token = :token ORDER BY id DESC")
     fun getStudentBills(token: String): LiveData<List<BillingEntity>>
 
     @Query("DELETE FROM billing WHERE token = :token")

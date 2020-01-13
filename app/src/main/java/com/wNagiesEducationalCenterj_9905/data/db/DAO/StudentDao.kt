@@ -33,7 +33,7 @@ interface StudentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCircular(circularEntityList: List<CircularEntity>)
 
-    @Query("SELECT * FROM circular WHERE token = :token")
+    @Query("SELECT * FROM circular WHERE token = :token ORDER BY id DESC")
     fun getCircular(token: String): LiveData<List<CircularEntity>>
 
     @Query("DELETE FROM circular WHERE token = :token")

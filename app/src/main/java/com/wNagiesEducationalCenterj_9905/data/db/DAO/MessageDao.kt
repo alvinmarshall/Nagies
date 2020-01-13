@@ -29,7 +29,7 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSentMessage(messageEntity: MessageEntity):Single<Long>
 
-    @Query("SELECT * FROM messages WHERE token = :token")
+    @Query("SELECT * FROM messages WHERE token = :token ORDER BY id DESC")
     fun getSentMessages(token: String):Flowable<List<MessageEntity>>
 
     @Query("DELETE FROM messages WHERE uid = :id")

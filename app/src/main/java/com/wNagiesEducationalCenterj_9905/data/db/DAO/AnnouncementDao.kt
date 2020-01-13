@@ -15,7 +15,7 @@ interface AnnouncementDao {
     @Query("DELETE FROM announcement WHERE token = :token")
     fun deleteAnnouncement(token: String)
 
-    @Query("SELECT * FROM announcement WHERE token = :token AND content LIKE :search")
+    @Query("SELECT * FROM announcement WHERE token = :token AND content LIKE :search ORDER BY id DESC")
     fun getAnnouncement(token: String,search:String): LiveData<List<AnnouncementEntity>>
 
     @Query("SELECT * FROM announcement WHERE id = :announcement_id")

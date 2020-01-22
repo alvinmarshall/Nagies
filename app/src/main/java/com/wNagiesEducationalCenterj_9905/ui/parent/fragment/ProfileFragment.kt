@@ -21,6 +21,7 @@ import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_dashboard.recycler_view
 import kotlinx.android.synthetic.main.fragment_profile.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 
@@ -82,6 +83,11 @@ class ProfileFragment : BaseFragment() {
                     Status.ERROR -> {
                         Timber.i(it.message)
                         showLoadingDialog(false)
+                        it.message?.let {msg->
+                            if (msg.contains("Unable to resolve host")) {
+                                toast("No internet connection")
+                            }
+                        }
                     }
                     Status.LOADING -> {
                         Timber.i("loading data...")

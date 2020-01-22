@@ -7,6 +7,7 @@ import com.wNagiesEducationalCenterj_9905.R
 import com.wNagiesEducationalCenterj_9905.common.*
 import com.wNagiesEducationalCenterj_9905.common.extension.toString
 import com.wNagiesEducationalCenterj_9905.vo.SessionData
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -27,7 +28,12 @@ class PreferenceProvider @Inject constructor(
         preferences.apply()
     }
 
-    fun setUserBasicInfo(username: String?, name: String?, level: String?, imageUrl: String? = null) {
+    fun setUserBasicInfo(
+        username: String?,
+        name: String?,
+        level: String?,
+        imageUrl: String? = null
+    ) {
         val preferences = sharedPreferences.edit()
         preferences.putString(USER_NAME_PREF_KEY, username)
         preferences.putString(USER_FULL_NAME_PREF_KEY, name)
@@ -92,67 +98,88 @@ class PreferenceProvider @Inject constructor(
         val fetchDate: String?
         return when (type) {
             FetchType.ASSIGNMENT_PDF -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_assignment_pdf), null)
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_assignment_pdf),
+                    null
+                )
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.ASSIGNMENT_IMAGE -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_assignment_image), null)
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_assignment_image),
+                    null
+                )
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.REPORT_PDF -> {
-                true
-//                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_report_pdf), null)
-//                val minutes = getDifferenceInTime(fetchDate)
-//                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_report_pdf), null)
+                val minutes = getDifferenceInTime(fetchDate)
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.REPORT_IMAGE -> {
-                true
-//                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_report_image), null)
-//                val minutes = getDifferenceInTime(fetchDate)
-//                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_report_image),
+                    null
+                )
+                val minutes = getDifferenceInTime(fetchDate)
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.MESSAGE -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_message), null)
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_message), null)
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.ANNOUNCEMENT -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_announcement), null)
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_announcement),
+                    null
+                )
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.COMPLAINT -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_complaint), null)
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_complaint), null)
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.CLASS_TEACHER -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_class_teacher), null)
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_class_teacher),
+                    null
+                )
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.CIRCULAR -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_circular), null)
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_circular), null)
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.BILLING -> {
-                true
-//                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_billing), null)
-//                val minutes = getDifferenceInTime(fetchDate)
-//                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_billing), null)
+                val minutes = getDifferenceInTime(fetchDate)
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.CLASS_STUDENT -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_class_student), null)
+                fetchDate = sharedPreferences.getString(
+                    context.getString(R.string.fetch_class_student),
+                    null
+                )
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
             FetchType.TIME_TABLE -> {
-                fetchDate = sharedPreferences.getString(context.getString(R.string.fetch_timetable), null)
+                fetchDate =
+                    sharedPreferences.getString(context.getString(R.string.fetch_timetable), null)
                 val minutes = getDifferenceInTime(fetchDate)
-                (minutes > getFetchInterval() && NetworkStateUtils.isOnline(context))
+                (minutes > getFetchInterval() || NetworkStateUtils.isOnline(context))
             }
         }
 
@@ -161,10 +188,10 @@ class PreferenceProvider @Inject constructor(
     private fun getFetchInterval(): Int {
         val interval = sharedPreferences.getString(
             context.getString(R.string.pref_fetch_option_key),
-            context.getString(R.string.pref_fetch_option_20_min_value)
+            context.getString(R.string.pref_fetch_option_1_min_value)
         )
-        if (BuildConfig.DEBUG) return 5
-        return  interval?.toInt() ?: 20
+//        if (BuildConfig.DEBUG) return 5
+        return interval?.toInt() ?: 1
     }
 
 

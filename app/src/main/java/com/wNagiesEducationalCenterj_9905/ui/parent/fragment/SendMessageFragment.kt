@@ -118,7 +118,12 @@ class SendMessageFragment : BaseFragment() {
                         }
                         Status.ERROR -> {
                             showLoadingDialog(false)
-                            showDataAvailableMessage(label_msg_title,resource.data,MessageType.MESSAGES)
+                            showDataAvailableMessage(label_msg_title,null,MessageType.MESSAGES)
+                            resource.message?.let {
+                                if (it.contains("Unable to resolve host")) {
+                                    toast("No internet connection")
+                                }
+                            }
                             Timber.i(resource.message)
                         }
                         Status.LOADING -> {

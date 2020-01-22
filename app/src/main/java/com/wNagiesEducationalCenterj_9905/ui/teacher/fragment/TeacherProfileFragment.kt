@@ -20,6 +20,7 @@ import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_teacher_profile.*
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 
@@ -79,6 +80,11 @@ class TeacherProfileFragment : BaseFragment() {
                     }
                     Status.ERROR -> {
                         showLoadingDialog(false)
+                        resource.message?.let {
+                            if (it.contains("Unable to resolve host")) {
+                                toast("No internet connection")
+                            }
+                        }
                         Timber.i(resource.message)
                     }
                     Status.LOADING -> {

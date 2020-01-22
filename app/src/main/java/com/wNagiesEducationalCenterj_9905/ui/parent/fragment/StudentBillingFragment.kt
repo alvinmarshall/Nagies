@@ -102,7 +102,7 @@ class StudentBillingFragment : BaseFragment() {
                         Status.ERROR -> {
                             Timber.i(resource.message)
                             showLoadingDialog(false)
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            showDataAvailableMessage(label_msg_title, null, MessageType.FILES)
                         }
                         Status.LOADING -> {
                             Timber.i("loading...")

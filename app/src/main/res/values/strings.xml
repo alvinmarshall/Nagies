@@ -134,10 +134,14 @@
     <!--preference strings-->
     <string name="pref_fetch_option_label">Update interval</string>
     <string name="pref_fetch_option_key">pref_fetch_option_key</string>
+    <string name="pref_fetch_option_0_min_label">Off</string>
+    <string name="pref_fetch_option_1_min_label">Every 1 Minute</string>
     <string name="pref_fetch_option_20_min_label">Every 20 Minutes</string>
     <string name="pref_fetch_option_40_min_label">Every 40 Minutes</string>
     <string name="pref_fetch_option_60_min_label">Every 1 Hour</string>
 
+    <string name="pref_fetch_option_0_min_value">0</string>
+    <string name="pref_fetch_option_1_min_value">1</string>
     <string name="pref_fetch_option_20_min_value">20</string>
     <string name="pref_fetch_option_40_min_value">40</string>
     <string name="pref_fetch_option_60_min_value">60</string>

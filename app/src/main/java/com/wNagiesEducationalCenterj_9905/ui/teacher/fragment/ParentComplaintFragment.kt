@@ -20,6 +20,7 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.TeacherComplaintAdapter
 import com.wNagiesEducationalCenterj_9905.ui.teacher.viewmodel.TeacherViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_parent_complaint.*
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -147,7 +148,12 @@ class ParentComplaintFragment : BaseFragment() {
                                 }
                                 Status.ERROR -> {
                                     showLoadingDialog(false)
-                                    showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                    showDataAvailableMessage(label_msg_title, null, MessageType.MESSAGES)
+                                    resource.message?.let {
+                                        if (it.contains("Unable to resolve host")) {
+                                            toast("No internet connection")
+                                        }
+                                    }
                                     Timber.i(resource?.message)
                                 }
                                 Status.LOADING -> {

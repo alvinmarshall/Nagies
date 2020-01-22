@@ -129,7 +129,7 @@ class AnnouncementFragment : BaseFragment() {
                             }
                             Status.ERROR -> {
                                 showLoadingDialog(false)
-                                showDataAvailableMessage(label_msg_title, resource.data, MessageType.MESSAGES)
+                                showDataAvailableMessage(label_msg_title, null, MessageType.MESSAGES)
                             }
                             Status.LOADING -> {
                                 Timber.i("loading...")

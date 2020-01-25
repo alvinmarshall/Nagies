@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.cheise_proj.wNagiesEducationCenterj_9905"
+        applicationId "com.cheise_proj.parentapp"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
@@ -26,7 +26,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$rootProject.appcompatVersion"
     implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
@@ -34,6 +33,7 @@ dependencies {
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.expresso_core"
+    implementation "com.google.android.material:material:$rootProject.material_version"
 
     //dagger
     implementation "com.google.dagger:dagger:$rootProject.dagger_version"
@@ -42,4 +42,26 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$rootProject.dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.dagger_version"
 
+    //Rx
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rx_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rx_android_version"
+    implementation "androidx.room:room-rxjava2:$rootProject.room_version"
+
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofit_version"
+
+    //Gson
+    implementation "com.google.code.gson:gson:$rootProject.gson_version"
+
+
+    implementation project(path: ':parent-feature')
+    implementation project(path: ':login-feature')
+    implementation project(path: ':domain')
+    implementation project(path: ':remote-source')
+    implementation project(path: ':data')
+    implementation project(path: ':local-source')
+    implementation project(path: ':presentation')
+    implementation project(path: ':common-module')
 }

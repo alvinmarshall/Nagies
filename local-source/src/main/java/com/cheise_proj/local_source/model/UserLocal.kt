@@ -5,8 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "users")
 data class UserLocal(
-    @PrimaryKey(autoGenerate = true)
-    var uuid: Int,
     val username: String,
     var password: String,
     val role: String,
@@ -14,4 +12,7 @@ data class UserLocal(
     val name: String,
     val level: String,
     val token: String
-)
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0
+}

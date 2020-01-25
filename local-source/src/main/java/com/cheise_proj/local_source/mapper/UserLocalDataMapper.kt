@@ -7,7 +7,7 @@ import javax.inject.Inject
 class UserLocalDataMapper @Inject constructor() : LocalMapper<UserLocal, UserData> {
     override fun localToData(l: UserLocal): UserData {
         return UserData(
-            uuid = l.uuid,
+            uuid = l.id,
             name = l.name,
             level = l.level,
             role = l.role,
@@ -20,7 +20,6 @@ class UserLocalDataMapper @Inject constructor() : LocalMapper<UserLocal, UserDat
 
     override fun dataToLocal(d: UserData): UserLocal {
         return UserLocal(
-            uuid = d.uuid,
             name = d.name,
             level = d.level,
             role = d.role,

@@ -12,7 +12,7 @@ object TestUserGenerator {
             role = "test role",
             photo = "test url",
             token = "test token",
-            uuid = 1
+            uuid = 0
         )
     }
 }

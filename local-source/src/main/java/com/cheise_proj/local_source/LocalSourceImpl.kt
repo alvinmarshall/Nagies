@@ -12,8 +12,11 @@ class LocalSourceImpl @Inject constructor(
     private val userLocalDataMapper: UserLocalDataMapper
 ) : LocalSource {
     override fun saveUser(userData: UserData) {
-        userDao.saveUser(userLocalDataMapper.dataToLocal(userData))
+        with(userLocalDataMapper.dataToLocal(userData)){
+            userDao.saveUser(this)
+        }
     }
+
 
     override fun getUser(username: String, password: String): Single<UserData> {
         return userDao.getUser(username, password).map { userLocalDataMapper.localToData(it) }

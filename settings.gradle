@@ -1,1 +1,1 @@
-include ':domain', ':app', ':data', ':remote-source', ':local-source', ':presentation'
+include ':domain', ':app', ':data', ':remote-source', ':local-source', ':presentation', ':login-feature', ':common-module', ':parent-feature', ':parentapp'

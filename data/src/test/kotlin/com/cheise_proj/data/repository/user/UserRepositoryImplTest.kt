@@ -19,45 +19,41 @@ import utils.TestUserGenerator
 class UserRepositoryImplTest {
     private lateinit var userRepositoryImpl: UserRepositoryImpl
     private lateinit var userDataEntityMapper: UserDataEntityMapper
+    @Mock
+    lateinit var localSource: LocalSource
+    @Mock
+    lateinit var remoteSource: RemoteSource
 
-    @Mock
-    private lateinit var remoteSource: RemoteSource
-    @Mock
-    private lateinit var localSource: LocalSource
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         userDataEntityMapper = UserDataEntityMapper()
-
         userRepositoryImpl = UserRepositoryImpl(remoteSource, localSource, userDataEntityMapper)
     }
 
     @Test
-    fun `Authenticate user  success`() {
-        val errorMsg = "user not found exception"
+    fun `Authenticate user from empty local db success`() {
         val user = TestUserGenerator.user()
+        val errorMsg = "An exception occurred while getting user"
         Mockito.`when`(localSource.getUser(user.username, user.password))
             .thenReturn(Single.error(Throwable(errorMsg)))
-
-        Mockito.`when`(remoteSource.authenticateUser(user.username, user.password, user.role))
-            .thenReturn(Observable.just(user))
-
+        Mockito.`when`(remoteSource.authenticateUser(user.role, user.username, user.password))
+            .thenReturn(
+                Observable.just(user)
+            )
         with(user) {
-            userRepositoryImpl.authenticateUser(username, password, user.role).test()
+            userRepositoryImpl.authenticateUser(username, password, role).test()
                 .assertSubscribed()
                 .assertValueCount(1)
                 .assertValue {
-                    it == userDataEntityMapper.dataToEntity(user)
+                    println(it)
+                    it == userDataEntityMapper.dataToEntity(this)
                 }
                 .assertComplete()
-            Mockito.verify(localSource, times(1))
-                .getUser(username, password)
-
-            Mockito.verify(remoteSource, times(1))
-                .authenticateUser(username, password, role)
+            Mockito.verify(remoteSource, times(1)).authenticateUser(role, username, password)
+            Mockito.verify(localSource, times(1)).getUser(username, password)
         }
+
     }
-
-
 }

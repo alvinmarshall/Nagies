@@ -2,10 +2,9 @@ package com.cheise_proj.remote_source
 
 import com.cheise_proj.remote_source.api.ApiService
 import com.cheise_proj.remote_source.mapper.UserDtoDataMapper
+import com.cheise_proj.remote_source.model.request.LoginRequest
 import io.reactivex.Observable
 import org.junit.Before
-
-import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -23,7 +22,6 @@ class RemoteSourceImplTest {
     private val username = "test username"
     private val password = "test password"
     private val parent = "parent role"
-
     @Mock
     private lateinit var apiService: ApiService
 
@@ -38,7 +36,7 @@ class RemoteSourceImplTest {
     @Test
     fun `Authenticate parent role success`() {
         val response = TestUserGenerator.user()
-        Mockito.`when`(apiService.getAuthenticateUser(parent, username, password)).thenReturn(
+        Mockito.`when`(apiService.getAuthenticateUser(parent, LoginRequest(username,password))).thenReturn(
             Observable.just(response)
         )
         remoteSourceImpl.authenticateUser(parent, username, password).test()
@@ -49,8 +47,6 @@ class RemoteSourceImplTest {
             }
             .assertComplete()
         Mockito.verify(apiService, times(1))
-            .getAuthenticateUser(parent, username, password)
-
-
+            .getAuthenticateUser(parent,LoginRequest(username,password))
     }
 }

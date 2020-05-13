@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -111,26 +112,39 @@ class ClassTeacherFragment : BaseFragment() {
 
     private fun subscribeObservers(token: String) {
         studentViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
-            studentViewModel.getClassTeacher(token, search).observe(viewLifecycleOwner, Observer { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        Timber.i("fetch data size ${resource.data?.size}")
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.TEACHERS)
-                        adapter?.submitList(resource.data)
-                        showLoadingDialog(false)
+            studentViewModel.getClassTeacher(token, search)
+                .observe(viewLifecycleOwner, Observer { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            Timber.i("fetch data size ${resource.data?.size}")
+                            showDataAvailableMessage(
+                                label_msg_title,
+                                resource.data,
+                                MessageType.TEACHERS
+                            )
+                            adapter?.submitList(resource.data)
+                            showLoadingDialog(false)
+                        }
+                        Status.ERROR -> {
+                            Timber.i(resource.message)
+                            showDataAvailableMessage(
+                                label_msg_title,
+                                resource.data,
+                                MessageType.TEACHERS
+                            )
+                            showLoadingDialog(false)
+                            resource.message?.let {
+                                if (it.contains("Unable to resolve host")) {
+                                    toast("No internet connection")
+                                }
+                            }
+                        }
+                        Status.LOADING -> {
+                            Timber.i("loading...")
+                            showLoadingDialog()
+                        }
                     }
-                    Status.ERROR -> {
-                        Timber.i(resource.message)
-                        showDataAvailableMessage(label_msg_title, resource.data, MessageType.TEACHERS)
-                        showLoadingDialog(false)
-                        toast("${resource.message}")
-                    }
-                    Status.LOADING -> {
-                        Timber.i("loading...")
-                        showLoadingDialog()
-                    }
-                }
-            })
+                })
         })
 
     }

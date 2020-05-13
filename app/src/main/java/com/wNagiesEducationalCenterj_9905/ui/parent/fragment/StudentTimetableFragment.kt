@@ -107,7 +107,7 @@ class StudentTimetableFragment : BaseFragment() {
                     Status.ERROR -> {
                         showDataAvailableMessage(
                             label_msg_title,
-                            resource.data,
+                            null,
                             MessageType.FILES
                         )
                         showLoadingDialog(false)

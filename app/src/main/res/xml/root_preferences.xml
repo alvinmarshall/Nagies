@@ -6,7 +6,7 @@
             app:title="Information delivery">
 
         <ListPreference
-                app:defaultValue="@string/pref_fetch_option_20_min_value"
+                app:defaultValue="@string/pref_fetch_option_1_min_value"
                 app:title="@string/pref_fetch_option_label"
                 app:entries="@array/pref_fetch_options_label"
                 app:entryValues="@array/pref_fetch_options_values"

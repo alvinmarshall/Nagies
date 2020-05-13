@@ -109,7 +109,7 @@ class ReportFragment : BaseFragment() {
                         }
                         Status.ERROR -> {
                             Timber.i(resource.message)
-                            showDataAvailableMessage(label_msg_title, resource.data, MessageType.FILES)
+                            showDataAvailableMessage(label_msg_title, null, MessageType.FILES)
                             showLoadingDialog(false)
                         }
                         Status.LOADING -> {

@@ -18,6 +18,7 @@ import com.wNagiesEducationalCenterj_9905.ui.adapter.MessageAdapter
 import com.wNagiesEducationalCenterj_9905.ui.parent.viewmodel.StudentViewModel
 import com.wNagiesEducationalCenterj_9905.vo.Status
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import org.jetbrains.anko.support.v4.toast
 import timber.log.Timber
 
 class DashboardFragment : BaseFragment() {
@@ -86,7 +87,8 @@ class DashboardFragment : BaseFragment() {
 
     private fun initRecyclerView() {
         recyclerView?.hasFixedSize()
-        recyclerView?.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
+        recyclerView?.layoutManager =
+            LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
         messageAdapter = MessageAdapter()
         messageAdapter?.setItemCallback(object : ItemCallback<Int> {
             override fun onHold(data: Int?) {
@@ -94,8 +96,14 @@ class DashboardFragment : BaseFragment() {
 
             override fun onClick(data: Int?) {
                 val action =
-                    data?.let { DashboardFragmentDirections.actionDashboardFragmentToMessageDetailFragment(it) }
-                activity?.let { Navigation.findNavController(it, R.id.fragment_socket).navigate(action!!) }
+                    data?.let {
+                        DashboardFragmentDirections.actionDashboardFragmentToMessageDetailFragment(
+                            it
+                        )
+                    }
+                activity?.let {
+                    Navigation.findNavController(it, R.id.fragment_socket).navigate(action!!)
+                }
             }
         })
         recyclerView?.adapter = messageAdapter
@@ -105,26 +113,40 @@ class DashboardFragment : BaseFragment() {
         studentViewModel.searchString.observe(viewLifecycleOwner, Observer { search ->
             token?.let {
                 shouldFetch.observe(viewLifecycleOwner, Observer { fetch ->
-                    if (fetch){
+                    if (fetch) {
                         preferenceProvider.setNotificationCallback(MESSAGE_RECEIVE_EXTRA, false)
                     }
-                    studentViewModel.getStudentMessages(it, fetch, search).observe(viewLifecycleOwner, Observer { r ->
-                        when (r.status) {
-                            Status.SUCCESS -> {
-                                showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
-                                messageAdapter?.submitList(r.data)
-                                showLoadingDialog(false)
+                    studentViewModel.getStudentMessages(it, fetch, search)
+                        .observe(viewLifecycleOwner, Observer { r ->
+                            when (r.status) {
+                                Status.SUCCESS -> {
+                                    showDataAvailableMessage(
+                                        label_msg_title,
+                                        r.data,
+                                        MessageType.MESSAGES
+                                    )
+                                    messageAdapter?.submitList(r.data)
+                                    showLoadingDialog(false)
+                                }
+                                Status.ERROR -> {
+                                    showLoadingDialog(false)
+                                    showDataAvailableMessage(
+                                        label_msg_title,
+                                        null,
+                                        MessageType.MESSAGES
+                                    )
+                                    r.message?.let {
+                                        if (it.contains("Unable to resolve host")) {
+                                            toast("No internet connection")
+                                        }
+                                    }
+                                    Timber.i(r.message)
+                                }
+                                Status.LOADING -> {
+                                    showLoadingDialog()
+                                }
                             }
-                            Status.ERROR -> {
-                                showLoadingDialog(false)
-                                showDataAvailableMessage(label_msg_title, r.data, MessageType.MESSAGES)
-                                Timber.i(r.message)
-                            }
-                            Status.LOADING -> {
-                                showLoadingDialog()
-                            }
-                        }
-                    })
+                        })
                 })
             }
         })
